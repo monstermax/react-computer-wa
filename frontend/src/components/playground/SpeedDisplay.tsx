@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 import type { EmulatorHook } from "@/hooks/useEmulator";
+import { delayer } from "@/lib/lib_delayer";
 
 
 export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator }) => {
@@ -10,7 +11,9 @@ export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator })
     useEffect(() => {
         // Fonction pour mettre à jour l'affichage
         const updateSpeed = () => {
-            setSpeed(emulator.cyclesPerSecondRef.current);
+            delayer('cpu-speed', (cyclesPerSecond: number) => {
+                setSpeed(cyclesPerSecond);
+            }, 100, 500, [emulator.cyclesPerSecondRef.current])
         };
 
         // Mettre à jour à chaque tick
