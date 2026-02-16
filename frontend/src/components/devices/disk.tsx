@@ -145,15 +145,21 @@ export const Disk: React.FC<DiskProps> = (props) => {
     useEffect(() => {
         if (!deviceInstance) return;
 
-        deviceInstance.on('state', (state) => {
+        const stateHandler = (state: any) => {
             //console.log('Disk state update', state)
 
             if (state.storage) {
                 setStorage(new Map(state.storage))
             }
-        })
+        };
+
+        deviceInstance.on('state', stateHandler)
 
         setStorage(new Map(deviceInstance.storage))
+
+        return () => {
+            deviceInstance.off('state', stateHandler)
+        }
 
     }, [deviceInstance])
 

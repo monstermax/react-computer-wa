@@ -40,6 +40,7 @@ declare global {
     }
 }
 
+
 async function loadWasmExports(imports: { env: unknown }, debug=true) {
     const wasmFileUrl = debug
         ? "/web_assembly/debug.wasm"
@@ -74,6 +75,7 @@ const wasmConsoleWarn = (message: string) => {
     console.warn("[WASM WARN]", message);
 }
 window.wasmConsoleWarn = wasmConsoleWarn;
+
 
 
 type WasmExports = typeof releaseModule.__AdaptedExports;
@@ -191,26 +193,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     //  Init WASM 
     useEffect(() => {
-
         const _initWasm = async () => {
             if (wasmExportsRef.current) return;
 
             const wasmImports = {
                 env: {
-                    //memory: new WebAssembly.Memory({ initial: 256 }),
-                    abort: (messagePtr: number, fileNamePtr: number, lineNumber: number, columnNumber: number) => {
-                        clock.stop();
-                        setClockStatus(false)
-                        setCyclesPerSecond(0)
-                        const message = __liftString(messagePtr);
-                        const fileName = __liftString(fileNamePtr);
-                        lineNumber = lineNumber >>> 0;
-                        columnNumber = columnNumber >>> 0;
-
-                        console.error("[WASM ERROR]", message);
-                        addLog(`WASM ABORT: ${message}`);
-                        throw Error(`[WASM ABORT] ${message} in ${fileName}:${lineNumber}:${columnNumber}`);
-                    },
                     jsIoRead,
                     jsIoWrite,
                     jsIoReset,
@@ -282,18 +269,30 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 if (wasmExportsRef.current && computerPointer) {
                     const wasmExports = wasmExportsRef.current;
 
-                    // Run cycles
-                    wasmExports.computerRunCycles(computerPointer, speedFactor);
+                    try {
+                        // Run cycles
+                        wasmExports.computerRunCycles(computerPointer, speedFactor);
 
-                    // Compute speed only
-                    const newCycles = wasmExports.computerGetCycles(computerPointer);
-                    const diff = newCycles - lastCycles;
-                    const duration = Date.now() - lastCyclesDate;
-                    const _cyclesPerSecond = 1000 * Number(diff) / duration;
-                    setCyclesPerSecond(_cyclesPerSecond);
+                    } catch (err: any) {
+                        wasmError(err);
+                        throw new Error("Unreachable Error");
+                    }
 
-                    lastCycles = newCycles;
-                    lastCyclesDate = Date.now();
+                    try {
+                        // Compute speed only
+                        const newCycles = wasmExports.computerGetCycles(computerPointer);
+                        const diff = newCycles - lastCycles;
+                        const duration = Date.now() - lastCyclesDate;
+                        const _cyclesPerSecond = 1000 * Number(diff) / duration;
+                        setCyclesPerSecond(_cyclesPerSecond);
+
+                        lastCycles = newCycles;
+                        lastCyclesDate = Date.now();
+
+                    } catch (err: any) {
+                        wasmError(err);
+                        throw new Error("Unreachable Error");
+                    }
                 }
             });
         };
@@ -301,6 +300,16 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const timer = setTimeout(_initClock, 100);
         return () => clearTimeout(timer);
     }, [computerPointer]);
+
+
+    const wasmError = (error: Error) => {
+        clock.stop();
+        setClockStatus(false)
+        setCyclesPerSecond(0)
+
+        error.message = "[WASM ERROR] " + error.message;
+        throw error;
+    }
 
 
     const handleOpenFile = async () => {
@@ -396,10 +405,17 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
         const valPtr = wasmExports.allocate(values.length);
         new Uint8Array(wasmExports.memory.buffer).set(values, valPtr);
-        wasmExports.computerloadCode(computerPointer, valPtr, values.length);
 
-        setBootloaderLoaded(true);
-        addLog(`Bootloader loaded (${values.length} bytes)`);
+        try {
+            wasmExports.computerloadCode(computerPointer, valPtr, values.length);
+
+            setBootloaderLoaded(true);
+            addLog(`Bootloader loaded (${values.length} bytes)`);
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
     };
 
 
@@ -415,7 +431,15 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const memoryUint8 = new Uint8Array(wasmExports.memory.buffer);
         memoryUint8.set(nameBuffer, namePtr);
 
-        const deviceIdx = wasmExports.computerAddDevice(computerPointer, namePtr, nameBuffer.length, typeId) as u8;
+        let deviceIdx: u8 | null = null;
+
+        try {
+            deviceIdx = wasmExports.computerAddDevice(computerPointer, namePtr, nameBuffer.length, typeId) as u8;
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
 
         if (name === 'keyboard') {
             const device = new KeyboardDevice(deviceIdx, 'keyboard', { type: 'input', vendor, model });
@@ -473,7 +497,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const readRam = (address: u16): u8 => {
         if (!wasmExportsRef.current || computerPointer === null) return 0 as u8;
         const wasmExports = wasmExportsRef.current;
-        return wasmExports.computerGetMemory(computerPointer, address) as u8;
+
+        try {
+            return wasmExports.computerGetMemory(computerPointer, address) as u8;
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
     };
 
 
@@ -482,7 +513,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         if (!wasmExportsRef.current || computerPointer === null) return;
         const wasmExports = wasmExportsRef.current;
         //console.log(`write ram @ ${toHex(address, 4)} : ${toHex(value)} (${value})`)
-        wasmExports.computerSetMemory(computerPointer, address, value);
+
+        try {
+            wasmExports.computerSetMemory(computerPointer, address, value);
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
     };
 
 
@@ -510,7 +548,13 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const dataBefore = readDataRegisters(wasmExports, computerPointer);
         console.log('BEFORE', controlBefore, dataBefore);
 
-        wasmExports.computerRunCycles(computerPointer, 1);
+        try {
+            wasmExports.computerRunCycles(computerPointer, 1);
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
 
         const controlAfter = readControlRegisters(wasmExports, computerPointer);
         const dataAfter = readDataRegisters(wasmExports, computerPointer);
@@ -524,7 +568,13 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         if (!wasmExportsRef.current || computerPointer === null) return;
         const wasmExports = wasmExportsRef.current;
 
-        wasmExports.computerResetComputer(computerPointer)
+        try {
+            wasmExports.computerResetComputer(computerPointer)
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
     }
 
 
@@ -532,21 +582,37 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     //  Register & memory dump (on demand only)
     // ═══════════════════════════════════════════
 
-    const readControlRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => ({
-        cycles: wasmExports.computerGetCycles(computerPtr),
-        PC: wasmExports.computerGetRegisterPC(computerPtr) as u16,
-        SP: wasmExports.computerGetRegisterSP(computerPtr) as u16,
-        IR: wasmExports.computerGetRegisterIR(computerPtr) as u8,
-    });
+    const readControlRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
+        try {
+            return {
+                cycles: wasmExports.computerGetCycles(computerPtr),
+                PC: wasmExports.computerGetRegisterPC(computerPtr) as u16,
+                SP: wasmExports.computerGetRegisterSP(computerPtr) as u16,
+                IR: wasmExports.computerGetRegisterIR(computerPtr) as u8,
+            }
 
-    const readDataRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => ({
-        A: wasmExports.computerGetRegisterA(computerPtr) as u8,
-        B: wasmExports.computerGetRegisterB(computerPtr) as u8,
-        C: wasmExports.computerGetRegisterC(computerPtr) as u8,
-        D: wasmExports.computerGetRegisterD(computerPtr) as u8,
-        E: wasmExports.computerGetRegisterE(computerPtr) as u8,
-        F: wasmExports.computerGetRegisterF(computerPtr) as u8,
-    });
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
+    };
+
+    const readDataRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
+        try {
+            return {
+                A: wasmExports.computerGetRegisterA(computerPtr) as u8,
+                B: wasmExports.computerGetRegisterB(computerPtr) as u8,
+                C: wasmExports.computerGetRegisterC(computerPtr) as u8,
+                D: wasmExports.computerGetRegisterD(computerPtr) as u8,
+                E: wasmExports.computerGetRegisterE(computerPtr) as u8,
+                F: wasmExports.computerGetRegisterF(computerPtr) as u8,
+            }
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
+    };
 
     const dumpRegisters = async () => {
         if (!wasmExportsRef.current || computerPointer === null) return;
@@ -568,11 +634,19 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const start = 0x0000;
         const end = MEMORY_MAP.RAM_END;
         const memoryUint8Array = new Uint8Array(1 + end - start);
-        for (let address = start; address <= end; address++) {
-            const value = wasmExports.computerGetMemory(computerPointer, address as u16);
-            memoryUint8Array[address] = value;
+
+        try {
+            for (let address = start; address <= end; address++) {
+                const value = wasmExports.computerGetMemory(computerPointer, address as u16);
+                memoryUint8Array[address] = value;
+            }
+
+            setMemory(memoryUint8Array);
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
         }
-        setMemory(memoryUint8Array);
     };
 
 

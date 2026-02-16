@@ -158,7 +158,7 @@ export const Keyboard: React.FC<KeyboardProps> = (props) => {
     useEffect(() => {
         if (!deviceInstance) return;
 
-        deviceInstance.on('state', (state) => {
+        const stateHandler = (state: any) => {
             if (state.lastChar !== undefined) {
                 setLastChar(state.lastChar)
             }
@@ -169,7 +169,13 @@ export const Keyboard: React.FC<KeyboardProps> = (props) => {
             if (state.hasChar !== undefined) {
                 setHasChar(state.hasChar)
             }
-        })
+        }
+
+        deviceInstance.on('state', stateHandler)
+
+        return () => {
+            deviceInstance.off('state', stateHandler)
+        };
 
     }, [deviceInstance])
 

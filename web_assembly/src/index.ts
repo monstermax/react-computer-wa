@@ -2,8 +2,7 @@
 // The entry file of your WebAssembly module.
 
 import { Computer } from "./Computer";
-
-import { console } from "./external_functions.ts";
+import { console } from "./external_functions";
 
 
 export function instanciateComputer(): Computer {

@@ -76,13 +76,19 @@ export const Leds: React.FC<LedsProps> = (props) => {
     useEffect(() => {
         if (!deviceInstance) return;
 
-        deviceInstance.on('state', (state) => {
+        const stateHandler = (state: any) => {
             //console.log('Leds state update', state)
 
             if (state.leds !== undefined) {
                 setLeds(state.leds)
             }
-        })
+        }
+
+        deviceInstance.on('state', stateHandler)
+
+        return () => {
+            deviceInstance.off('state', stateHandler)
+        };
 
     }, [deviceInstance])
 

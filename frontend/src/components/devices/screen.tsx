@@ -128,7 +128,7 @@ export const Screen: React.FC<ScreenProps> = (props) => {
     useEffect(() => {
         if (!deviceInstance) return;
 
-        deviceInstance.on('state', (state) => {
+        const stateHandler = (state: any) => {
             //console.log('Screen state update', state)
 
             if (state.pixels !== undefined) {
@@ -142,7 +142,13 @@ export const Screen: React.FC<ScreenProps> = (props) => {
             if (state.currentY !== undefined) {
                 setCurrentY(state.currentY)
             }
-        })
+        };
+
+        deviceInstance.on('state', stateHandler)
+
+        return () => {
+            deviceInstance.off('state', stateHandler)
+        };
 
     }, [deviceInstance])
 
