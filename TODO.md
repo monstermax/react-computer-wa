@@ -11,6 +11,8 @@
 - io randomizer
 - io rtc
 - io sound/buzzer/speaker
+- io switches (8 toggles cliquables dans l'UI, lu comme un byte sur un port (utile pour configurer des paramètres au runtime))
+- io gamepad
 - cpu: interrupts
 - os: interrupts
 - os: syscall
