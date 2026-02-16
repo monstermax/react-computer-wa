@@ -1,0 +1,23 @@
+{
+  "name": "react-computer-wa-assemblyscript",
+  "dependencies": {
+    "assemblyscript": "^0.28.9"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  },
+  "scripts": {
+    "asbuild:debug": "asc src/index.ts --target debug",
+    "asbuild:release": "asc src/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release && cp -a build/* ../frontend/public/web_assembly/",
+    "test": "node tests",
+    "start": "npx serve ."
+  },
+  "devDependencies": {
+    "assemblyscript": "^0.28.9"
+  }
+}
