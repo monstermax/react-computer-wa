@@ -13,6 +13,7 @@
 - io sound/buzzer/speaker
 - io switches (8 toggles cliquables dans l'UI, lu comme un byte sur un port (utile pour configurer des paramètres au runtime))
 - io gamepad
+- io network/socket
 - cpu: interrupts
 - os: interrupts
 - os: syscall
