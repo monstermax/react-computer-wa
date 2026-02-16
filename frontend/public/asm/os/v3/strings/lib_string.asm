@@ -38,7 +38,7 @@ strlen:
 
 
 
-; TODO: strlower & strupper
+; TODO: strlower & strupper & int_to_str & str_to_int
 
 
 ; -----------------------------------------------

@@ -1,7 +1,6 @@
 
 
-- bouton reset
-- onglet explorer de fichiers/code
+- os: parser les arguments de la commande shell
 - os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - os: shell: ameliorer la comparaison de chaines (verifier la longueur des chaines)
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
