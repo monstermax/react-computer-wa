@@ -9,6 +9,7 @@
 
 - io timer
 - io randomizer
+- io rtc
 - io sound/buzzer/speaker
 - cpu: interrupts
 - os: interrupts
