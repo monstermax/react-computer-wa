@@ -79,6 +79,7 @@ export class DiskDevice extends IoDevice {
                 }
 
                 this.currentAddress = U16(this.currentAddress + 1);
+    console.log('💾 WRITE at', this.currentAddress, 'value', value);
                 this.emit('state', { storage: this.storage })
                 break;
 
@@ -137,8 +138,9 @@ export const Disk: React.FC<DiskProps> = (props) => {
 
 
     const sortedDiskData = useMemo(() => {
+         // TODO: pb de performance ici
         return Array.from(storage.entries()).sort(([a], [b]) => a - b)
-    }, [deviceInstance, storage]);
+    }, [storage]);
 
 
 
@@ -149,13 +151,13 @@ export const Disk: React.FC<DiskProps> = (props) => {
             //console.log('Disk state update', state)
 
             if (state.storage) {
-                setStorage(new Map(state.storage))
+                setStorage(state.storage)
             }
         };
 
         deviceInstance.on('state', stateHandler)
 
-        setStorage(new Map(deviceInstance.storage))
+        setStorage(deviceInstance.storage); // TODO: pb de performance ici
 
         return () => {
             deviceInstance.off('state', stateHandler)
@@ -169,6 +171,7 @@ export const Disk: React.FC<DiskProps> = (props) => {
             <>Loading Disk...</>
         );
     }
+
 
     return (
         <>

@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Clock } from "@/components/devices/clock";
 
@@ -34,8 +34,8 @@ export const useEmulator = (params: useEmulatorParams) => {
 
     // Clock
     const [clock] = useState(() => new Clock(clockFrequency));
-    const [cyclesPerSecond, setCyclesPerSecond] = useState<number>(0);
     const [clockStatus, setClockStatus] = useState<boolean>(false);
+    const cyclesPerSecondRef = useRef(0);
 
 
     //  Init WASM 
@@ -105,14 +105,14 @@ export const useEmulator = (params: useEmulatorParams) => {
     const jsCpuHalted = (): void => {
         clock.stop();
         setClockStatus(false)
-        setCyclesPerSecond(0)
+        cyclesPerSecondRef.current = 0
         addLog('CPU halted');
     };
 
     const jsCpuBreakpoint = (): void => {
         clock.stop();
         setClockStatus(false)
-        setCyclesPerSecond(0)
+        cyclesPerSecondRef.current = 0
         addLog('CPU Breakpoint');
     };
 
@@ -141,8 +141,8 @@ export const useEmulator = (params: useEmulatorParams) => {
                         const newCycles = wasmExports.computerGetCycles(computerPointer);
                         const diff = newCycles - lastCycles;
                         const duration = Date.now() - lastCyclesDate;
-                        const _cyclesPerSecond = 1000 * Number(diff) / duration;
-                        setCyclesPerSecond(_cyclesPerSecond);
+                        const cyclesPerSecond = 1000 * Number(diff) / duration;
+                        cyclesPerSecondRef.current = cyclesPerSecond;
 
                         lastCycles = newCycles;
                         lastCyclesDate = Date.now();
@@ -170,7 +170,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     const stopClock = () => {
         clock.stop();
         setClockStatus(false)
-        setCyclesPerSecond(0)
+        cyclesPerSecondRef.current = 0
         addLog('Clock stopped')
     }
 
@@ -271,7 +271,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     const wasmError = (error: Error) => {
         clock.stop();
         setClockStatus(false)
-        setCyclesPerSecond(0)
+        cyclesPerSecondRef.current = 0
 
         error.message = "[WASM ERROR] " + error.message;
         throw error;
@@ -306,11 +306,10 @@ export const useEmulator = (params: useEmulatorParams) => {
         wasmExports,
         computerPointer,
         clock,
-        cyclesPerSecond,
+        cyclesPerSecondRef,
         clockStatus,
         runCycles,
         setClockStatus,
-        setCyclesPerSecond,
         startClock,
         stopClock,
         readControlRegisters,
@@ -330,11 +329,10 @@ export type EmulatorHook = {
     wasmExports: WasmExports | null;
     computerPointer: releaseModule.__Internref4 | null;
     clock: Clock;
-    cyclesPerSecond: number;
+    cyclesPerSecondRef: React.RefObject<number>;
     clockStatus: boolean;
     runCycles: (cyclesCount?: number) => void;
     setClockStatus: (value: React.SetStateAction<boolean>) => void;
-    setCyclesPerSecond: (value: React.SetStateAction<number>) => void;
     startClock: () => void;
     stopClock: () => void;
     readControlRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { cycles: bigint, PC: u16, SP: u16, IR: u8 };
