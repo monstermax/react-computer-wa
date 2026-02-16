@@ -138,10 +138,8 @@ export const Disk: React.FC<DiskProps> = (props) => {
 
 
     const sortedDiskData = useMemo(() => {
-         // TODO: pb de performance ici
         return Array.from(storage.entries()).sort(([a], [b]) => a - b)
     }, [storage]);
-
 
 
     useEffect(() => {
