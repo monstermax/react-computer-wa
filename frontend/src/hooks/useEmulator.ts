@@ -63,7 +63,8 @@ export const useEmulator = (params: useEmulatorParams) => {
                 addLog('Emulator initialized');
 
             } catch (err: any) {
-                console.error('[WASM ERROR]', err)
+                wasmError(err);
+                throw new Error("Unreachable Error");
             }
 
         };
