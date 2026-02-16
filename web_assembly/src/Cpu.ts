@@ -2,14 +2,7 @@
 import { Opcode } from "./cpu_instructions";
 import { Computer } from "./Computer";
 import { toHex } from "./lib/lib_numbers";
-
-
-
-@external("env", "jsCpuHalted")
-declare function jsCpuHalted(): void;
-
-@external("env", "jsCpuBreakpoint")
-declare function jsCpuBreakpoint(): void;
+import { console, jsCpu } from "./external_functions";
 
 
 export class CpuRegisters {
@@ -244,7 +237,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             action = (cpu: Cpu) => {
                 cpu.halted = true;
                 console.log(`CPU Halted`)
-                jsCpuHalted()
+                jsCpu.halted()
             };
             break;
 
@@ -282,7 +275,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             action = (cpu: Cpu) => {
                 console.log(`CPU Breakpoint`)
                 cpu.isOnBreakpoint = true;
-                jsCpuBreakpoint()
+                jsCpu.breakpoint()
                 cpu.registers.PC += 1;
             };
             break;

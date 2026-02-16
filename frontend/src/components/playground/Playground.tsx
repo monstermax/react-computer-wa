@@ -24,23 +24,56 @@ import { Screen, ScreenDevice } from "@/components/devices/screen";
 import { Leds, LedsDevice } from "@/components/devices/leds";
 import { Disk, DiskDevice } from "@/components/devices/disk";
 import { DmaDevice } from "@/components/devices/dma";
-
-
-import type { u16, u8, u32 } from "@/types/computer.types";
-
-
-import * as releaseModule from "@/../public/web_assembly/release";
 import { FileModal } from "./FileModal";
 import { Docs } from "./Docs";
 import { Registers } from "./Registers";
 
+import * as releaseModule from "@/../public/web_assembly/release";
 
-async function loadWasmExports(imports: { env: unknown }) {
-    const _module = await globalThis.WebAssembly.compileStreaming(globalThis.fetch("/web_assembly/release.wasm"));
+import type { u16, u8, u32 } from "@/types/computer.types";
+
+
+declare global {
+    interface Window {
+        wasmConsoleLog: (message: string) => void;
+        wasmConsoleWarn: (message: string) => void;
+    }
+}
+
+async function loadWasmExports(imports: { env: unknown }, debug=true) {
+    const wasmFileUrl = debug
+        ? "/web_assembly/debug.wasm"
+        : "/web_assembly/release.wasm"
+
+    const _module = await globalThis.WebAssembly.compileStreaming(globalThis.fetch(wasmFileUrl));
     const wasmExports = await releaseModule.instantiate(_module, imports);
     return wasmExports;
 }
 
+
+const wasmConsoleLog = (message: string) => {
+    let styles: string[] = [];
+
+    //const message = __liftString(ptr);
+    if (message?.startsWith('Executing instruction')) styles.push('color:cyan');
+    if (message?.startsWith('Reading Memory')) styles.push('color:green');
+    if (message?.startsWith('Writing Memory')) styles.push('color:yellow');
+    if (message?.startsWith('DEBUG')) styles.push('color:orange');
+    styles.push('color:blue')
+
+    const messages = styles.length
+        ? ["%c[WASM LOG]", styles.join(';'), message]
+        : ["[WASM LOG]", message];
+
+    console.log(...messages);
+}
+window.wasmConsoleLog = wasmConsoleLog;
+
+
+const wasmConsoleWarn = (message: string) => {
+    console.warn("[WASM WARN]", message);
+}
+window.wasmConsoleWarn = wasmConsoleWarn;
 
 
 type WasmExports = typeof releaseModule.__AdaptedExports;
@@ -50,7 +83,8 @@ const defaultLoadAddress = '0xA000';
 
 
 //  Default user code
-const DEFAULT_CODE = "" // await import(`@/../public/asm/examples/draw_fractal_on_screen.asm?url`)
+const defaultCodeUrl = "/asm/examples/draw_fractal_on_screen.asm";
+//const DEFAULT_CODE = "" // await import(`@/../public/asm/examples/draw_fractal_on_screen.asm?url`)
 
 
 // ─────────────────────────────────────────────
@@ -109,10 +143,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const [isFileModalOpen, setIsFileModalOpen] = useState(false);
 
 
+    // Load default editor code
     useEffect(() => {
         const _fetch = async () => {
-            const url = "/asm/examples/draw_fractal_on_screen.asm";
-            const response = await fetch(url);
+            const response = await fetch(defaultCodeUrl);
             const content = await response.text();
             setInitialContent(content)
         }
@@ -122,6 +156,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }, []);
 
 
+    // prevent Tab key
     useEffect(() => {
         const setupKeydownEvent = (event: KeyboardEvent) => {
             if (event.key == "Tab") {
@@ -129,38 +164,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             }
         }
 
-        const setupKeyupEvent = (event: KeyboardEvent) => {
-            if (event.key == "Tab") {
-                const active = event.target as HTMLElement
-
-                if (active && active.matches(".pce-textarea")) {
-                    event.preventDefault();
-
-                    // todo: 
-                    // - si selection : indenter la selection
-                    // - si pas de selection : indenter la ligne courante
-
-                    const selection = editorRef.current?.getSelection()
-                    const activeLine = editorRef.current?.activeLine;
-                    //console.log({ selection, activeLine })
-
-                    if (selection) {
-                        const parts = [
-                            editorContent.slice(0, selection[0]),
-                            editorContent.slice(selection[0], selection[1]).replace(/\n/g, '\n\t'),
-                            editorContent.slice(selection[1]),
-                        ];
-
-                        //console.log({parts})
-                        //setInitialContent(parts.join('')); // DO NOT WORK
-                    }
-
-                    return;
-                }
-            }
-        }
-
-        //window.addEventListener("keyup", setupKeyupEvent)
         window.addEventListener("keydown", setupKeydownEvent)
     }, []);
 
@@ -188,36 +191,25 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     //  Init WASM 
     useEffect(() => {
+
         const _initWasm = async () => {
             if (wasmExportsRef.current) return;
 
-            const imports = {
+            const wasmImports = {
                 env: {
-                    memory: new WebAssembly.Memory({ initial: 256 }),
-                    abort: (ptr: number) => {
+                    //memory: new WebAssembly.Memory({ initial: 256 }),
+                    abort: (messagePtr: number, fileNamePtr: number, lineNumber: number, columnNumber: number) => {
                         clock.stop();
                         setClockStatus(false)
                         setCyclesPerSecond(0)
-                        const message = readWasmStringUtf16(ptr);
+                        const message = __liftString(messagePtr);
+                        const fileName = __liftString(fileNamePtr);
+                        lineNumber = lineNumber >>> 0;
+                        columnNumber = columnNumber >>> 0;
+
                         console.error("[WASM ERROR]", message);
                         addLog(`WASM ABORT: ${message}`);
-                        throw new Error("[WASM ABORT]");
-                    },
-                    'console.log': (ptr: number) => {
-                        const message = readWasmStringUtf16(ptr);
-                        let styles: string[] = [];
-                        if (message.startsWith('Executing instruction')) styles.push('color:cyan');
-                        if (message.startsWith('Reading Memory')) styles.push('color:green');
-                        if (message.startsWith('Writing Memory')) styles.push('color:yellow');
-                        if (message.startsWith('DEBUG')) styles.push('color:orange');
-                        const messages = styles.length
-                            ? ["%c[WASM LOG]", styles.join(';'), message]
-                            : ["[WASM LOG]", message];
-                        console.log(...messages);
-                    },
-                    'console.warn': (ptr: number) => {
-                        const message = readWasmStringUtf16(ptr);
-                        console.warn("[WASM WARN]", message);
+                        throw Error(`[WASM ABORT] ${message} in ${fileName}:${lineNumber}:${columnNumber}`);
                     },
                     jsIoRead,
                     jsIoWrite,
@@ -227,21 +219,21 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 },
             };
 
-            //  imports.env = {
-            //      jsIoWrite: () => {},
-            //  }
-            //const importModule = await import(`@/../public/webassembly/release`);
-
-            const _wasmExports = await loadWasmExports(imports);
+            const _wasmExports = await loadWasmExports(wasmImports, true);
             wasmExportsRef.current = _wasmExports;
             //window.wasm = _wasmExports.instance;
 
             console.log({ wasm: _wasmExports })
 
-            const _computerPointer = _wasmExports.instanciateComputer();
-            setComputerPointer(_computerPointer);
+            try {
+                const _computerPointer = _wasmExports.instanciateComputer();
+                setComputerPointer(_computerPointer);
 
-            addLog('Emulator initialized');
+                addLog('Emulator initialized');
+
+            } catch (err: any) {
+                console.error('[WASM ERROR]', err)
+            }
 
         };
 
@@ -367,16 +359,20 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     //  WASM string helper
-    const readWasmStringUtf16 = (ptr: number) => {
+    function __liftString(ptr: number) { // source: release.js
+        if (!ptr) return null;
         if (!wasmExportsRef.current) throw new Error("wasm not found in readString");
         const wasmExports = wasmExportsRef.current;
-        const mem = wasmExports.memory as WebAssembly.Memory;
-        const uint16 = new Uint16Array(mem.buffer, ptr);
-        let len = 0;
-        while (uint16[len] !== 0) len++;
-        const bytes = new Uint8Array(mem.buffer, ptr, len * 2);
-        return new TextDecoder('utf-16le').decode(bytes);
-    };
+        const memory = wasmExports.memory as WebAssembly.Memory;
+
+        const end = ptr + new Uint32Array(memory.buffer)[ptr - 4 >>> 2] >>> 1;
+        const memoryU16 = new Uint16Array(memory.buffer);
+
+        let start = ptr >>> 1;
+        let string = "";
+        while (end - start > 1024) string += String.fromCharCode(...memoryU16.subarray(start, start += 1024));
+        return string + String.fromCharCode(...memoryU16.subarray(start, end));
+    }
 
 
     //  Load bootloader 

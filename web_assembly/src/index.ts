@@ -2,15 +2,8 @@
 // The entry file of your WebAssembly module.
 
 import { Computer } from "./Computer";
-import { MemoryBus } from "./Memory";
-import { Opcode } from "./cpu_instructions";
 
-
-//@external("env", "jsIoRead")
-//declare function jsIoRead(deviceIdx: u8, port: u8): u8;
-
-//@external("env", "jsIoWrite")
-//declare function jsIoWrite(deviceIdx: u8, port: u8, value: u8): void;
+import { console } from "./external_functions.ts";
 
 
 export function instanciateComputer(): Computer {
@@ -20,81 +13,8 @@ export function instanciateComputer(): Computer {
     computer.addMemoryRom();
     computer.addMemoryIoManager();
     computer.addMemoryCpu();
-
-    const memoryBus = computer.memoryBus;
-
-    if (!computer.memoryBus) {
-        throw new Error(`Cannot instanciate memoryBus`);
-    }
-
-    if (memoryBus) {
-        // write some BIOS code
-        //loadTmpCode(memoryBus);
-    }
-
     console.log(`Computer instanciated`)
-
-    //const jsreaded = jsIoRead(1, 2) // test
-    //console.log(`jsreaded: ${jsreaded}`)
-
-    //computerAddDevice(computer, 'keyboard', 'input')
-
-    //jsIoWrite(4, 5, 6)
-
     return computer;
-}
-
-
-export function loadTmpCode(memoryBus: MemoryBus): void {
-    memoryBus.write(0x0000, Opcode.MOV_REG_MEM as u8); // read keyboard status
-    memoryBus.write(0x0001, 0x01); // register A
-    memoryBus.write(0x0002, 0x01); // 0xF001 low byte
-    memoryBus.write(0x0003, 0xF0); // 0xF001 high byte
-
-    memoryBus.write(0x0004, Opcode.CMP_REG_IMM as u8); // compare keyboard status
-    memoryBus.write(0x0005, 0x01); // register A
-    memoryBus.write(0x0006, 0x00); // IMM 0
-
-    memoryBus.write(0x0007, Opcode.JE as u8);
-    memoryBus.write(0x0008, 0x00); // 0x0000 low byte
-    memoryBus.write(0x0009, 0x00); // 0x0000 high byte
-
-    memoryBus.write(0x000A, Opcode.MOV_REG_MEM as u8); // read keyboard
-    memoryBus.write(0x000B, 0x01); // register A
-    memoryBus.write(0x000C, 0x00); // 0xF000 low byte
-    memoryBus.write(0x000D, 0xF0); // 0xF000 high byte
-
-    memoryBus.write(0x000E, Opcode.MOV_MEM_REG as u8); // write console
-    memoryBus.write(0x000F, 0x10); // 0xF010 low byte
-    memoryBus.write(0x0010, 0xF0); // 0xF010 high byte
-    memoryBus.write(0x0011, 0x01); // register A
-
-    memoryBus.write(0x0012, Opcode.MOV_REG_IMM as u8); // ack keyboard status
-    memoryBus.write(0x0013, 0x01); // register A
-    memoryBus.write(0x0014, 0x01); // IMM 1 => keyboard ack
-
-    memoryBus.write(0x0015, Opcode.MOV_MEM_REG as u8); // write keyboard (ack)
-    memoryBus.write(0x0016, 0x00); // 0xF000 low byte
-    memoryBus.write(0x0017, 0xF0); // 0xF000 high byte
-    memoryBus.write(0x0018, 0x01); // register A
-
-    memoryBus.write(0x0019, Opcode.JMP as u8); // loop to begin
-    memoryBus.write(0x001A, 0x00); // 0x0000 low byte
-    memoryBus.write(0x001B, 0x00); // 0x0000 high byte
-}
-
-
-
-function loadCode(memoryBus: MemoryBus, addresses: Uint8Array, values: Uint8Array): void {
-    if (addresses.length !== values.length) throw new Error(`Length mismatch`);
-
-    for (let i = 0; i < addresses.length; i++) {
-        const address = addresses[i];
-        const value = values[i];
-        memoryBus.write(address, value);
-    }
-
-    console.log(`${addresses.length} addresses written`)
 }
 
 
@@ -284,13 +204,6 @@ export function computerAddDevice(
     //console.log(`Adding Device "${name}" [${nameLen}] (type ${typeId})`);
 
     return ioManager.addDevice(name, typeId);
-}
-
-
-// Pour libérer la mémoire quand on a fini
-export function destroyComputer(computer: Computer): void {
-    // AssemblyScript gère ça automatiquement avec son GC
-    // mais c'est bien de garder une référence explicite
 }
 
 

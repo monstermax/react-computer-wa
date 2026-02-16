@@ -7,11 +7,6 @@ declare namespace __AdaptedExports {
    */
   export function instanciateComputer(): __Internref4;
   /**
-   * src/index/loadTmpCode
-   * @param memoryBus `src/Memory/MemoryBus`
-   */
-  export function loadTmpCode(memoryBus: __Internref5): void;
-  /**
    * src/index/allocate
    * @param size `i32`
    * @returns `usize`
@@ -114,11 +109,6 @@ declare namespace __AdaptedExports {
    */
   export function computerAddDevice(computer: __Internref4, namePtr: number, nameLen: number, typeId: number): number;
   /**
-   * src/index/destroyComputer
-   * @param computer `src/Computer/Computer`
-   */
-  export function destroyComputer(computer: __Internref4): void;
-  /**
    * src/index/computerResetComputer
    * @param computer `src/Computer/Computer`
    */
@@ -127,11 +117,6 @@ declare namespace __AdaptedExports {
 /** src/Computer/Computer */
 declare class __Internref4 extends Number {
   private __nominal4: symbol;
-  private __nominal0: symbol;
-}
-/** src/Memory/MemoryBus */
-declare class __Internref5 extends Number {
-  private __nominal5: symbol;
   private __nominal0: symbol;
 }
 /** Instantiates the compiled WebAssembly module with the given imports. */

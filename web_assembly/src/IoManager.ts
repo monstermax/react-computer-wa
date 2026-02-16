@@ -2,16 +2,7 @@
 import { MEMORY_MAP } from "./memory_map";
 import { toHex } from "./lib/lib_numbers";
 import { Computer } from "./Computer";
-
-
-@external("env", "jsIoRead")
-declare function jsIoRead(deviceIdx: u8, port: u8): u8;
-
-@external("env", "jsIoWrite")
-declare function jsIoWrite(deviceIdx: u8, port: u8, value: u8): void;
-
-@external("env", "jsIoReset")
-declare function jsIoReset(deviceIdx: u8): void;
+import { console, jsIo } from "./external_functions";
 
 
 const DEVICE_PORT_SIZE: u8 = 0x10; // 16 ports per device
@@ -63,7 +54,7 @@ export class IoManager {
             const device = this.devices[i];
 
             if (device) {
-                jsIoReset(i as u8);
+                jsIo.reset(i as u8);
             }
         }
     }
@@ -143,7 +134,7 @@ export class IoManager {
 
 
         if (device) {
-            return jsIoRead(ioDevice, ioPort)
+            return jsIo.read(ioDevice, ioPort)
         }
 
         console.warn(`No IO Device found. Cannot read device #${ioDevice} on port ${ioPort}`);
@@ -163,7 +154,7 @@ export class IoManager {
         const device = this.devices[ioDevice];
 
         if (device) {
-            jsIoWrite(ioDevice, ioPort, value)
+            jsIo.write(ioDevice, ioPort, value)
             return
         }
 

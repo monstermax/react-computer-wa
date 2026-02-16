@@ -1,8 +1,8 @@
 
-//import { toHex } from "./lib/lib_numbers";
 import { Cpu } from "./Cpu";
 import { IoManager } from "./IoManager";
 import { MemoryBus, Ram, Rom } from "./Memory";
+//import { console } from "./external_functions";
 
 
 export class Computer {
@@ -26,7 +26,7 @@ export class Computer {
         //const ram = this.ram;
         //if (ram) {
         //    const ptr = changetype<usize>(ram) as i32;
-        //    console.log(`Ram mounted at address ${toHex(ptr)}`)
+        //    consoleLog(`Ram mounted at address ${toHex(ptr)}`)
         //}
     }
 

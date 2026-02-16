@@ -12,15 +12,15 @@ export async function instantiate(module, imports = {}) {
           throw Error(`${message} in ${fileName}:${lineNumber}:${columnNumber}`);
         })();
       },
-      "console.log"(text) {
-        // ~lib/bindings/dom/console.log(~lib/string/String) => void
-        text = __liftString(text >>> 0);
-        console.log(text);
+      wasmConsoleLog(s) {
+        // src/external_functions/console.log(~lib/string/String) => void
+        s = __liftString(s >>> 0);
+        wasmConsoleLog(s);
       },
-      "console.warn"(text) {
-        // ~lib/bindings/dom/console.warn(~lib/string/String) => void
-        text = __liftString(text >>> 0);
-        console.warn(text);
+      wasmConsoleWarn(s) {
+        // src/external_functions/console.warn(~lib/string/String) => void
+        s = __liftString(s >>> 0);
+        wasmConsoleWarn(s);
       },
     }, Object.assign(Object.create(globalThis), imports.env || {})),
   };
@@ -30,11 +30,6 @@ export async function instantiate(module, imports = {}) {
     instanciateComputer() {
       // src/index/instanciateComputer() => src/Computer/Computer
       return __liftInternref(exports.instanciateComputer() >>> 0);
-    },
-    loadTmpCode(memoryBus) {
-      // src/index/loadTmpCode(src/Memory/MemoryBus) => void
-      memoryBus = __lowerInternref(memoryBus) || __notnull();
-      exports.loadTmpCode(memoryBus);
     },
     allocate(size) {
       // src/index/allocate(i32) => usize
@@ -114,11 +109,6 @@ export async function instantiate(module, imports = {}) {
       // src/index/computerAddDevice(src/Computer/Computer, usize, i32, u8) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerAddDevice(computer, namePtr, nameLen, typeId);
-    },
-    destroyComputer(computer) {
-      // src/index/destroyComputer(src/Computer/Computer) => void
-      computer = __lowerInternref(computer) || __notnull();
-      exports.destroyComputer(computer);
     },
     computerResetComputer(computer) {
       // src/index/computerResetComputer(src/Computer/Computer) => void

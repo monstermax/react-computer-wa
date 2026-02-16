@@ -6,6 +6,17 @@ import { IoDevice } from "./IoDevice";
 import type { u8 } from "@/types/computer.types";
 
 
+const initialConsoleLines = [
+    `# Press the Start button above to run the computer`,
+    '',
+    '',
+    '# 1. This will launch the bootloader located in the ROM.',
+    '',
+    '# 2. The operating system is then loaded into memory and executed. Once started, it offers a shell containing several commands.',
+    '',
+    '# 3. You can write assembly code (in the left-hand section), compile it, and run it in this emulator.',
+];
+
 export type ConsoleDeviceParams = {
     type: string;
     vendor?: string;
@@ -117,14 +128,21 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
     const [lines, setLines] = useState<string[]>([])
     const [currentLine, setCurrentLine] = useState<string>("")
+    const [demoCleaned, setDemoCleaned] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {
         if (!deviceInstance) return;
 
-        deviceInstance.on('state', (state) => {
+        const stateHandler = (state: any) => {
             //console.log('Console state update', state)
+
+            if (!demoCleaned) {
+                setLines([]);
+                setCurrentLine("");
+                setDemoCleaned(true)
+            }
 
             if (state.lines !== undefined) {
                 setLines(state.lines)
@@ -133,20 +151,20 @@ export const Console: React.FC<ConsoleProps> = (props) => {
             if (state.currentLine !== undefined) {
                 setCurrentLine(state.currentLine)
             }
-        })
+        };
 
-        setLines([
-            `# Press the Start button above to run the computer`,
-            '',
-            '',
-            '# 1. This will launch the bootloader located in the ROM.',
-            '',
-            '# 2. The operating system is then loaded into memory and executed. Once started, it offers a shell containing several commands.',
-            '',
-            '# 3. You can write assembly code (in the left-hand section), compile it, and run it in this emulator.',
-        ])
+        deviceInstance.on('state', stateHandler)
 
-    }, [deviceInstance])
+        if (!demoCleaned) {
+            setLines(initialConsoleLines);
+        }
+
+        return () => {
+            deviceInstance.off('state', stateHandler)
+        };
+
+    }, [deviceInstance, demoCleaned])
+
 
     const handleClear = () => {
         if (!deviceInstance) return;
@@ -162,60 +180,60 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
 
     return (
-    <div className="flex justify-end">
-      <div
-        ref={scrollRef}
-        className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-xl font-mono text-sm relative group"
-        style={{ height: `${deviceInstance.height * 1.15}em`, width: `${deviceInstance.width * 1.1}ch` }}
-      >
-        {/* Terminal Header */}
-        <div className="bg-[#2d2d2d] px-4 py-2 flex items-center border-b border-gray-700">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#ff3b30]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#ff9f0a]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#34c759]"></div>
-          </div>
-          <div className="flex-1 text-center">
-            <span className="text-xs text-gray-400">bash</span>
-          </div>
-          <div className="w-16"></div>
-        </div>
+        <div className="flex justify-end">
+            <div
+                ref={scrollRef}
+                className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-xl font-mono text-sm relative group"
+                style={{ height: `${deviceInstance.height * 1.15}em`, width: `${deviceInstance.width * 1.1}ch` }}
+            >
+                {/* Terminal Header */}
+                <div className="bg-[#2d2d2d] px-4 py-2 flex items-center border-b border-gray-700">
+                    <div className="flex space-x-2">
+                        <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#ff3b30]"></div>
+                        <div className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#ff9f0a]"></div>
+                        <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#34c759]"></div>
+                    </div>
+                    <div className="flex-1 text-center">
+                        <span className="text-xs text-gray-400">bash</span>
+                    </div>
+                    <div className="w-16"></div>
+                </div>
 
-        {/* Terminal Content */}
-        <div
-          className="p-4 overflow-y-auto bg-[#1e1e1e] cursor-text relative"
-          style={{ height: `calc(${deviceInstance.height * 1.15}em - 41px)` }}
-          onClick={() => document.getElementById('device-keyboard')?.focus()}
-        >
-          {/* Clear button - appears on hover */}
-          <button
-            onClick={handleClear}
-            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-700 hover:bg-red-600 px-2 py-0.5 rounded text-xs text-gray-200 border border-red-600"
-          >
-            Clear
-          </button>
+                {/* Terminal Content */}
+                <div
+                    className="p-4 overflow-y-auto bg-[#1e1e1e] cursor-text relative"
+                    style={{ height: `calc(${deviceInstance.height * 1.15}em - 41px)` }}
+                    onClick={() => document.getElementById('device-keyboard')?.focus()}
+                >
+                    {/* Clear button - appears on hover */}
+                    <button
+                        onClick={handleClear}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-700 hover:bg-red-600 px-2 py-0.5 rounded text-xs text-gray-200 border border-red-600"
+                    >
+                        Clear
+                    </button>
 
-          {lines.length === 0 && !currentLine ? (
-            <div className="text-green-500/50 italic">
-                
+                    {lines.length === 0 && !currentLine ? (
+                        <div className="text-green-500/50 italic">
+
+                        </div>
+                    ) : (
+                        <>
+                            {lines.map((line, i) => (
+                                <div key={i} className="text-gray-300 whitespace-pre-wrap break-all">
+                                    {line || '\u00A0'}
+                                </div>
+                            ))}
+                            {currentLine && (
+                                <div className="text-gray-300 whitespace-pre-wrap break-all">
+                                    {currentLine}
+                                    <span className="animate-pulse ml-0.5">▊</span>
+                                </div>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
-          ) : (
-            <>
-              {lines.map((line, i) => (
-                <div key={i} className="text-gray-300 whitespace-pre-wrap break-all">
-                  {line || '\u00A0'}
-                </div>
-              ))}
-              {currentLine && (
-                <div className="text-gray-300 whitespace-pre-wrap break-all">
-                  {currentLine}
-                  <span className="animate-pulse ml-0.5">▊</span>
-                </div>
-              )}
-            </>
-          )}
         </div>
-      </div>
-    </div>
-  );
+    );
 }
