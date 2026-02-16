@@ -27,9 +27,10 @@ import { DmaDevice } from "@/components/devices/dma";
 import { FileModal } from "./FileModal";
 import { Docs } from "./Docs";
 import { Registers } from "./Registers";
+import { SpeedDisplay } from "./SpeedDisplay";
+import { ScreenCanvas, ScreenCanvasDevice } from "../devices/screen_canvas";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
-import { SpeedDisplay } from "./SpeedDisplay";
 
 
 declare global {
@@ -123,7 +124,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     // ── Devices ──
     const keyboardDevice = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
     const consoleDevice = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
-    const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
+    //const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
+    const screenDevice = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen', ScreenCanvasDevice, { width: 32, height: 32, pixelSize: 8 });
     const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
     const diskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
     const dmaDevice = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
@@ -675,7 +677,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
                             {/* Screen */}
                             <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0">
-                                <Screen deviceInstance={screenDevice.instance} />
+                                <ScreenCanvas deviceInstance={screenDevice.instance} />
                             </div>
                         </div>
 
