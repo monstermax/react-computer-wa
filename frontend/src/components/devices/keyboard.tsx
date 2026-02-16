@@ -14,7 +14,7 @@ export type KeyboardDeviceParams = {
 
 export class KeyboardDevice extends IoDevice {
     name = 'keyboard';
-    type = 'input';
+    static type = 'input';
     vendor = '';
     model = '';
 

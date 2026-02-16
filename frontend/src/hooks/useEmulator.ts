@@ -1,14 +1,15 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { getBytecodeArray } from "@/compiler/compiler_utils";
+import { deviceTypeFromString, useDevicesManager, type DeviceHook, type DevicesManagerHook } from "./useDevice";
 import { Clock } from "@/components/devices/clock";
 
 import * as releaseModule from "@/../public/web_assembly/release";
 
 import type { u32, u8, u16 } from "@/types/computer.types";
-import type { IoDevice } from "@/components/devices/IoDevice";
 import type { CompiledProgram } from "@/types/compiler.types";
-import { getBytecodeArray } from "@/compiler/compiler_utils";
+import type { IoDevice } from "@/components/devices/IoDevice";
 
 
 
@@ -18,13 +19,12 @@ export type WasmExports = typeof releaseModule.__AdaptedExports;
 export type useEmulatorParams = {
     clockFrequency: u32;
     speedMultiplier: u32;
-    devicesRef: React.RefObject<Map<number, IoDevice>>;
     addLog: (msg: string) => void;
 }
 
 
 export const useEmulator = (params: useEmulatorParams) => {
-    const { clockFrequency, speedMultiplier, devicesRef, addLog } = params
+    const { clockFrequency, speedMultiplier, addLog } = params
 
     // Wasm
     const [wasmExports, setWasmExports] = useState<WasmExports | null>(null);
@@ -36,6 +36,37 @@ export const useEmulator = (params: useEmulatorParams) => {
     const [clock] = useState(() => new Clock(clockFrequency));
     const [clockStatus, setClockStatus] = useState<boolean>(false);
     const cyclesPerSecondRef = useRef(0);
+
+    // ── Devices Manager ──
+    const devicesManager = useDevicesManager();
+
+
+    // Add a device
+    const addDevicesToComputer = (deviceHooks: DeviceHook<IoDevice>[]): void => {
+        if (!wasmExports || !computerPointer || !devicesManager.devicesRef.current) return;
+
+        for (const deviceHook of deviceHooks) {
+            const deviceType: string = deviceHook.deviceClass.type;
+            const typeId = deviceTypeFromString(deviceType);
+            const nameBuffer = new TextEncoder().encode(deviceHook.deviceName);
+            const namePtr = wasmExports.allocate(nameBuffer.length);
+            const memoryUint8 = new Uint8Array(wasmExports.memory.buffer);
+            memoryUint8.set(nameBuffer, namePtr);
+
+            let deviceIdx: u8 | null = null;
+
+            try {
+                deviceIdx = wasmExports.computerAddDevice(computerPointer, namePtr, nameBuffer.length, typeId) as u8;
+
+            } catch (err: any) {
+                wasmError(err);
+                throw new Error("Unreachable Error");
+            }
+
+            devicesManager.setDevicesMap(m => new Map(m).set(deviceHook.deviceName, deviceIdx));
+            deviceHook.instanciate(deviceIdx);
+        }
+    }
 
 
     //  Init WASM 
@@ -79,24 +110,24 @@ export const useEmulator = (params: useEmulatorParams) => {
     // ═══════════════
 
     const jsIoRead = (deviceIdx: u8, port: u8): u8 => {
-        if (!devicesRef.current) throw new Error("missing devices ref");
-        const device = devicesRef.current.get(deviceIdx);
+        if (!devicesManager.devicesRef.current) throw new Error("missing devices ref");
+        const device = devicesManager.devicesRef.current.get(deviceIdx);
         if (!device) throw new Error(`device #${deviceIdx} not found`);
         return device.read(port);
     };
 
 
     const jsIoWrite = (deviceIdx: u8, port: u8, value: u8): void => {
-        if (!devicesRef.current) throw new Error("missing devices ref");
-        const device = devicesRef.current.get(deviceIdx);
+        if (!devicesManager.devicesRef.current) throw new Error("missing devices ref");
+        const device = devicesManager.devicesRef.current.get(deviceIdx);
         if (!device) throw new Error(`device #${deviceIdx} not found`);
         device.write(port, value);
     };
 
 
     const jsIoReset = (deviceIdx: u8): void => {
-        if (!devicesRef.current) throw new Error("missing devices ref");
-        const device = devicesRef.current.get(deviceIdx);
+        if (!devicesManager.devicesRef.current) throw new Error("missing devices ref");
+        const device = devicesManager.devicesRef.current.get(deviceIdx);
         if (!device) throw new Error(`device #${deviceIdx} not found`);
         device.reset();
     }
@@ -282,7 +313,7 @@ export const useEmulator = (params: useEmulatorParams) => {
 
     // Load bootloader
     const loadBootloader = (compiled: CompiledProgram): number => {
-        if (!wasmExports || !computerPointer || !devicesRef.current) return 0;
+        if (!wasmExports || !computerPointer || !devicesManager.devicesRef.current) return 0;
 
         const byteCodeMap: MapIterator<[u16, u8]> = getBytecodeArray(compiled).entries();
         const byteCodeArr = Array.from(byteCodeMap);
@@ -308,6 +339,8 @@ export const useEmulator = (params: useEmulatorParams) => {
         clock,
         cyclesPerSecondRef,
         clockStatus,
+        devicesManager,
+        addDevicesToComputer,
         runCycles,
         setClockStatus,
         startClock,
@@ -331,6 +364,8 @@ export type EmulatorHook = {
     clock: Clock;
     cyclesPerSecondRef: React.RefObject<number>;
     clockStatus: boolean;
+    devicesManager: DevicesManagerHook;
+    addDevicesToComputer: (deviceHooks: DeviceHook<IoDevice>[]) => void;
     runCycles: (cyclesCount?: number) => void;
     setClockStatus: (value: React.SetStateAction<boolean>) => void;
     startClock: () => void;

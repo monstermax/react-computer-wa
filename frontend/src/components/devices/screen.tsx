@@ -16,8 +16,8 @@ export type ScreenDeviceParams = {
 }
 
 export class ScreenDevice extends IoDevice {
+    static type = 'output';
     name = 'screen';
-    type = 'output';
     vendor = '';
     model = '';
 

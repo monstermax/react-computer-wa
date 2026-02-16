@@ -17,8 +17,8 @@ export type DmaDeviceParams = {
 }
 
 export class DmaDevice extends IoDevice {
+    static type = 'system';
     name = 'dma';
-    type = 'system';
     vendor = '';
     model = '';
 

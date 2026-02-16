@@ -11,14 +11,13 @@ import "prism-react-editor/themes/github-dark.css";
 
 import { toHex } from "@/lib/lib_numbers";
 import { useEmulator, type EmulatorHook } from "@/hooks/useEmulator";
-import { deviceTypeFromString, useDevice } from "@/hooks/useDevice";
+import { useDevice } from "@/hooks/useDevice";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
 import { compileCode, formatBytecode, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
 
 import { MemoryExplorer } from "@/components/playground/MemoryExplorer";
-import { IoDevice } from "@/components/devices/IoDevice";
 import { Keyboard, KeyboardDevice } from "@/components/devices/keyboard";
 import { Console, ConsoleDevice } from "@/components/devices/console";
 import { Screen, ScreenDevice } from "@/components/devices/screen";
@@ -30,6 +29,7 @@ import { Docs } from "./Docs";
 import { Registers } from "./Registers";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
+import { SpeedDisplay } from "./SpeedDisplay";
 
 
 declare global {
@@ -87,17 +87,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const [registers16, setRegisters16] = useState<Record<string, u8 | u16 | bigint>>({});
     const [memory, setMemory] = useState<Uint8Array<ArrayBuffer> | null>(null);
 
-    // ── Devices ──
-    const devicesRef = useRef<Map<number, IoDevice>>(new Map);
-    const [devicesMap, setDevicesMap] = useState<Map<string, u8>>(new Map)
-
-    const keyboardDevice = useDevice<KeyboardDevice>({ deviceName: 'keyboard', devicesRef, devicesMap });
-    const consoleDevice = useDevice<ConsoleDevice>({ deviceName: 'console', devicesRef, devicesMap });
-    const screenDevice = useDevice<ScreenDevice>({ deviceName: 'screen', devicesRef, devicesMap });
-    const ledsDevice = useDevice<LedsDevice>({ deviceName: 'leds', devicesRef, devicesMap });
-    const diskDevice = useDevice<DiskDevice>({ deviceName: 'os_disk', devicesRef, devicesMap });
-    const dmaDevice = useDevice<DmaDevice>({ deviceName: 'dma', devicesRef, devicesMap });
-
     // ── Boot state ──
     const [devicesLoaded, setDevicesLoaded] = useState(false);
     const [bootloaderLoaded, setBootloaderLoaded] = useState(false);
@@ -127,8 +116,17 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         setLogs(prev => [...prev.slice(-300), `[${new Date().toLocaleTimeString()}] ${msg}`]);
     }, []);
 
+
     // ── Emulator ──
-    const emulator = useEmulator({ clockFrequency, speedMultiplier, devicesRef, addLog });
+    const emulator = useEmulator({ clockFrequency, speedMultiplier, addLog });
+
+    // ── Devices ──
+    const keyboardDevice = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
+    const consoleDevice = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
+    const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
+    const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
+    const diskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
+    const dmaDevice = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
 
 
     // Prevent GUI Tab key
@@ -167,7 +165,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // Load bootloader
     const loadBootloader = async (bootloaderFileUrl: string) => {
-        if (!emulator.wasmExports || !emulator.computerPointer || !devicesRef.current) return;
+        if (!emulator.wasmExports || !emulator.computerPointer || !emulator.devicesManager.devicesRef.current) return;
 
         const sourceCode = await loadSourceCodeFromFile(bootloaderFileUrl);
         const compiled = await compileCode(sourceCode, CUSTOM_CPU);
@@ -221,12 +219,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         if (!emulator.computerPointer || !osDiskData || devicesLoaded) return;
 
         const _loadDevices = async () => {
-            addDevice('keyboard', 'input', KeyboardDevice, {});
-            addDevice('console', 'output', ConsoleDevice, { width: 80, height: 25 });
-            addDevice('leds', 'input', LedsDevice, {});
-            addDevice('screen', 'output', ScreenDevice, {});
-            addDevice('os_disk', 'storage', DiskDevice, { data: osDiskData });
-            addDevice('dma', 'system', DmaDevice, { devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
+            emulator.addDevicesToComputer([
+                keyboardDevice,
+                consoleDevice,
+                ledsDevice,
+                screenDevice,
+                diskDevice,
+                dmaDevice,
+            ]);
 
             setDevicesLoaded(true);
             addLog('Devices loaded (keyboard, console, leds, screen, os_disk, dma)');
@@ -236,32 +236,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         return () => clearTimeout(timer);
     }, [emulator.computerPointer, osDiskData, devicesLoaded]);
 
-
-    //  Add a device
-    const addDevice = (name: string, deviceType: string, deviceClass: any, optionalParams: any): void => {
-        if (!emulator.wasmExports || !emulator.computerPointer || !devicesRef.current) return;
-
-        const typeId = deviceTypeFromString(deviceType);
-        const nameBuffer = new TextEncoder().encode(name);
-        const namePtr = emulator.wasmExports.allocate(nameBuffer.length);
-        const memoryUint8 = new Uint8Array(emulator.wasmExports.memory.buffer);
-        memoryUint8.set(nameBuffer, namePtr);
-
-        let deviceIdx: u8 | null = null;
-
-        try {
-            deviceIdx = emulator.wasmExports.computerAddDevice(emulator.computerPointer, namePtr, nameBuffer.length, typeId) as u8;
-
-        } catch (err: any) {
-            emulator.wasmError(err);
-            throw new Error("Unreachable Error");
-        }
-
-        setDevicesMap(m => new Map(m).set(name, deviceIdx));
-
-        const device = new deviceClass(deviceIdx, name, { type: deviceType, vendor: '', model: '', ...optionalParams });
-        devicesRef.current.set(deviceIdx, device);
-    }
 
 
 
@@ -696,12 +670,12 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         <div className="flex gap-3 mb-3">
                             {/* Console */}
                             <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] min-w-0">
-                                <Console deviceInstance={consoleDevice} />
+                                <Console deviceInstance={consoleDevice.instance} />
                             </div>
 
                             {/* Screen */}
                             <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0">
-                                <Screen deviceInstance={screenDevice} />
+                                <Screen deviceInstance={screenDevice.instance} />
                             </div>
                         </div>
 
@@ -711,12 +685,12 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                             <div className="flex-1 flex flex-col gap-3">
                                 {/* Keyboard */}
                                 <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] min-w-0 grow-0">
-                                    <Keyboard deviceInstance={keyboardDevice} />
+                                    <Keyboard deviceInstance={keyboardDevice.instance} />
                                 </div>
 
                                 {/* LEDs */}
                                 <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                    <Leds deviceInstance={ledsDevice} />
+                                    <Leds deviceInstance={ledsDevice.instance} />
                                 </div>
                             </div>
 
@@ -729,7 +703,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
                             {/* Disk ── */}
                             <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                <Disk deviceInstance={diskDevice} />
+                                <Disk deviceInstance={diskDevice.instance} />
                             </div>
                         </div>
                     </div>
@@ -767,36 +741,3 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
 
-
-// Nouveau composant à côté de Playground ou dans un fichier séparé
-const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator }) => {
-    const [speed, setSpeed] = useState(0);
-
-    useEffect(() => {
-        // Fonction pour mettre à jour l'affichage
-        const updateSpeed = () => {
-            setSpeed(emulator.cyclesPerSecondRef.current);
-        };
-
-        // Mettre à jour à chaque tick
-        emulator.clock.on('tick', updateSpeed);
-
-        // Nettoyage
-        return () => {
-            emulator.clock.off('tick', updateSpeed);
-        };
-    }, [emulator]);
-
-    return (
-        <div className="flex items-center gap-4 text-xs text-zinc-500 min-w-48 justify-end">
-            <div>Speed: </div>
-            {!emulator.clockStatus && <div>Stopped</div>}
-            {emulator.clockStatus && speed < 10 && (
-                <div>{Math.round(10 * speed) / 10}/sec.</div>
-            )}
-            {emulator.clockStatus && speed >= 10 && (
-                <div>{Math.round(speed)}/sec.</div>
-            )}
-        </div>
-    );
-};

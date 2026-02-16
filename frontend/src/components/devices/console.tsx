@@ -27,8 +27,8 @@ export type ConsoleDeviceParams = {
 }
 
 export class ConsoleDevice extends IoDevice {
+    static type = 'output';
     name = 'console';
-    type = 'output';
     vendor = '';
     model = '';
 

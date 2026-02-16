@@ -1,7 +1,32 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { IoDevice } from "@/components/devices/IoDevice";
+import type { EmulatorHook } from "./useEmulator";
+
+
+
+
+export function useDevicesManager() {
+    const devicesRef = useRef<Map<number, IoDevice>>(new Map);
+    const [devicesMap, setDevicesMap] = useState<Map<string, u8>>(new Map)
+
+    const devicesManagerHook: DevicesManagerHook = {
+        devicesRef,
+        devicesMap,
+        setDevicesMap,
+    }
+
+    return devicesManagerHook;
+}
+
+
+export type DevicesManagerHook = {
+    devicesRef: React.RefObject<Map<number, IoDevice>>;
+    devicesMap: Map<string, number>;
+    setDevicesMap: React.Dispatch<React.SetStateAction<Map<string, number>>>;
+}
+
 
 
 export type useDeviceParams = {
@@ -10,19 +35,43 @@ export type useDeviceParams = {
     devicesMap: Map<string, u8>;
 }
 
-export function useDevice<T=IoDevice>(params: useDeviceParams) {
-    const { deviceName, devicesRef, devicesMap } = params;
+export function useDevice<T>(devicesManager: DevicesManagerHook, deviceName: string, deviceClass: any, optionalParams: any) {
+    const { devicesRef, devicesMap } = devicesManager;
 
     const deviceIdx: number | null = useMemo(() => devicesMap.get(deviceName), [devicesMap]) ?? null;
 
-    const device: T | null = useMemo(() => {
+    const instance: T | null = useMemo(() => {
         return (devicesRef.current && deviceIdx !== null)
             ? (devicesRef.current.get(deviceIdx) ?? null) as T
             : null;
     }, [deviceIdx]);
 
-    return device;
+    const instanciate = (deviceIdx: u8) => {
+        const deviceType: string = deviceClass.type;
+        const device = new deviceClass(deviceIdx, name, { type: deviceType, vendor: '', model: '', ...optionalParams });
+        devicesManager.devicesRef.current.set(deviceIdx, device);
+    }
+
+    const deviceHook: DeviceHook<T> = {
+        deviceName,
+        deviceClass,
+        optionalParams,
+        instance,
+        instanciate,
+    }
+
+    return deviceHook;
 }
+
+export type DeviceHook<T> = {
+    deviceName: string,
+    deviceClass: any,
+    optionalParams: any
+    instance: T | null;
+    instanciate: (deviceIdx: number) => void;
+}
+
+
 
 
 export const DEVICE_TYPE_SYSTEM: u8 = 0x00;

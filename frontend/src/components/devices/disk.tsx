@@ -16,8 +16,8 @@ export type DiskDeviceParams = {
 }
 
 export class DiskDevice extends IoDevice {
+    static type = 'storage';
     name = 'disk';
-    type = 'output';
     vendor = '';
     model = '';
 
