@@ -81,7 +81,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const { autoStart = false } = props;
 
     const clockFrequency = 100 as u32;   // nb tick per second
-    const speedMultiplier = 10000 as u32; // nb cycles per tick
+    const speedMultiplier = 0.5 * 10_000 as u32; // nb cycles per tick
 
     // ── Registers & Memory (on-demand only via Dump buttons, NOT synced per tick) ──
     const [registers8, setRegisters8] = useState<Record<string, u8>>({});

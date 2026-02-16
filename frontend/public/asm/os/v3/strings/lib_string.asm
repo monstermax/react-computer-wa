@@ -70,6 +70,8 @@ strcmp:
 strcmp_len:
     push fl ; sauvegarde la longueur de la chaine (1 byte) = longueur restante à lire
 
+    ; TODO: a revoir => il faut (aussi) comparer la longueur des chaines
+
     ; si chaine vide, on quitte directement
     cmp fl, 0
     je STRCMP_LEN_END_POP
