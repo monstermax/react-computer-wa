@@ -1,5 +1,5 @@
 
-; == User Program (Loaded @ ${defaultLoadAddress}) ==
+; == User Program (Loaded @ 0xA000) ==
 ; Type "custom" in the shell to run it.
 ; IMPORTANT: end with "ret" !
 
