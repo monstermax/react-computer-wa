@@ -1,6 +1,6 @@
 
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Editor, type PrismEditor } from "prism-react-editor";
 import { Link } from "wouter";
 
@@ -84,12 +84,22 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // ── Devices (ALL of them, same as TestV3Component) ──
     const devicesRef = useRef<Map<number, IoDevice>>(new Map);
-    const [keyboardDevice, setKeyboardDevice] = useState<KeyboardDevice | null>(null);
+    //const [keyboardDevice, setKeyboardDevice] = useState<KeyboardDevice | null>(null);
     const [consoleDevice, setConsoleDevice] = useState<ConsoleDevice | null>(null);
     const [screenDevice, setScreenDevice] = useState<ScreenDevice | null>(null);
     const [ledsDevice, setLedsDevice] = useState<LedsDevice | null>(null);
     const [diskDevice, setDiskDevice] = useState<DiskDevice | null>(null);
     const [dmaDevice, setDmaDevice] = useState<DmaDevice | null>(null);
+
+    const [devicesMap, setDevicesMap] = useState<Map<string, u8>>(new Map)
+
+    // Keyboard device
+    const keyboardDeviceIdx = useMemo(() => devicesMap.get('keyboard'), [devicesMap]);
+    const keyboardDevice: KeyboardDevice | null = useMemo(() => {
+        return (devicesRef.current && keyboardDeviceIdx !== undefined)
+            ? (devicesRef.current.get(keyboardDeviceIdx) ?? null) as KeyboardDevice
+            : null;
+    }, [keyboardDeviceIdx]);
 
     // ── Boot state ──
     const [devicesLoaded, setDevicesLoaded] = useState(false);
@@ -218,7 +228,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         if (name === 'keyboard') {
             const device = new KeyboardDevice(deviceIdx, 'keyboard', { type: 'input', vendor, model });
             devicesRef.current.set(deviceIdx, device);
-            setKeyboardDevice(device);
+            //setKeyboardDevice(device);
+            setDevicesMap(m => new Map(m).set(name, deviceIdx));
 
         } else if (name === 'console') {
             const { width, height } = { width: 80, height: 25 };
