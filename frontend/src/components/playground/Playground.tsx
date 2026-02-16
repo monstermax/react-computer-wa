@@ -70,7 +70,7 @@ const defaultLoadAddress = '0xA000';
 
 
 //  Default user code
-const defaultCodeUrl = "/asm/examples/draw_fractal_on_screen.asm";
+const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
 
 
 // ─────────────────────────────────────────────
