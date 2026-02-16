@@ -28,14 +28,3 @@ export type Register = Register8 | Register16;
 export type IoDeviceType = 'Input' | 'DiskStorage' | 'Display' | 'Audio' | 'Random' | 'Time' | 'Interrupt' | 'Memory';
 
 
-
-export interface IoDevice {
-    name: string;
-    ioPort: u8;
-    type: IoDeviceType;
-    read(port: u8): u8;
-    write(port: u8, value: u8): void;
-    getSize?(): number;
-    reset?(): void;
-}
-

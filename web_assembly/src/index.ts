@@ -3,6 +3,7 @@
 
 import { Computer } from "./Computer";
 import { console } from "./external_functions";
+import { MEMORY_MAP } from "./memory_map";
 
 
 export function instanciateComputer(): Computer {
@@ -23,7 +24,7 @@ export function allocate(size: i32): usize {
 }
 
 
-// Load bootloader code
+// Load bootloader code in ROM
 export function computerloadCode(
     computer: Computer,
     valPtr: usize,
@@ -33,6 +34,10 @@ export function computerloadCode(
 
     if (!memoryBus) {
         throw new Error("Memory Bus not found");
+    }
+
+    if (dataLen > (MEMORY_MAP.ROM_END + 1 as i32)) {
+        throw new Error("Bootloader code too heavy");
     }
 
     for (let i: i32 = 0; i < dataLen; i++) {

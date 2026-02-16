@@ -130,6 +130,7 @@ export const Console: React.FC<ConsoleProps> = (props) => {
     const [currentLine, setCurrentLine] = useState<string>("")
     const [demoCleaned, setDemoCleaned] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const logEndRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {
@@ -164,6 +165,12 @@ export const Console: React.FC<ConsoleProps> = (props) => {
         };
 
     }, [deviceInstance, demoCleaned])
+
+
+    // Handle Console Scroll
+    useEffect(() => {
+        //logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); // TODO: a revoir: ca scroll la page entiere, à chaque nouveau caractere
+    }, [currentLine, lines]);
 
 
     const handleClear = () => {
@@ -232,6 +239,7 @@ export const Console: React.FC<ConsoleProps> = (props) => {
                             )}
                         </>
                     )}
+                    <div ref={logEndRef} />
                 </div>
             </div>
         </div>

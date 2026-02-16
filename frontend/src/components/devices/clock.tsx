@@ -17,16 +17,14 @@ export class Clock extends EventEmitter {
         if (this.timer) return;
 
         this.timer = setInterval(this.tick.bind(this), 1000 / this.frequency)
-
-        console.log('clock started')
+        console.log('Clock started')
     }
 
     stop(): void {
         if (!this.timer) return;
         clearInterval(this.timer)
         this.timer = null;
-
-        console.log('clock stopped')
+        console.log('Clock stopped')
     }
 
     status(): boolean {
