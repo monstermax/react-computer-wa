@@ -10,6 +10,8 @@ import "prism-react-editor/layout.css";
 import "prism-react-editor/themes/github-dark.css";
 
 import { toHex } from "@/lib/lib_numbers";
+import { useEmulator } from "@/hooks/useEmulator";
+import { useDevice } from "@/hooks/useDevice";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
 import { compileCode, formatBytecode, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
@@ -26,7 +28,6 @@ import { DmaDevice } from "@/components/devices/dma";
 import { FileModal } from "./FileModal";
 import { Docs } from "./Docs";
 import { Registers } from "./Registers";
-import { useEmulator } from "@/hooks/useEmulator";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
 
@@ -67,6 +68,7 @@ window.wasmConsoleWarn = wasmConsoleWarn;
 const defaultLoadAddress = '0xA000';
 
 
+
 //  Default user code
 const defaultCodeUrl = "/asm/examples/draw_fractal_on_screen.asm";
 
@@ -77,29 +79,24 @@ const defaultCodeUrl = "/asm/examples/draw_fractal_on_screen.asm";
 export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const { autoStart = false } = props;
 
+    const clockFrequency = 100 as u32;
+    const speedMultiplier = 100 as u32;
+
     // ── Registers & Memory (on-demand only via Dump buttons, NOT synced per tick) ──
     const [registers8, setRegisters8] = useState<Record<string, u8>>({});
     const [registers16, setRegisters16] = useState<Record<string, u8 | u16 | bigint>>({});
     const [memory, setMemory] = useState<Uint8Array<ArrayBuffer> | null>(null);
 
-    // ── Devices (ALL of them, same as TestV3Component) ──
+    // ── Devices ──
     const devicesRef = useRef<Map<number, IoDevice>>(new Map);
-    //const [keyboardDevice, setKeyboardDevice] = useState<KeyboardDevice | null>(null);
-    const [consoleDevice, setConsoleDevice] = useState<ConsoleDevice | null>(null);
-    const [screenDevice, setScreenDevice] = useState<ScreenDevice | null>(null);
-    const [ledsDevice, setLedsDevice] = useState<LedsDevice | null>(null);
-    const [diskDevice, setDiskDevice] = useState<DiskDevice | null>(null);
-    const [dmaDevice, setDmaDevice] = useState<DmaDevice | null>(null);
-
     const [devicesMap, setDevicesMap] = useState<Map<string, u8>>(new Map)
 
-    // Keyboard device
-    const keyboardDeviceIdx = useMemo(() => devicesMap.get('keyboard'), [devicesMap]);
-    const keyboardDevice: KeyboardDevice | null = useMemo(() => {
-        return (devicesRef.current && keyboardDeviceIdx !== undefined)
-            ? (devicesRef.current.get(keyboardDeviceIdx) ?? null) as KeyboardDevice
-            : null;
-    }, [keyboardDeviceIdx]);
+    const keyboardDevice = useDevice<KeyboardDevice>({ deviceName: 'keyboard', devicesRef, devicesMap });
+    const consoleDevice = useDevice<ConsoleDevice>({ deviceName: 'console', devicesRef, devicesMap });
+    const screenDevice = useDevice<ScreenDevice>({ deviceName: 'screen', devicesRef, devicesMap });
+    const ledsDevice = useDevice<LedsDevice>({ deviceName: 'leds', devicesRef, devicesMap });
+    const diskDevice = useDevice<DiskDevice>({ deviceName: 'disk', devicesRef, devicesMap });
+    const dmaDevice = useDevice<DmaDevice>({ deviceName: 'dma', devicesRef, devicesMap });
 
     // ── Boot state ──
     const [devicesLoaded, setDevicesLoaded] = useState(false);
@@ -129,7 +126,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }, []);
 
     // ── Emulator ──
-    const emulator = useEmulator({ devicesRef, addLog });
+    const emulator = useEmulator({ clockFrequency, speedMultiplier, devicesRef, addLog });
 
 
     // Prevent GUI Tab key
@@ -225,32 +222,29 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             throw new Error("Unreachable Error");
         }
 
+        setDevicesMap(m => new Map(m).set(name, deviceIdx));
+
+
         if (name === 'keyboard') {
             const device = new KeyboardDevice(deviceIdx, 'keyboard', { type: 'input', vendor, model });
             devicesRef.current.set(deviceIdx, device);
-            //setKeyboardDevice(device);
-            setDevicesMap(m => new Map(m).set(name, deviceIdx));
 
         } else if (name === 'console') {
             const { width, height } = { width: 80, height: 25 };
             const device = new ConsoleDevice(deviceIdx, 'console', { type: 'output', vendor, model, width, height });
             devicesRef.current.set(deviceIdx, device);
-            setConsoleDevice(device);
 
         } else if (name === 'screen') {
             const device = new ScreenDevice(deviceIdx, 'screen', { type: 'output', vendor, model });
             devicesRef.current.set(deviceIdx, device);
-            setScreenDevice(device);
 
         } else if (name === 'leds') {
             const device = new LedsDevice(deviceIdx, 'leds', { type: 'output', vendor, model });
             devicesRef.current.set(deviceIdx, device);
-            setLedsDevice(device);
 
         } else if (name === 'dma') {
             const device = new DmaDevice(deviceIdx, 'dma', { type: 'system', vendor, model, devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
             devicesRef.current.set(deviceIdx, device);
-            setDmaDevice(device);
 
         } else if (name === 'os_disk') {
             const startAddress = MEMORY_MAP.OS_START;
@@ -270,7 +264,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             // Load OS Code on OS_DISK
             const device = new DiskDevice(deviceIdx, 'os_disk', { type: 'storage', vendor, model, data });
             devicesRef.current.set(deviceIdx, device);
-            setDiskDevice(device);
 
         } else {
             const device = new IoDevice(deviceIdx, name, { type });
