@@ -527,9 +527,9 @@ run_command_ps:
 
 run_command_pixels:
     debug 9, 4
-    call draw_plasma
+    ;call draw_plasma
     ;call draw_xor_pattern
-    ;call draw_tunnel
+    call draw_tunnel
     ;call draw_diamond
     ;call draw_fire_palette
     ;call draw_checkerboard_gradient

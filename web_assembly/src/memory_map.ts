@@ -43,6 +43,18 @@ export namespace MEMORY_MAP {
 };
 
 
+
+// IRQ Sources (pour référence)
+export namespace IRQ_MAP {
+    export const IRQ_TIMER: u8 = 0;      // Bit 0 - Timer
+    export const IRQ_KEYBOARD: u8 = 1;   // Bit 1 - Clavier
+    export const IRQ_DISK: u8 = 2;       // Bit 2 - Disque
+    export const IRQ_UART: u8 = 3;       // Bit 3 - UART/Console
+    export const IRQ_BUTTON: u8 = 4;     // Bit 4 - Boutons UI
+};
+
+
+
 export const DEVICE_TYPE_SYSTEM: u8 = 0x00;
 export const DEVICE_TYPE_INPUT: u8 = 0x01;
 export const DEVICE_TYPE_OUTPUT: u8 = 0x02;

@@ -29,8 +29,13 @@ import { Docs } from "./Docs";
 import { Registers } from "./Registers";
 import { SpeedDisplay } from "./SpeedDisplay";
 import { ScreenCanvas, ScreenCanvasDevice } from "../devices/screen_canvas";
+import { InterruptDevice } from "../devices/interrupt";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
+import { TimerDevice } from "../devices/timer";
+import { BuzzerDevice } from "../devices/buzzer";
+import { RngDevice } from "../devices/rng";
+import { RtcDevice } from "../devices/rtc";
 
 
 declare global {
@@ -129,6 +134,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
     const diskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
     const dmaDevice = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
+    const interruptDevice = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {  });
+    const timerDevice = useDevice<TimerDevice>(emulator.devicesManager, 'timer', TimerDevice, {  });
+    const rtcDevice = useDevice<RtcDevice>(emulator.devicesManager, 'rtc', RtcDevice, {  });
+    const rngDevice = useDevice<RngDevice>(emulator.devicesManager, 'rng', RngDevice, {  });
+    const buzzerDevice = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {  });
 
 
     // Prevent GUI Tab key
