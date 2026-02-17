@@ -26,7 +26,7 @@ export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator })
     }, [emulator]);
 
     return (
-        <div className="flex items-center gap-4 text-xs text-zinc-500 min-w-48 justify-end">
+        <div className="flex items-center gap-4 text-xs text-zinc-500 min-w-32 justify-end">
             <div>Speed: </div>
             {!emulator.clockStatus && (
                 <div>Stopped</div>

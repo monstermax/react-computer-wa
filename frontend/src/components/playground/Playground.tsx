@@ -85,8 +85,8 @@ const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
 export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const { autoStart = true } = props;
 
-    const clockFrequency = 100 as u32;   // nb tick per second
-    const speedMultiplier = 0.5 * 10_000 as u32; // nb cycles per tick
+    const [clockFrequency, setClockFrequency] = useState(100 as u32);   // nb tick per second
+    const [speedMultiplier, setSpeedMultiplier] = useState(0.3 * 10_000 as u32); // nb cycles per tick
 
     // ── Registers & Memory (on-demand only via Dump buttons, NOT synced per tick) ──
     const [registers8, setRegisters8] = useState<Record<string, u8>>({});
@@ -459,7 +459,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace" }}>
 
             {/* ── Header ── */}
-            <header className="flex items-center justify-between px-5 py-0 border-b border-zinc-800/80 bg-[#0d0d14] shrink-0">
+            <header className="flex items-center px-5 py-0 border-b border-zinc-800/80 bg-[#0d0d14] shrink-0">
                 <div className="flex items-center gap-3">
                     <Link to="/" className="flex gap-2 items-center">
                         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
@@ -502,6 +502,36 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                     >
                         Reset
                     </button>
+                </div>
+
+                <div className="ms-auto me-4 flex gap-4 text-sm">
+                    <div className="flex gap-1">
+                        <div>Tick Freq</div>
+
+                        <input
+                            type="number"
+                            min={1}
+                            max={1000}
+                            step={1}
+                            className="w-16 bg-background-light px-1 rounded text-end"
+                            value={clockFrequency}
+                            onChange={(event) => setClockFrequency(Number(event.target.value) as u32)}
+                        />
+                    </div>
+
+                    <div className="flex gap-1">
+                        <div>Speed Multiplier</div>
+
+                        <input
+                            type="number"
+                            min={1}
+                            max={10_000}
+                            step={1}
+                            className="w-16 bg-background-light px-1 rounded text-end"
+                            value={speedMultiplier}
+                            onChange={(event) => setSpeedMultiplier(Number(event.target.value) as u32)}
+                        />
+                    </div>
                 </div>
 
                 <SpeedDisplay emulator={emulator} />

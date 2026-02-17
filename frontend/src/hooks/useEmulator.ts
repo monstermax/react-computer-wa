@@ -206,7 +206,13 @@ export const useEmulator = (params: useEmulatorParams) => {
         return () => {
             clock.off('tick', _handleClockTick);
         }
-    }, [computerPointer, devicesManager]);
+    }, [computerPointer, devicesManager, speedMultiplier]);
+
+
+    // Redémarre la clock quand on change le frequence
+    useEffect(() => {
+        clock.setFrequency(clockFrequency);
+    }, [clockFrequency])
 
 
     const startClock = () => {
