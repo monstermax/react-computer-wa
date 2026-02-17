@@ -546,10 +546,10 @@ run_command_pixels:
 
 run_command_sprite:
     debug 9, 5
-    call draw_mario
+    ;call draw_mario
     ;call draw_mario_and_sonic ; Sonic est un peu foiré
     ;call draw_pacman
-    ;call draw_ghost
+    call draw_ghost
     ;call draw_invader
     ;call draw_heart
     ;call draw_mushroom

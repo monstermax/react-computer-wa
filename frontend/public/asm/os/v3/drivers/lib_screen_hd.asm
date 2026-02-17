@@ -1,9 +1,9 @@
 ; Author: yomax
 ; Date: 2026-02
-; Name: lib_screen
-; Description: Screen Driver
+; Name: lib_screen_hd
+; Description: HD Screen Driver
 
-; Screen I/O ports (relatifs à screen_io_base) :
+; HD Screen I/O ports (relatifs à screenhd_io_base) :
 ;   +0 = PIXEL_X
 ;   +1 = PIXEL_Y
 ;   +2 = PIXEL_COLOR
@@ -15,39 +15,39 @@
 
 
 section .data
-    screen_io_base  dw 0xF030  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    screenhd_io_base  dw 0xF0D0  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
 
-    SCREEN_WIDTH equ 32
-    SCREEN_HEIGHT equ 32
+    SCREENHD_WIDTH equ 256
+    SCREENHD_HEIGHT equ 256
 
 
 section .text
-    global screen_print_pixel
-    global screen_set_pixel
+    global screenhd_print_pixel
+    global screenhd_set_pixel
 
 
 _exit:
     ret
 
 
-screen_print_pixel:
-    ; get pixel x - @PIXEL_X = screen_io_base
-    mov cl, [screen_io_base]
-    mov dl, [screen_io_base + 1]
+screenhd_print_pixel:
+    ; get pixel x - @PIXEL_X = screenhd_io_base
+    mov cl, [screenhd_io_base]
+    mov dl, [screenhd_io_base + 1]
     ldi al, cl, dl
 
-    ; set pixel x - @PIXEL_X = screen_io_base
-    ;mov cl, [screen_io_base]
-    ;mov dl, [screen_io_base + 1]
+    ; set pixel x - @PIXEL_X = screenhd_io_base
+    ;mov cl, [screenhd_io_base]
+    ;mov dl, [screenhd_io_base + 1]
     ;mov al, 0
     sti cl, dl, al
 
-    ; set pixel y - @PIXEL_Y = screen_io_base + 1
+    ; set pixel y - @PIXEL_Y = screenhd_io_base + 1
     call inc_cd
     ;mov al, 0
     sti cl, dl, al
 
-    ; set pixel color - @PIXEL_COLOR = screen_io_base + 2
+    ; set pixel color - @PIXEL_COLOR = screenhd_io_base + 2
     call inc_cd
     push al ; sauvegarde A (la position courante)
     inc al ; incremente A (pour ne pas etre à 0 lors de la 1ere iteration)
@@ -71,19 +71,19 @@ screen_print_pixel:
 
 
 ; ============================================================================
-; SCREEN_SET_PIXEL - Écrit un pixel à (F, E) avec la couleur AL
+; SCREENHD_SET_PIXEL - Écrit un pixel à (F, E) avec la couleur AL
 ;
 ; Input:  F = X, E = Y, AL = couleur
 ; Uses:   C:D comme pointeur I/O (sauvegardés)
 ; ============================================================================
-screen_set_pixel:
+screenhd_set_pixel:
     push cl
     push dl
 
     ; Charger l'adresse I/O base dans C:D
-    ;lea cl, dl, [screen_io_base]
-    mov cl, [screen_io_base]
-    mov dl, [screen_io_base + 1]
+    ;lea cl, dl, [screenhd_io_base]
+    mov cl, [screenhd_io_base]
+    mov dl, [screenhd_io_base + 1]
 
     ; Écrire X (port +0)
     sti cl, dl, fl              ; [C:D] = F  (PIXEL_X = F)

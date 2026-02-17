@@ -86,6 +86,7 @@ const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
 export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const { autoStart = true } = props;
 
+    // ── Clock ──
     const [clockFrequency, setClockFrequency] = useState(100 as u32);   // nb tick per second
     const [speedMultiplier, setSpeedMultiplier] = useState(0.3 * 10_000 as u32); // nb cycles per tick
 
@@ -117,6 +118,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const [logs, setLogs] = useState<string[]>([]);
     const logEndRef = useRef<HTMLDivElement>(null);
 
+    const [preferHdScreen, setPreferHdScreen] = useState(false);
+
 
     //  Logging
     const addLog = useCallback((msg: string) => {
@@ -130,8 +133,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     // ── Devices ──
     const keyboardDevice = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
     const consoleDevice = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
-    //const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
-    const screenDevice = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen', ScreenCanvasDevice, { width: 128, height: 128, pixelSize: 2 });
+    const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
+    const screenHdDevice = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen_hd', ScreenCanvasDevice, { width: 256, height: 256, pixelSize: 2 });
     const switchsDevice = useDevice<SwitchsDevice>(emulator.devicesManager, 'switchs', SwitchsDevice, {});
     const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
     const osDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
@@ -279,6 +282,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 rngDevice,
                 buzzerDevice,
                 switchsDevice,
+                screenHdDevice,
             ]);
 
             setDevicesLoaded(true);
@@ -756,9 +760,25 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                                 <Console deviceInstance={consoleDevice.instance} />
                             </div>
 
-                            {/* Screen */}
-                            <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0">
-                                <ScreenCanvas deviceInstance={screenDevice.instance} />
+                            <div className="flex-1 relative">
+                                <button
+                                    className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
+                                    onClick={() => setPreferHdScreen(b => !b)}
+                                    >
+                                    <div className={!preferHdScreen ? "" : "line-through"}>SD</div>
+                                    /
+                                    <div className={preferHdScreen ? "" : "line-through"}>HD</div>
+                                </button>
+
+                                {/* Screen */}
+                                <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
+                                    <Screen deviceInstance={screenDevice.instance} />
+                                </div>
+
+                                {/* Screen HD */}
+                                <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
+                                    <ScreenCanvas deviceInstance={screenHdDevice.instance} />
+                                </div>
                             </div>
                         </div>
 

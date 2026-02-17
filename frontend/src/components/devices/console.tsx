@@ -349,7 +349,8 @@ export const Console: React.FC<ConsoleProps> = (props) => {
                             {currentLine && (
                                 <div className="text-gray-300 whitespace-pre-wrap break-all relative">
                                     {currentLine}
-                                    <span className={`absolute animate-pulse ml-0.5`} style={{ left: `${currentLinePosition % width}ch`, top: `${(1.2 * Math.floor(currentLinePosition / width)).toFixed(1)}rem` }}>▊</span>
+                                    {/* <span className={`absolute animate-pulse ml-0.5`} style={{ left: `${currentLinePosition % width}ch`, top: `${(1.2 * Math.floor(currentLinePosition / width)).toFixed(1)}rem` }}>▊</span> */}
+                                    <span className={`animate-pulse ml-0.5`}>▊</span>
                                 </div>
                             )}
                         </>

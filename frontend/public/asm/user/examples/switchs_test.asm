@@ -1,3 +1,7 @@
+; Author: yomax + deepseek
+; Date: 2026-02
+; Name: switchs_test
+; Description: Switchs/Buttons Test
 
 .include "os/v3/drivers/lib_switchs.asm"
 
@@ -14,24 +18,18 @@ _start:
     ; Afficher le résultat
     cmp al, 1
     je .switch_on
+
     ; switch est OFF
+    ; TODO: enregistrer la valeur si on le souhaite
     jmp .done
 
 .switch_on:
     ; switch est ON
+    ; TODO: enregistrer la valeur si on le souhaite
 
 .done:
     ; Acquitter le traitement
     mov al, bl                 ; AL = index
     call ack_switchs
 
-    ; Ou plus simple : attendre et traiter en boucle
-.main_loop:
-    call wait_switch_change    ; attend un changement
-    ; AL = index du switch
-
-    call get_switch_state      ; AL = état
-    ; faire quelque chose...
-
-    call ack_switchs           ; acquitter
-    jmp .main_loop
+    ret

@@ -150,9 +150,22 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                     </div>
 
                     {/* Quick jump */}
-                    <div className="mt-4 pt-2 border-t border-gray-700 flex gap-2 text-xs">
+                    <div className="mt-4 pt-2 border-t border-gray-700 flex gap-2 text-xs items-center">
                         <span className="text-gray-400">Jump to:</span>
-                        {[0x0000, 0x0300, 0x0500, 0x0700, 0x1000, 0xA000].map(addr => (
+
+                        <div>ROM</div>
+                        {[0x0000, 0x0300].map(addr => (
+                            <button
+                                key={addr}
+                                onClick={() => setPage(Math.floor(addr / bytesPerPage))}
+                                className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded"
+                            >
+                                {toHex(addr, 4)}
+                            </button>
+                        ))}
+
+                        <div>RAM</div>
+                        {[0x0500, 0x0700, 0x1000, 0xA000].map(addr => (
                             <button
                                 key={addr}
                                 onClick={() => setPage(Math.floor(addr / bytesPerPage))}
