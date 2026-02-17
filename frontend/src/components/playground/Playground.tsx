@@ -36,6 +36,7 @@ import { InterruptTimerDevice } from "../devices/interrupt_timer";
 import { BuzzerDevice } from "../devices/buzzer";
 import { RngDevice } from "../devices/rng";
 import { RtcDevice } from "../devices/rtc";
+import { Switchs, SwitchsDevice } from "../devices/switchs";
 
 
 declare global {
@@ -130,7 +131,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const keyboardDevice = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
     const consoleDevice = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
     //const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
-    const screenDevice = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen', ScreenCanvasDevice, { width: 32, height: 32, pixelSize: 8 });
+    const screenDevice = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen', ScreenCanvasDevice, { width: 128, height: 128, pixelSize: 2 });
+    const switchsDevice = useDevice<SwitchsDevice>(emulator.devicesManager, 'switchs', SwitchsDevice, {});
     const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
     const osDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
     const userDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { data: [] });
@@ -276,6 +278,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 rtcDevice,
                 rngDevice,
                 buzzerDevice,
+                switchsDevice,
             ]);
 
             setDevicesLoaded(true);
@@ -771,6 +774,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                                 {/* LEDs */}
                                 <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
                                     <Leds deviceInstance={ledsDevice.instance} />
+                                </div>
+
+                                {/* Switchs */}
+                                <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                                    <Switchs deviceInstance={switchsDevice.instance} />
                                 </div>
                             </div>
 

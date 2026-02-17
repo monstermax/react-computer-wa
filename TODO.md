@@ -23,7 +23,7 @@
 - os: gestionnaire des users
 
 
-- jeux: pong, arkanoid, snake, tetris, sokoban, pacman, game of life
+- jeux: t-rex, pong, arkanoid, snake, tetris, sokoban, pacman, game of life
 
 - partage de code entre utilisateurs
 

@@ -211,6 +211,7 @@ const instructions: InstructionDef[] = [
         mnemonic: 'ADD', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_IMM8', opcode: Opcode.ADD_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'ADD_REG_IMM' },
             { operands: 'REG_REG', opcode: Opcode.ADD_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'ADD_REG_REG' },
+            { operands: 'REG_MEM', opcode: Opcode.ADD_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'ADD_REG_MEM' },
         ],
     },
 
@@ -218,6 +219,7 @@ const instructions: InstructionDef[] = [
         mnemonic: 'SUB', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_IMM8', opcode: Opcode.SUB_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'SUB_REG_IMM' },
             { operands: 'REG_REG', opcode: Opcode.SUB_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'SUB_REG_REG' },
+            { operands: 'REG_MEM', opcode: Opcode.SUB_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'SUB_REG_MEM' },
         ],
     },
 
@@ -225,6 +227,7 @@ const instructions: InstructionDef[] = [
         mnemonic: 'AND', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_IMM8', opcode: Opcode.AND_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'AND_REG_IMM' },
             { operands: 'REG_REG', opcode: Opcode.AND_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'AND_REG_REG' },
+            { operands: 'REG_MEM', opcode: Opcode.AND_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'AND_REG_MEM' },
         ],
     },
 
@@ -232,6 +235,7 @@ const instructions: InstructionDef[] = [
         mnemonic: 'OR', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_IMM8', opcode: Opcode.OR_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'OR_REG_IMM' },
             { operands: 'REG_REG', opcode: Opcode.OR_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'OR_REG_REG' },
+            { operands: 'REG_MEM', opcode: Opcode.OR_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'OR_REG_MEM' },
         ],
     },
 
@@ -239,6 +243,7 @@ const instructions: InstructionDef[] = [
         mnemonic: 'XOR', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_IMM8', opcode: Opcode.XOR_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'XOR_REG_IMM' },
             { operands: 'REG_REG', opcode: Opcode.XOR_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'XOR_REG_REG' },
+            { operands: 'REG_MEM', opcode: Opcode.XOR_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'XOR_REG_MEM' },
         ],
     },
 
@@ -246,6 +251,7 @@ const instructions: InstructionDef[] = [
         mnemonic: 'TEST', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_REG', opcode: Opcode.TEST_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'TEST_REG_REG' },
             { operands: 'REG_IMM8', opcode: Opcode.TEST_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'TEST_REG_IMM' },
+            { operands: 'REG_MEM', opcode: Opcode.TEST_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'TEST_REG_MEM' },
         ]
     },
 
@@ -253,6 +259,7 @@ const instructions: InstructionDef[] = [
         mnemonic: 'CMP', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_REG', opcode: Opcode.CMP_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'CMP_REG_REG' },
             { operands: 'REG_IMM8', opcode: Opcode.CMP_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'CMP_REG_IMM' },
+            { operands: 'REG_MEM', opcode: Opcode.CMP_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'CMP_REG_MEM' },
         ]
     },
 
@@ -260,6 +267,9 @@ const instructions: InstructionDef[] = [
         mnemonic: 'SHL', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_IMM8', opcode: Opcode.SHL_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'SHL_REG_IMM' },
             { operands: 'REG_REG', opcode: Opcode.SHL_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'SHL_REG_REG' },
+            { operands: 'REG_MEM', opcode: Opcode.SHL_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'SHL_REG_MEM' },
+            { operands: 'MEM_IMM8', opcode: Opcode.SHL_MEM_IMM, size: 4, condition: (ops) => true, mnemonic: 'SHL_MEM_IMM' },
+            { operands: 'MEM_REG', opcode: Opcode.SHL_MEM_REG, size: 4, condition: (ops) => true, mnemonic: 'SHL_MEM_REG' },
         ]
     },
 
@@ -267,6 +277,9 @@ const instructions: InstructionDef[] = [
         mnemonic: 'SHR', opcode: 0x00, operands: 'NONE', size: 1, variants: [
             { operands: 'REG_IMM8', opcode: Opcode.SHR_REG_IMM, size: 3, condition: (ops) => true, mnemonic: 'SHR_REG_IMM' },
             { operands: 'REG_REG', opcode: Opcode.SHR_REG_REG, size: 3, condition: (ops) => true, mnemonic: 'SHR_REG_REG' },
+            { operands: 'REG_MEM', opcode: Opcode.SHR_REG_MEM, size: 4, condition: (ops) => true, mnemonic: 'SHR_REG_MEM' },
+            { operands: 'MEM_IMM8', opcode: Opcode.SHR_MEM_IMM, size: 4, condition: (ops) => true, mnemonic: 'SHR_MEM_IMM' },
+            { operands: 'MEM_REG', opcode: Opcode.SHR_MEM_REG, size: 4, condition: (ops) => true, mnemonic: 'SHR_MEM_REG' },
         ]
     },
 ];

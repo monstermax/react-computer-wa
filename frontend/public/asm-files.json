@@ -1,6 +1,6 @@
 {
-  "generated": "2026-02-17T04:49:23.998Z",
-  "count": 25,
+  "generated": "2026-02-17T20:24:49.322Z",
+  "count": 27,
   "files": [
     "bootloader/lib_devices.asm",
     "bootloader/lib_string.asm",
@@ -11,8 +11,10 @@
     "bootloader/devices/lib_os_disk.asm",
     "bootloader/devices/lib_leds.asm",
     "bootloader/bootloader_v2.asm",
+    "user/examples/rng_test.asm",
     "user/examples/buzzer_test.asm",
     "user/examples/draw_fractal_on_screen.asm",
+    "user/trex_game.asm",
     "os/os_v3.asm",
     "os/v3/strings/lib_string.asm",
     "os/v3/strings/lib_ascii.asm",

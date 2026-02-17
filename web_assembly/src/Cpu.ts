@@ -1002,12 +1002,12 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             };
             break;
 
-
+        // SHL (Shift Left)
         case <u8>Opcode.SHL_REG_IMM:
             run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
-                const imm = cpu.readMem8(cpu.registers.PC + 1);
+                const imm: u8 = cpu.readMem8(cpu.registers.PC + 1);
                 const aluResult = cpu.alu.shl(regValue, imm);
                 cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
                 cpu.setRegisterValueByIdx(regIdx, aluResult.result);
@@ -1015,11 +1015,63 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             };
             break;
 
+        case <u8>Opcode.SHL_REG_REG:
+            run = (cpu: Cpu) => {
+                const regIdx = cpu.readMem8(cpu.registers.PC);
+                const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
+                const countRegIdx = cpu.readMem8(cpu.registers.PC + 1);
+                const count: u8 = cpu.getRegisterValueByIdx(countRegIdx);
+                const aluResult = cpu.alu.shl(regValue, count);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.setRegisterValueByIdx(regIdx, aluResult.result);
+                cpu.registers.PC += 3;
+            };
+            break;
+
+        case <u8>Opcode.SHL_REG_MEM:
+            run = (cpu: Cpu) => {
+                const regIdx = cpu.readMem8(cpu.registers.PC);
+                const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
+                const memAddress = cpu.readMem16(cpu.registers.PC + 1);
+                const count: u8 = cpu.readMemory(memAddress);
+                const aluResult = cpu.alu.shl(regValue, count);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.setRegisterValueByIdx(regIdx, aluResult.result);
+                cpu.registers.PC += 4;
+            };
+            break;
+
+        case <u8>Opcode.SHL_MEM_IMM:
+            run = (cpu: Cpu) => {
+                const memAddress = cpu.readMem16(cpu.registers.PC);
+                const memValue: u8 = cpu.readMemory(memAddress);
+                const imm: u8 = cpu.readMem8(cpu.registers.PC + 2);
+                const aluResult = cpu.alu.shl(memValue, imm);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.writeMemory(memAddress, aluResult.result);
+                cpu.registers.PC += 4;
+            };
+            break;
+
+        case <u8>Opcode.SHL_MEM_REG:
+            run = (cpu: Cpu) => {
+                const memAddress = cpu.readMem16(cpu.registers.PC);
+                const memValue: u8 = cpu.readMemory(memAddress);
+                const countRegIdx = cpu.readMem8(cpu.registers.PC + 2);
+                const count: u8 = cpu.getRegisterValueByIdx(countRegIdx);
+                const aluResult = cpu.alu.shl(memValue, count);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.writeMemory(memAddress, aluResult.result);
+                cpu.registers.PC += 4;
+            };
+            break;
+
+        // SHR (Shift Right)
         case <u8>Opcode.SHR_REG_IMM:
             run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
-                const imm = cpu.readMem8(cpu.registers.PC + 1);
+                const imm: u8 = cpu.readMem8(cpu.registers.PC + 1);
                 const aluResult = cpu.alu.shr(regValue, imm);
                 cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
                 cpu.setRegisterValueByIdx(regIdx, aluResult.result);
@@ -1027,6 +1079,56 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             };
             break;
 
+        case <u8>Opcode.SHR_REG_REG:
+            run = (cpu: Cpu) => {
+                const regIdx = cpu.readMem8(cpu.registers.PC);
+                const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
+                const countRegIdx = cpu.readMem8(cpu.registers.PC + 1);
+                const count: u8 = cpu.getRegisterValueByIdx(countRegIdx);
+                const aluResult = cpu.alu.shr(regValue, count);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.setRegisterValueByIdx(regIdx, aluResult.result);
+                cpu.registers.PC += 3;
+            };
+            break;
+
+        case <u8>Opcode.SHR_REG_MEM:
+            run = (cpu: Cpu) => {
+                const regIdx = cpu.readMem8(cpu.registers.PC);
+                const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
+                const memAddress = cpu.readMem16(cpu.registers.PC + 1);
+                const count: u8 = cpu.readMemory(memAddress);
+                const aluResult = cpu.alu.shr(regValue, count);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.setRegisterValueByIdx(regIdx, aluResult.result);
+                cpu.registers.PC += 4;
+            };
+            break;
+
+        case <u8>Opcode.SHR_MEM_IMM:
+            run = (cpu: Cpu) => {
+                const memAddress = cpu.readMem16(cpu.registers.PC);
+                const memValue: u8 = cpu.readMemory(memAddress);
+                const imm: u8 = cpu.readMem8(cpu.registers.PC + 2);
+                const aluResult = cpu.alu.shr(memValue, imm);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.writeMemory(memAddress, aluResult.result);
+                cpu.registers.PC += 4;
+            };
+            break;
+
+        case <u8>Opcode.SHR_MEM_REG:
+            run = (cpu: Cpu) => {
+                const memAddress = cpu.readMem16(cpu.registers.PC);
+                const memValue: u8 = cpu.readMemory(memAddress);
+                const countRegIdx = cpu.readMem8(cpu.registers.PC + 2);
+                const count: u8 = cpu.getRegisterValueByIdx(countRegIdx);
+                const aluResult = cpu.alu.shr(memValue, count);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.writeMemory(memAddress, aluResult.result);
+                cpu.registers.PC += 4;
+            };
+            break;
 
         // LEA_REG_REG_IMM: (regLow, regHigh) = imm16
         // Encoding: [opcode] [regLow] [regHigh] [imm16_low] [imm16_high]
