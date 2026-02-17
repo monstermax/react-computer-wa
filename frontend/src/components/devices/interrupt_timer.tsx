@@ -11,14 +11,14 @@ import type { DevicesManagerHook } from "@/hooks/useDevice";
 import type { InterruptDevice } from "./interrupt";
 
 
-export type TimerDeviceParams = {
+export type InterruptTimerDeviceParams = {
     type: string;
     vendor?: string;
     model?: string;
     devicesManager: DevicesManagerHook;
 }
 
-export class TimerDevice extends IoDevice {
+export class InterruptTimerDevice extends IoDevice {
     static type = 'system';
     public devicesManager: DevicesManagerHook;
     public counter = 0 as u8;
@@ -26,7 +26,7 @@ export class TimerDevice extends IoDevice {
     public enabled = false;
 
 
-    constructor(idx: u8, name: string, params: TimerDeviceParams) {
+    constructor(idx: u8, name: string, params: InterruptTimerDeviceParams) {
         super(idx, name, params);
 
         this.devicesManager = params.devicesManager;

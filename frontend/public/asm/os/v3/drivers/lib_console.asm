@@ -26,7 +26,7 @@ _exit:
 console_clear:
     mov al, 0x01
     ; mov [CONSOLE_CLEAR], al
-debug 8, dl
+
     mov el, [console_io_base]     ; low  byte de l'adresse de la variable console_io_base
     mov fl, [console_io_base + 1] ; high byte de l'adresse de la variable console_io_base
 

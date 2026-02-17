@@ -39,8 +39,6 @@
 
 
 section .data
-    screen_io_base  dw 0xF030
-
     ; --- Couleurs ---
     COL_TRANSPARENT equ 0x00
     COL_RED         equ 0x01

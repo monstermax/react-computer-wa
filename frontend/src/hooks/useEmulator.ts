@@ -10,7 +10,7 @@ import * as releaseModule from "@/../public/web_assembly/release";
 import type { u32, u8, u16 } from "@/types/computer.types";
 import type { CompiledProgram } from "@/types/compiler.types";
 import type { IoDevice } from "@/components/devices/IoDevice";
-import type { TimerDevice } from "@/components/devices/timer";
+import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer";
 
 
 
@@ -185,9 +185,10 @@ export const useEmulator = (params: useEmulatorParams) => {
 
                 try {
                     const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
-                    const timer = (timerIdx === null)
+
+                    const timer: InterruptTimerDevice | null = (timerIdx === null)
                         ? null
-                        : devicesManager.devicesRef.current.get(timerIdx) as TimerDevice | undefined ?? null;
+                        : devicesManager.devicesRef.current.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
 
                     if (timer) {
                         timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer

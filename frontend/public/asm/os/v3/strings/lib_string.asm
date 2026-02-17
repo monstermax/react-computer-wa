@@ -7,6 +7,10 @@
 .include "os/v3/arithmetic/lib_math.asm"
 
 
+section .data
+    DIGIT_0 equ 48
+    DIGIT_9 equ 57
+
 section .text
     global strlen
     global strcmp
@@ -113,3 +117,204 @@ strcmp_len:
 
     STRCMP_LEN_END:
     ret
+
+
+
+
+; -----------------------------------------------
+; int_to_str : convertit un entier 8 bits en string
+; Entrée : AL = nombre à convertir (0-255)
+;         [C:D] = buffer de destination (au moins 4 bytes)
+; Sortie : [C:D] contient la string terminée par \0
+;         A retourne la longueur de la string
+; -----------------------------------------------
+int_to_str:
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    ; Sauvegarde l'adresse de destination
+    push cl
+    push dl
+
+    mov el, 0           ; compteur de caractères
+    
+    ; Cas spécial: nombre = 0
+    cmp al, 0
+    jne .not_zero
+
+    mov fl, DIGIT_0
+    sti cl, dl, fl
+    call inc_cd
+    inc el
+    jmp .null_term
+
+.not_zero:
+    ; Sauvegarde la valeur originale
+    push al
+
+    ; === Calcul des centaines ===
+    mov bl, 0           ; compteur centaines
+    mov fl, al          ; valeur restante
+    
+.count_100:
+    cmp fl, 100
+    jb .done_100
+    sub fl, 100
+    inc bl
+    jmp .count_100
+
+.done_100:
+    mov al, bl          ; al = nombre de centaines
+    cmp al, 0
+    je .prepare_tens
+
+    ; Affiche les centaines
+    add al, DIGIT_0
+    sti cl, dl, al
+    call inc_cd
+    inc el
+
+.prepare_tens:
+    ; FL contient le reste (0-99)
+    ; On le sauvegarde pour plus tard
+    push fl             ; ← PUSH équilibré : on push ici pour tous les chemins
+
+    ; === Calcul des dizaines ===
+    mov bl, 0           ; compteur dizaines
+    mov al, fl          ; al = reste (0-99)
+    
+.count_10:
+    cmp al, 10
+    jb .done_10
+    sub al, 10
+    inc bl
+    jmp .count_10
+
+.done_10:
+    ; À ce stade : bl = dizaines, al = unités
+    ; On récupère le reste des centaines pour décider l'affichage
+    pop fl              ; ← POP correspondant au PUSH de .prepare_tens
+
+    ; Décide si on affiche les dizaines
+    cmp fl, 0           ; fl = reste des centaines (0-99)
+    jne .show_tens      ; Si on avait des centaines, on affiche toujours les dizaines
+    cmp bl, 0
+    je .show_units      ; Si pas de centaines ET dizaines=0, on saute
+
+.show_tens:
+    push al             ; sauvegarde les unités
+    mov al, bl
+    add al, DIGIT_0
+    sti cl, dl, al
+    call inc_cd
+    inc el
+    pop al              ; restaure les unités
+
+.show_units:
+    add al, DIGIT_0
+    sti cl, dl, al
+    call inc_cd
+    inc el
+
+    ; Nettoie la pile de la sauvegarde de .not_zero
+    pop al              ; correspond au push al de .not_zero
+
+.null_term:
+    mov fl, 0
+    sti cl, dl, fl
+
+    ; Restaure l'adresse de départ pour calculer la longueur
+    pop dl
+    pop cl
+    mov al, el          ; A = longueur de la string
+
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    ret
+
+
+
+; -----------------------------------------------
+; str_to_int : convertit une string en entier 8 bits
+; Entrée : [C:D] = adresse de la string (terminée par \0)
+; Sortie : AL = valeur numérique (0-255)
+;         Si erreur (caractère non numérique ou dépassement), AL = 0xFF
+; -----------------------------------------------
+str_to_int:
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    mov al, 0        ; résultat
+    mov el, 0        ; compteur de chiffres (max 3)
+
+.next_char:
+    ; Lecture du caractère
+    ldi fl, cl, dl   ; FL = caractère courant
+
+    ; Fin de chaine ?
+    cmp fl, 0
+    je .end_success
+
+    ; Vérification que c'est un chiffre (0-9)
+    cmp fl, DIGIT_0
+    jb .error
+    cmp fl, DIGIT_9
+    ja .error
+
+    ; Conversion ASCII → valeur (soustraire '0')
+    sub fl, DIGIT_0
+
+    ; Sauvegarde du nouveau chiffre
+    push fl
+
+    ; Multiplication du résultat actuel par 10
+    ; AL = AL * 10
+    mov bl, 10
+    call mul8        ; AL = AL * 10 (utilise BL=10)
+
+    ; Ajout du nouveau chiffre
+    pop fl
+    add al, fl
+    jc .error        ; Si carry, dépassement (>255)
+
+    ; Passage au caractère suivant
+    call inc_cd
+    inc el           ; inc compteur chiffres
+
+    ; Maximum 3 chiffres pour 0-255
+    cmp el, 3
+    jge .check_end
+    jmp .next_char
+
+.check_end:
+    ; Vérifie qu'il n'y a plus que le null terminator
+    ldi fl, cl, dl
+    cmp fl, 0
+    jne .error       ; Si pas null, trop long
+
+.end_success:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    ret
+
+.error:
+    mov al, 0xFF
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    ret
+

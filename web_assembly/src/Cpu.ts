@@ -210,6 +210,8 @@ export class Cpu {
             return;
         }
 
+        // TODO: gérer les Interrupts
+
         const actions: InstructionActions = fetchInstructionActions(opcode);
 
         if (actions.fetch && actions.execute) {

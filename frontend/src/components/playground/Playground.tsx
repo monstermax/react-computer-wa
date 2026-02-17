@@ -32,7 +32,7 @@ import { ScreenCanvas, ScreenCanvasDevice } from "../devices/screen_canvas";
 import { InterruptDevice } from "../devices/interrupt";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
-import { TimerDevice } from "../devices/timer";
+import { InterruptTimerDevice } from "../devices/interrupt_timer";
 import { BuzzerDevice } from "../devices/buzzer";
 import { RngDevice } from "../devices/rng";
 import { RtcDevice } from "../devices/rtc";
@@ -136,7 +136,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const userDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { data: [] });
     const dmaDevice = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
     const interruptDevice = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {  });
-    const timerDevice = useDevice<TimerDevice>(emulator.devicesManager, 'timer', TimerDevice, {  });
+    const timerDevice = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {  });
     const rtcDevice = useDevice<RtcDevice>(emulator.devicesManager, 'rtc', RtcDevice, {  });
     const rngDevice = useDevice<RngDevice>(emulator.devicesManager, 'rng', RngDevice, {  });
     const buzzerDevice = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {  });
