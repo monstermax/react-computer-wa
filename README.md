@@ -119,8 +119,22 @@ frontend/
 
 ## Resources
 
+### Assembly
+- https://pacman128.github.io/static/pcasm-book-french.pdf
+- https://www.gladir.com/CODER/ASM8086/intro.htm
+
 ### Assembly Script
 - https://www.assemblyscript.org/
+
+### CPU Emulator
+- https://app.x64.halb.it/
+- https://onecompiler.com/assembly
+- https://peterhigginson.co.uk/lmc/
+- https://www.101computing.net/lmc/
+- https://wellingborough.github.io/LMC/LMC0.3.html
+
+### ASCII Table
+- https://www.ascii-code.com/fr
 
 
 ## License

@@ -3,22 +3,19 @@
 - os: parser les arguments de la commande shell
 - os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
-- persistent user disk (local storage)
+- persistent user disk (local storage) + import/export via json
 - os: filesystem
 
-- /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM.
+- /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 
-- io timer
-- io randomizer
-- io rtc
+- cpu: interrupts
 - io sound/buzzer/speaker
 - io switches (8 toggles cliquables dans l'UI, lu comme un byte sur un port (utile pour configurer des paramètres au runtime))
 - io gamepad
 - io mouse
-- io network/socket/websocket
 - io lcd screen
 - io 7-segments display
-- cpu: interrupts
+- io network/socket/websocket
 - os: interrupts
 - os: syscall
 - os: gestionnaire de fichiers ouverts
@@ -26,7 +23,17 @@
 - os: gestionnaire des users
 
 
-- webworkers ?
+- jeux: pong, arkanoid, snake, tetris, sokoban, pacman, game of life
 
-- jeux: pong, arkanoid, snake, tetris, sokoban, pacman
+- partage de code entre utilisateurs
 
+
+
+
+Périphériques créatifs
+- Clavier virtuel sur le screen, cliquable à la souris (pour tablettes/tactile)
+- Piano : Utiliser le clavier PC comme touches de piano avec le buzzer
+- Générateur de musique : Format mod/tracker minimal avec 3 canaux
+- Horloge/timer : Réveil avec alarme (buzzer) et affichage 7-segments
+- Météo : Récupérer la météo via network et l'afficher
+- Terminal chat : Discussion entre deux navigateurs via WebSocket
