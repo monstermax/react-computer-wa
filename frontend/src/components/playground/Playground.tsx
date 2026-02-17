@@ -223,6 +223,21 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }, [])
 
 
+
+    const handleResetComputer = async () => {
+        // Reload OS on OS_DISK
+        if (osDiskDevice.instance) {
+            const diskData = await compileAndLoadOsCode();
+            setOsDiskData(diskData);
+
+            osDiskDevice.instance.loadRawData(new Map(diskData))
+        }
+
+        // Reset Computer
+        emulator.resetComputer()
+    }
+
+
     // Compile OS Code
     const compileAndLoadOsCode = async () => {
         const startAddress = MEMORY_MAP.OS_START;
@@ -497,7 +512,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
                     <button
                         disabled={false}
-                        onClick={() => emulator.resetComputer()}
+                        onClick={() => handleResetComputer()}
                         className="ms-8 px-3 py-1.5 text-xs rounded bg-red-800/80 hover:bg-red-700 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
                     >
                         Reset
