@@ -224,16 +224,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_HELP] ; (C,D) = [STR_COMMAND_HELP]
 
+    ; recupere la longueur de la chaine à comparer
     push al
     call strlen ; => A = longueur de la chaine STR_COMMAND_HELP
-    mov el, al
-    pop al
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
 
-    cmp el, fl
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
     jne AFTER_CHECK_COMMAND_HELP ; si longueur de chaine differente, on passe a la commande suivante
 
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_HELP ; si chaine differente, on passe a la commande suivante
 
@@ -251,8 +251,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_LS] ; (C,D) = [STR_COMMAND_LS]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_LS
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_LS ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_LS ; si chaine differente, on passe a la commande suivante
 
@@ -270,8 +278,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_PS] ; (C,D) = [STR_COMMAND_PS]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_PS
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_PS ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_PS ; si chaine differente, on passe a la commande suivante
 
@@ -289,8 +305,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_PIXELS] ; (C,D) = [STR_COMMAND_PIXELS]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_PIXELS
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_PIXELS ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_PIXELS ; si chaine differente, on passe a la commande suivante
 
@@ -308,8 +332,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_SPRITE] ; (C,D) = [STR_COMMAND_SPRITE]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_SPRITE
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_SPRITE ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_SPRITE ; si chaine differente, on passe a la commande suivante
 
@@ -327,8 +359,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_LEDS] ; (C,D) = [STR_COMMAND_LEDS]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_LEDS
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_LEDS ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_LEDS ; si chaine differente, on passe a la commande suivante
 
@@ -346,8 +386,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_CUSTOM] ; (C,D) = [STR_COMMAND_CUSTOM]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_CUSTOM
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_CUSTOM ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_CUSTOM ; si chaine differente, on passe a la commande suivante
 
@@ -365,8 +413,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_HALT] ; (C,D) = [STR_COMMAND_HALT]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_HALT
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_HALT ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_HALT ; si chaine differente, on passe a la commande suivante
 
@@ -384,8 +440,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_REBOOT] ; (C,D) = [STR_COMMAND_REBOOT]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_REBOOT
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_REBOOT ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_REBOOT ; si chaine differente, on passe a la commande suivante
 
@@ -403,8 +467,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_CLEAR] ; (C,D) = [STR_COMMAND_CLEAR]
 
-    pop fl ; restaure la longueur de la chaine
-    push fl ; sauvegarde la longueur de la chaine
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_CLEAR
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_CLEAR ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
     call strcmp_len
     jne AFTER_CHECK_COMMAND_CLEAR ; si chaine differente, on passe a la commande suivante
 
