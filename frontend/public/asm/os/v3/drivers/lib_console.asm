@@ -35,7 +35,7 @@ console_clear:
     jnc CONSOLE_CLEAR_AFTER_CARRY
     inc fl
     CONSOLE_CLEAR_AFTER_CARRY:
-debug 9, dl
+
     sti el, fl, al ; [e:f] = A
     ret
 
