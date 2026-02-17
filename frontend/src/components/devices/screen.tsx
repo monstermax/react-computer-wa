@@ -17,10 +17,6 @@ export type ScreenDeviceParams = {
 
 export class ScreenDevice extends IoDevice {
     static type = 'output';
-    name = 'screen';
-    vendor = '';
-    model = '';
-
     width = 32 as u8;
     height = 32 as u8;
     private pixels: Uint8Array[];

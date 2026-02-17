@@ -132,7 +132,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     //const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
     const screenDevice = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen', ScreenCanvasDevice, { width: 32, height: 32, pixelSize: 8 });
     const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
-    const diskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
+    const osDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
+    const userDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { data: [] });
     const dmaDevice = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
     const interruptDevice = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {  });
     const timerDevice = useDevice<TimerDevice>(emulator.devicesManager, 'timer', TimerDevice, {  });
@@ -252,8 +253,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 consoleDevice,
                 ledsDevice,
                 screenDevice,
-                diskDevice,
+                osDiskDevice,
+                userDiskDevice,
                 dmaDevice,
+                interruptDevice,
+                timerDevice,
+                rtcDevice,
+                rngDevice,
+                buzzerDevice,
             ]);
 
             setDevicesLoaded(true);
@@ -731,7 +738,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
                             {/* Disk ── */}
                             <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                <Disk deviceInstance={diskDevice.instance} />
+                                <Disk deviceInstance={osDiskDevice.instance} />
                             </div>
                         </div>
                     </div>

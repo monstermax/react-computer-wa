@@ -18,10 +18,6 @@ export type ScreenCanvasDeviceParams = {
 
 export class ScreenCanvasDevice extends IoDevice {
     static type = 'output';
-    name = 'screen';
-    vendor = '';
-    model = '';
-
     width = 32 as u8;
     height = 32 as u8;
     pixelSize = 1 as u8;

@@ -18,10 +18,6 @@ export type DmaDeviceParams = {
 
 export class DmaDevice extends IoDevice {
     static type = 'system';
-    name = 'dma';
-    vendor = '';
-    model = '';
-
     private devicesRef: React.RefObject<Map<number, IoDevice>>;
     private selectedIo = U8(0);
     private sourceStartAddress = U16(0); // disk address

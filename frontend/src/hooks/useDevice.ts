@@ -48,7 +48,7 @@ export function useDevice<T>(devicesManager: DevicesManagerHook, deviceName: str
 
     const instanciate = (deviceIdx: u8) => {
         const deviceType: string = deviceClass.type;
-        const device = new deviceClass(deviceIdx, name, { type: deviceType, vendor: '', model: '', ...optionalParams });
+        const device = new deviceClass(deviceIdx, deviceName, { type: deviceType, vendor: '', model: '', ...optionalParams });
         devicesManager.devicesRef.current.set(deviceIdx, device);
     }
 

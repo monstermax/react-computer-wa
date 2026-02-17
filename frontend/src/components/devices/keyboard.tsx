@@ -13,11 +13,7 @@ export type KeyboardDeviceParams = {
 }
 
 export class KeyboardDevice extends IoDevice {
-    name = 'keyboard';
     static type = 'input';
-    vendor = '';
-    model = '';
-
     lastChar = 0 as u8;
     lastCharName: string = "";
     hasChar = false;

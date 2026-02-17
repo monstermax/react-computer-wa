@@ -28,10 +28,6 @@ export type ConsoleDeviceParams = {
 
 export class ConsoleDevice extends IoDevice {
     static type = 'output';
-    name = 'console';
-    vendor = '';
-    model = '';
-
     width = 30;
     height = 15;
     lines = [] as string[];

@@ -14,10 +14,6 @@ export type LedsDeviceParams = {
 
 export class LedsDevice extends IoDevice {
     static type = 'output';
-    name = 'leds';
-    vendor = '';
-    model = '';
-
     private leds: u8 = 0 as u8;
 
 

@@ -17,10 +17,6 @@ export type DiskDeviceParams = {
 
 export class DiskDevice extends IoDevice {
     static type = 'storage';
-    name = 'disk';
-    vendor = '';
-    model = '';
-
     private currentAddress: u16 = 0 as u16;
     public storage: Map<u16, u8> = new Map;
     maxSize = 0xFFFF as u16;
@@ -79,7 +75,7 @@ export class DiskDevice extends IoDevice {
                 }
 
                 this.currentAddress = U16(this.currentAddress + 1);
-    console.log('💾 WRITE at', this.currentAddress, 'value', value);
+                //console.log('💾 WRITE at', this.currentAddress, 'value', value);
                 this.emit('state', { storage: this.storage })
                 break;
 
@@ -173,7 +169,7 @@ export const Disk: React.FC<DiskProps> = (props) => {
 
     return (
         <>
-            <h2>Disk</h2>
+            <h2>Disk {deviceInstance.name}</h2>
 
             <div className="font-mono text-sm space-y-1 max-h-[250px] overflow-y-auto overscroll-contain">
                 <div className="text-xs text-slate-400 mb-2">

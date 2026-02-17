@@ -10,6 +10,7 @@ import * as releaseModule from "@/../public/web_assembly/release";
 import type { u32, u8, u16 } from "@/types/computer.types";
 import type { CompiledProgram } from "@/types/compiler.types";
 import type { IoDevice } from "@/components/devices/IoDevice";
+import type { TimerDevice } from "@/components/devices/timer";
 
 
 
@@ -152,43 +153,59 @@ export const useEmulator = (params: useEmulatorParams) => {
     useEffect(() => {
         if (!computerPointer) return;
 
-        const _initClock = () => {
-            let lastCycles = 0n;
-            let lastCyclesDate = Date.now();
+        let lastCycles = 0n;
+        let lastCyclesDate = Date.now();
 
-            clock.on('tick', () => {
-                if (wasmExports && computerPointer) {
-                    try {
-                        // Run cycles
-                        wasmExports.computerRunCycles(computerPointer, speedMultiplier);
+        const _handleClockTick = () => {
+            if (wasmExports && computerPointer) {
+                try {
+                    // Run cycles
+                    wasmExports.computerRunCycles(computerPointer, speedMultiplier);
 
-                    } catch (err: any) {
-                        wasmError(err);
-                        throw new Error("Unreachable Error");
-                    }
-
-                    try {
-                        // Compute speed only
-                        const newCycles = wasmExports.computerGetCycles(computerPointer);
-                        const diff = newCycles - lastCycles;
-                        const duration = Date.now() - lastCyclesDate;
-                        const cyclesPerSecond = 1000 * Number(diff) / duration;
-                        cyclesPerSecondRef.current = cyclesPerSecond;
-
-                        lastCycles = newCycles;
-                        lastCyclesDate = Date.now();
-
-                    } catch (err: any) {
-                        wasmError(err);
-                        throw new Error("Unreachable Error");
-                    }
+                } catch (err: any) {
+                    wasmError(err);
+                    throw new Error("Unreachable Error");
                 }
-            });
-        };
 
-        const timer = setTimeout(_initClock, 100);
-        return () => clearTimeout(timer);
-    }, [computerPointer]);
+                try {
+                    // Compute speed only
+                    const newCycles = wasmExports.computerGetCycles(computerPointer);
+                    const diff = newCycles - lastCycles;
+                    const duration = Date.now() - lastCyclesDate;
+                    const cyclesPerSecond = 1000 * Number(diff) / duration;
+                    cyclesPerSecondRef.current = cyclesPerSecond;
+
+                    lastCycles = newCycles;
+                    lastCyclesDate = Date.now();
+
+                } catch (err: any) {
+                    wasmError(err);
+                    throw new Error("Unreachable Error");
+                }
+
+                try {
+                    const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
+                    const timer = (timerIdx === null)
+                        ? null
+                        : devicesManager.devicesRef.current.get(timerIdx) as TimerDevice | undefined ?? null;
+
+                    if (timer) {
+                        timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer
+                    }
+
+                } catch (err: any) {
+                    wasmError(err);
+                    throw new Error("Unreachable Error");
+                }
+            }
+        }
+
+        clock.on('tick', _handleClockTick);
+
+        return () => {
+            clock.off('tick', _handleClockTick);
+        }
+    }, [computerPointer, devicesManager]);
 
 
     const startClock = () => {
