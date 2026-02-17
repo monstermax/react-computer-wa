@@ -177,6 +177,12 @@ run_shell:
     ; Execute la commande tapée
     RUN_SHELL_RUN_COMMAND:
 
+    ; remplace le \10 final par \0
+    lea cl, dl, [shell_command_input]
+    mov el, [shell_command_ptr]
+    call add_cd_e
+    sti cl, dl, 0
+
     ; Detection caractere diese en debut de commande
     mov al, [shell_command_input]
     cmp, al, ASCII_SHARP

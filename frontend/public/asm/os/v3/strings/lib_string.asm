@@ -79,33 +79,31 @@ strcmp:
 
 
 strcmp_len:
-    push fl ; sauvegarde la longueur de la chaine (1 byte) = longueur restante à lire
-
-    ; TODO: a revoir => il faut (aussi) comparer la longueur des chaines
-
     ; si chaine vide, on quitte directement
     cmp fl, 0
-    je STRCMP_LEN_END_POP
+    je STRCMP_LEN_END
+
+    push fl ; sauvegarde la longueur de la chaine
 
     STRCMP_LEN_START:
 
     ; lecture des caracteres des 2 chaines
+    push fl ; sauvegarde la longueur de la chaine (1 byte) = longueur restante à lire
     ldi el, al, bl ; E = [A:B]
     ldi fl, cl, dl ; F = [C:D]
     cmp el, fl ; compare les caracteres
+    pop fl ; restaure la longueur restante à lire
 
     ; si caractere different, on quitte (avec sauvegarde du flag zero)
     jne STRCMP_LEN_END_POP
 
-
-    pop fl ; restaure la longueur restante à lire
     dec fl ; decremente la longueur restante à lire
     cmp fl, 0
 
     ; si fin de chaine (longueur atteinte), on quitte (avec sauvegarde du flag zero)
-    je STRCMP_LEN_END
+    je STRCMP_LEN_END_POP
 
-    push fl ; sauvegarde la longueur restante à lire
+    ;push fl ; sauvegarde la longueur restante à lire
 
     ; passage au caractere suivant
     call inc_ab
