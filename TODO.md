@@ -3,6 +3,8 @@
 - os: parser les arguments de la commande shell
 - os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
+- persistent user disk (local storage)
+- os: filesystem
 
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM.
 
@@ -12,7 +14,10 @@
 - io sound/buzzer/speaker
 - io switches (8 toggles cliquables dans l'UI, lu comme un byte sur un port (utile pour configurer des paramètres au runtime))
 - io gamepad
-- io network/socket
+- io mouse
+- io network/socket/websocket
+- io lcd screen
+- io 7-segments display
 - cpu: interrupts
 - os: interrupts
 - os: syscall

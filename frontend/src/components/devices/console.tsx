@@ -37,6 +37,9 @@ export class ConsoleDevice extends IoDevice {
     lines = [] as string[];
     maxLines = 100;
     currentLine = "";
+    currentLinePosition = 0;
+    private escapeSequence: string = "";
+    private inEscapeSequence: boolean = false;
 
 
     constructor(idx: u8, name: string, params: ConsoleDeviceParams) {
@@ -48,9 +51,71 @@ export class ConsoleDevice extends IoDevice {
     }
 
 
+    private handleEscapeSequence(charCode: u8): void {
+        // Accumuler la séquence
+        this.escapeSequence += String.fromCharCode(charCode);
+
+        // Les séquences pour les flèches sont: ESC [ A (haut), ESC [ B (bas), ESC [ C (droite), ESC [ D (gauche)
+        if (this.escapeSequence.length === 1 && charCode !== 0x5B) { // 0x5B = '['
+            // Pas une séquence de flèche valide
+            this.inEscapeSequence = false;
+            this.escapeSequence = "";
+            return;
+        }
+
+        if (this.escapeSequence.length === 2) {
+            // Séquence complète, on l'interprète
+            this.processArrowSequence(this.escapeSequence);
+            this.inEscapeSequence = false;
+            this.escapeSequence = "";
+        }
+    }
+
+
+    // Méthode pour traiter les flèches
+    private processArrowSequence(seq: string): void {
+        // seq est comme "[A", "[B", "[C", "[D"
+        const arrow = seq.slice(-1); // Le dernier caractère
+
+        // Représentation visuelle des flèches
+        let arrowChar = "";
+        switch (arrow) {
+            case 'A': { // Up
+                //arrowChar = "↑";
+                break;
+            }
+            case 'B': { // Down
+                //arrowChar = "↓";
+                break;
+            }
+            case 'C': { // Right
+                //arrowChar = "→";
+                this.currentLinePosition++;
+                break;
+            }
+            case 'D': { // Left
+                //arrowChar = "←";
+                this.currentLinePosition--;
+                break;
+            }
+            default: return;
+        }
+
+        if (arrowChar) {
+            // Afficher la flèche dans la console
+            this.currentLine = this.currentLine + arrowChar;
+            this.currentLinePosition += arrowChar.length;
+            this.emit('state', { currentLine: this.currentLine });
+        }
+
+        this.emit('state', { currentLinePosition: this.currentLinePosition });
+    }
+
+
     read(port: u8): u8 {
         return 0 as u8; // write only
     }
+
 
     write(port: u8, value: u8): void {
         const BACKSPACE = 8;
@@ -65,7 +130,21 @@ export class ConsoleDevice extends IoDevice {
                 const charCode = value;
                 const char = String.fromCharCode(charCode);
 
-                //console.log('console char:', char)
+                //console.log('console char:', charCode, `"${char}"`, this.inEscapeSequence)
+
+                // Gestion des séquences d'échappement
+                if (this.inEscapeSequence) {
+                    this.handleEscapeSequence(charCode);
+                    return;
+                }
+
+                if (charCode === ESC) {
+                    // Début d'une séquence d'échappement
+                    this.inEscapeSequence = true;
+                    this.escapeSequence = "";
+                    return;
+                }
+
 
                 if (charCode === CR || charCode === LF) {
                     // Newline (LF ou CR)
@@ -79,19 +158,22 @@ export class ConsoleDevice extends IoDevice {
                     }
 
                     this.currentLine = "";
+                    this.currentLinePosition = 0;
                     //console.log(`📟 Console: "${currentLine}"`);
 
-                    this.emit('state', { lines: this.lines, currentLine: this.currentLine })
+                    this.emit('state', { lines: this.lines, currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
 
                 } else if (charCode === BACKSPACE) {
                     // Backspace
                     this.currentLine = this.currentLine.slice(0, -1);
-                    this.emit('state', { currentLine: this.currentLine })
+                    this.currentLinePosition--;
+                    this.emit('state', { currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
 
                 } else if (charCode >= SPACE /* && charCode <= 0x7E */) {
                     // Caractères imprimables ASCII
                     this.currentLine = this.currentLine + char;
-                    this.emit('state', { currentLine: this.currentLine })
+                    this.currentLinePosition += char.length;
+                    this.emit('state', { currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
 
                 } else if ([TAB, ESC].includes(charCode)) {
                     // caractères de contrôle - ignorer
@@ -109,10 +191,12 @@ export class ConsoleDevice extends IoDevice {
         }
     }
 
+
     reset() {
         this.lines = [];
         this.currentLine = "";
-        this.emit('state', { lines: this.lines, currentLine: this.currentLine })
+        this.currentLinePosition = 0
+        this.emit('state', { lines: this.lines, currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
     }
 }
 
@@ -128,6 +212,7 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
     const [lines, setLines] = useState<string[]>([])
     const [currentLine, setCurrentLine] = useState<string>("")
+    const [currentLinePosition, setCurrentLinePosition] = useState<number>(0)
     const [demoCleaned, setDemoCleaned] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const logEndRef = useRef<HTMLDivElement>(null);
@@ -142,6 +227,7 @@ export const Console: React.FC<ConsoleProps> = (props) => {
             if (!demoCleaned) {
                 setLines([]);
                 setCurrentLine("");
+                setCurrentLinePosition(0);
                 setDemoCleaned(true)
             }
 
@@ -151,6 +237,10 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
             if (state.currentLine !== undefined) {
                 setCurrentLine(state.currentLine)
+            }
+
+            if (state.currentLinePosition !== undefined) {
+                setCurrentLinePosition(state.currentLinePosition)
             }
         };
 

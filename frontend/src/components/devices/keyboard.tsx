@@ -24,13 +24,26 @@ export class KeyboardDevice extends IoDevice {
     isEnable = true;
     irqEnabled = false;
     charQueue: {charCode: u8, charName: string}[] = [];
+    private specialKeys: Map<string, u8> = new Map<string, u8>();
 
 
     constructor(idx: u8, name: string, params: KeyboardDeviceParams) {
         super(idx, name, params);
-        // Keyboard listening is handled by the React component (div focus),
-        // not by a global window listener.
+
+        // Initialiser le mapping des touches spéciales
+        this.initSpecialKeys();
     }
+
+
+    private initSpecialKeys(): void {
+        // Codes standards pour les touches fléchées (souvent utilisés dans les terminaux)
+        this.specialKeys.set("ArrowUp", 0x1B as u8);     // ESC [ A
+        this.specialKeys.set("ArrowDown", 0x1B as u8);   // ESC [ B
+        this.specialKeys.set("ArrowLeft", 0x1B as u8);   // ESC [ C
+        this.specialKeys.set("ArrowRight", 0x1B as u8);  // ESC [ D
+        // Note: On utilise ESC comme premier caractère, le deuxième sera ajouté dans handleKeyDown
+    }
+
 
     read(port: u8): u8 {
         switch (port) {
@@ -72,11 +85,49 @@ export class KeyboardDevice extends IoDevice {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (!this.isEnable) return;
 
-            const charCode = (event.key.length === 1)
-                ? event.key.charCodeAt(0)
-                : event.keyCode;
+            let charCode: u8;
+            let charName: string;
 
-            const charName = event.key || `${charCode}`;
+            // Vérifier si c'est une touche fléchée
+            if (event.key.startsWith('Arrow')) {
+                // Pour les flèches, on utilise un séquence ESC + [ + lettre
+                // C'est le standard des terminaux (ANSI escape codes)
+                switch (event.key) {
+                    case 'ArrowUp':
+                        charCode = 0x41 as u8; // 'A' en ASCII
+                        charName = '↑';
+                        break;
+                    case 'ArrowDown':
+                        charCode = 0x42 as u8; // 'B' en ASCII
+                        charName = '↓';
+                        break;
+                    case 'ArrowLeft':
+                        charCode = 0x44 as u8; // 'D' en ASCII
+                        charName = '←';
+                        break;
+                    case 'ArrowRight':
+                        charCode = 0x43 as u8; // 'C' en ASCII
+                        charName = '→';
+                        break;
+                    default:
+                        return;
+                }
+
+                // Pour les flèches, on envoie d'abord ESC (0x1B) puis le caractère
+                this.handleCharCodeQueued(0x1B as u8, 'ESC');
+                this.handleCharCodeQueued(0x5B as u8, '['); // Caractère '['
+                this.handleCharCodeQueued(charCode, charName);
+
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            }
+
+            charCode = (event.key.length === 1)
+                ? event.key.charCodeAt(0) as u8
+                : event.keyCode as u8;
+
+            charName = event.key || `${charCode}`;
 
             const BACKSPACE = 8;
             const TAB = 9;

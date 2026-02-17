@@ -78,7 +78,7 @@ const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
 //  Playground Component
 // ─────────────────────────────────────────────
 export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
-    const { autoStart = false } = props;
+    const { autoStart = true } = props;
 
     const clockFrequency = 100 as u32;   // nb tick per second
     const speedMultiplier = 0.5 * 10_000 as u32; // nb cycles per tick
