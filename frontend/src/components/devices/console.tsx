@@ -154,14 +154,17 @@ export class ConsoleDevice extends IoDevice {
                     // Limiter le nombre de lignes
                     if (this.lines.length > this.maxLines) {
                         this.lines = this.lines.slice(-this.maxLines);
-                        return;
+
+                    } else {
+                        this.currentLine = "";
+                        this.currentLinePosition = 0;
+
+                        this.emit('state', { currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
                     }
 
-                    this.currentLine = "";
-                    this.currentLinePosition = 0;
-                    //console.log(`📟 Console: "${currentLine}"`);
+                    //console.log(`📟 Console: "${this.currentLine}"`);
 
-                    this.emit('state', { lines: this.lines, currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
+                    this.emit('state', { lines: this.lines.slice() })
 
                 } else if (charCode === BACKSPACE) {
                     // Backspace
@@ -196,7 +199,7 @@ export class ConsoleDevice extends IoDevice {
         this.lines = [];
         this.currentLine = "";
         this.currentLinePosition = 0
-        this.emit('state', { lines: this.lines, currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
+        this.emit('state', { lines: this.lines.slice(), currentLine: this.currentLine, currentLinePosition: this.currentLinePosition })
     }
 }
 
@@ -210,11 +213,13 @@ export type ConsoleProps = {
 export const Console: React.FC<ConsoleProps> = (props) => {
     const { deviceInstance } = props;
 
+    const [width, setWidth] = useState(0);
+    const [height, setHeight] = useState(0);
     const [lines, setLines] = useState<string[]>([])
     const [currentLine, setCurrentLine] = useState<string>("")
     const [currentLinePosition, setCurrentLinePosition] = useState<number>(0)
     const [demoCleaned, setDemoCleaned] = useState(false);
-    const scrollRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
     const logEndRef = useRef<HTMLDivElement>(null);
 
 
@@ -246,6 +251,13 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
         deviceInstance.on('state', stateHandler)
 
+        setWidth(deviceInstance.width)
+        setHeight(deviceInstance.height)
+
+        setLines(deviceInstance.lines.slice())
+        setCurrentLine(deviceInstance.currentLine)
+        setCurrentLinePosition(deviceInstance.currentLinePosition)
+
         if (!demoCleaned) {
             setLines(initialConsoleLines);
         }
@@ -260,7 +272,26 @@ export const Console: React.FC<ConsoleProps> = (props) => {
     // Handle Console Scroll
     useEffect(() => {
         //logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); // TODO: a revoir: ca scroll la page entiere, à chaque nouveau caractere
+
+        const element = logEndRef.current;
+        const offset = 0;
+
+        const container = scrollContainerRef.current;
+        if (!element || !container) return;
+
+        const elementTop = element.offsetTop;
+        const containerHeight = container.clientHeight;
+
+        const targetScroll = elementTop - (containerHeight / 2) + offset;
+        const maxScroll = container.scrollHeight - containerHeight;
+        const clampedScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+
+        container.scrollTo({
+            top: clampedScroll,
+            behavior: 'smooth'
+        });
     }, [currentLine, lines]);
+
 
 
     const handleClear = () => {
@@ -279,7 +310,6 @@ export const Console: React.FC<ConsoleProps> = (props) => {
     return (
         <div className="flex justify-end">
             <div
-                ref={scrollRef}
                 className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-xl font-mono text-sm relative group"
                 style={{ height: `${deviceInstance.height * 1.15}em`, width: `${deviceInstance.width * 1.1}ch` }}
             >
@@ -298,6 +328,7 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
                 {/* Terminal Content */}
                 <div
+                    ref={scrollContainerRef}
                     className="p-4 overflow-y-auto bg-[#1e1e1e] cursor-text relative"
                     style={{ height: `calc(${deviceInstance.height * 1.15}em - 41px)` }}
                     onClick={() => document.getElementById('device-keyboard')?.focus()}
@@ -311,9 +342,7 @@ export const Console: React.FC<ConsoleProps> = (props) => {
                     </button>
 
                     {lines.length === 0 && !currentLine ? (
-                        <div className="text-green-500/50 italic">
-
-                        </div>
+                        <div className=""></div>
                     ) : (
                         <>
                             {lines.map((line, i) => (
@@ -322,9 +351,9 @@ export const Console: React.FC<ConsoleProps> = (props) => {
                                 </div>
                             ))}
                             {currentLine && (
-                                <div className="text-gray-300 whitespace-pre-wrap break-all">
+                                <div className="text-gray-300 whitespace-pre-wrap break-all relative">
                                     {currentLine}
-                                    <span className="animate-pulse ml-0.5">▊</span>
+                                    <span className={`absolute animate-pulse ml-0.5`} style={{ left: `${currentLinePosition % width}ch`, top: `${(1.2 * Math.floor(currentLinePosition / width)).toFixed(1)}rem` }}>▊</span>
                                 </div>
                             )}
                         </>

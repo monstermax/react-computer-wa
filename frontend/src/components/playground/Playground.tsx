@@ -139,7 +139,23 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             }
         }
 
+        const setupBeforeUnloadEvent = (event: BeforeUnloadEvent) => {
+            if (document.activeElement?.id === 'device-keyboard') {
+                event.preventDefault();
+
+                var confirmationMessage = "\\o/";
+                event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+                return confirmationMessage; // Gecko, WebKit, Chrome <34
+            }
+        }
+
         window.addEventListener("keydown", setupKeydownEvent)
+        window.addEventListener("beforeunload", setupBeforeUnloadEvent)
+
+        return () => {
+            window.removeEventListener("keydown", setupKeydownEvent)
+            window.removeEventListener("beforeunload", setupBeforeUnloadEvent)
+        }
     }, []);
 
 

@@ -30,7 +30,7 @@ section .data
     STACK_END           equ 0xEFFF
 
     ; Strings
-    ASCII_LF            equ 0x0A
+    ASCII_LF            equ 0x0D
     ASCII_SPACE         equ 0x20
     ASCII_MINUS         equ 0x2D
     STR_WELCOME_LINE_1  db "BOOTLOADER OK", 13, 0
