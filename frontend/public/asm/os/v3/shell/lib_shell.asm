@@ -217,7 +217,6 @@ run_command:
 
 
     ; HANDLE HELP
-    debug 7, 7
 
     ; recupere un pointer vers la chaine de caractere de la commande à executer
     lea al, bl, [shell_command_input]
@@ -225,15 +224,16 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_HELP] ; (C,D) = [STR_COMMAND_HELP]
 
-    call strlen
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_HELP
+    mov el, al
+    pop al
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
-    push al
 
-    cmp al, fl
+    cmp el, fl
     jne AFTER_CHECK_COMMAND_HELP ; si longueur de chaine differente, on passe a la commande suivante
 
-    pop al
     call strcmp_len
     jne AFTER_CHECK_COMMAND_HELP ; si chaine differente, on passe a la commande suivante
 
@@ -254,9 +254,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_LS
-    call run_command_ls
+    jne AFTER_CHECK_COMMAND_LS ; si chaine differente, on passe a la commande suivante
+
+    call run_command_ls ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_LS:
 
 
@@ -271,9 +273,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_PS
-    call run_command_ps
+    jne AFTER_CHECK_COMMAND_PS ; si chaine differente, on passe a la commande suivante
+
+    call run_command_ps ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_PS:
 
 
@@ -288,9 +292,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_PIXELS
-    call run_command_pixels
+    jne AFTER_CHECK_COMMAND_PIXELS ; si chaine differente, on passe a la commande suivante
+
+    call run_command_pixels ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_PIXELS:
 
 
@@ -305,9 +311,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_SPRITE
-    call run_command_sprite
+    jne AFTER_CHECK_COMMAND_SPRITE ; si chaine differente, on passe a la commande suivante
+
+    call run_command_sprite ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_SPRITE:
 
 
@@ -322,9 +330,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_LEDS
-    call run_command_leds
+    jne AFTER_CHECK_COMMAND_LEDS ; si chaine differente, on passe a la commande suivante
+
+    call run_command_leds ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_LEDS:
 
 
@@ -339,9 +349,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_CUSTOM
-    call run_command_custom
+    jne AFTER_CHECK_COMMAND_CUSTOM ; si chaine differente, on passe a la commande suivante
+
+    call run_command_custom ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_CUSTOM:
 
 
@@ -356,9 +368,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_HALT
-    call run_command_halt
+    jne AFTER_CHECK_COMMAND_HALT ; si chaine differente, on passe a la commande suivante
+
+    call run_command_halt ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_HALT:
 
 
@@ -373,9 +387,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_REBOOT
-    call run_command_reboot
+    jne AFTER_CHECK_COMMAND_REBOOT ; si chaine differente, on passe a la commande suivante
+
+    call run_command_reboot ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_REBOOT:
 
 
@@ -390,9 +406,11 @@ run_command:
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_CLEAR
-    call run_command_clear
+    jne AFTER_CHECK_COMMAND_CLEAR ; si chaine differente, on passe a la commande suivante
+
+    call run_command_clear ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_CLEAR:
 
 

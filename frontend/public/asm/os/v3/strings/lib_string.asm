@@ -20,6 +20,10 @@ _exit:
 
 ; recupere la taille d'une chaine [C:D] (terminée par \0). => A = longueur de la chaine située à l'adresse [C:D]
 strlen:
+    push cl
+    push dl
+    push fl
+
     mov al, 0 ; A = longueur finale de la chaine à analyser
 
     STRLEN_LOOP:
@@ -34,6 +38,9 @@ strlen:
     jmp STRLEN_LOOP
 
     STRLEN_END:
+    pop fl
+    pop dl
+    pop cl
     ret
 
 

@@ -22166,6 +22166,11 @@
    call $src/Cpu/InstructionActions#get:execute
    i32.load
    call_indirect (type $1)
+   global.get $~lib/memory/__stack_pointer
+   i32.const 24
+   i32.add
+   global.set $~lib/memory/__stack_pointer
+   return
   else
    local.get $actions
    local.set $5
@@ -22210,7 +22215,7 @@
   local.get $5
   call $~lib/string/String#concat
   i32.const 4336
-  i32.const 226
+  i32.const 231
   i32.const 9
   call $~lib/builtins/abort
   unreachable

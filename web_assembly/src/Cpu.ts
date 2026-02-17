@@ -214,8 +214,13 @@ export class Cpu {
 
         if (actions.fetch && actions.execute) {
             // New API
-            const data: Uint8Array = actions.fetch(this); // fetch data (read-only)
-            actions.execute(this, data); // execute instruction (write)
+
+            // 1. Fetch data (read-only)
+            const data: Uint8Array = actions.fetch(this);
+
+            // 2. Execute instruction (write)
+            actions.execute(this, data);
+            return
 
         } else if (actions.run) {
             // Old API

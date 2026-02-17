@@ -17148,7 +17148,6 @@
  (func $src/Cpu/Cpu#runCpuCycle (param $0 i32)
   (local $1 i32)
   (local $2 i32)
-  (local $3 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 12
   i32.sub
@@ -17248,7 +17247,7 @@
    i32.store offset=4
    local.get $1
    i32.load8_u offset=8
-   local.set $2
+   local.set $1
    global.get $~lib/memory/__stack_pointer
    i32.const 24
    i32.sub
@@ -17267,36 +17266,36 @@
    global.get $~lib/memory/__stack_pointer
    local.get $0
    i32.load
-   local.tee $1
+   local.tee $2
    i32.store
    global.get $~lib/memory/__stack_pointer
-   local.get $1
+   local.get $2
    i32.load
-   local.tee $1
+   local.tee $2
    i32.store offset=8
-   block $__inlined_func$src/Cpu/Cpu#executeInstruction$31
-    local.get $1
+   block $folding-inner00
+    local.get $2
     i32.eqz
     if
      i32.const 6208
      call $src/external_functions/console.warn
-     br $__inlined_func$src/Cpu/Cpu#executeInstruction$31
+     br $folding-inner00
     end
     global.get $~lib/memory/__stack_pointer
-    local.get $2
+    local.get $1
     call $src/Cpu/fetchInstructionActions
-    local.tee $3
+    local.tee $2
     i32.store offset=12
     global.get $~lib/memory/__stack_pointer
-    local.get $3
+    local.get $2
     i32.store
-    local.get $3
+    local.get $2
     i32.load offset=4
     if (result i32)
      global.get $~lib/memory/__stack_pointer
-     local.get $3
+     local.get $2
      i32.store
-     local.get $3
+     local.get $2
      i32.load offset=8
     else
      i32.const 0
@@ -17306,11 +17305,11 @@
      local.get $0
      i32.store
      global.get $~lib/memory/__stack_pointer
-     local.get $3
+     local.get $2
      i32.store offset=4
      global.get $~lib/memory/__stack_pointer
      local.get $0
-     local.get $3
+     local.get $2
      i32.load offset=4
      i32.load
      call_indirect (type $2)
@@ -17323,36 +17322,39 @@
      local.get $1
      i32.store offset=4
      global.get $~lib/memory/__stack_pointer
-     local.get $3
+     local.get $2
      i32.store offset=20
      local.get $0
      local.get $1
-     local.get $3
+     local.get $2
      i32.load offset=8
      i32.load
      call_indirect (type $5)
+     br $folding-inner00
     else
      global.get $~lib/memory/__stack_pointer
-     local.get $3
+     local.get $2
      i32.store
-     local.get $3
+     local.get $2
      i32.load
      if
       global.get $~lib/memory/__stack_pointer
       local.get $0
       i32.store
       global.get $~lib/memory/__stack_pointer
-      local.get $3
+      local.get $2
       i32.store offset=4
       local.get $0
-      local.get $3
+      local.get $2
       i32.load
       i32.load
       call_indirect (type $0)
-      br $__inlined_func$src/Cpu/Cpu#executeInstruction$31
+      br $folding-inner00
      end
     end
-    local.get $2
+    local.get $1
+    i32.const 255
+    i32.and
     call $~lib/util/number/utoa32
     local.set $0
     global.get $~lib/memory/__stack_pointer
@@ -17362,7 +17364,7 @@
     local.get $0
     call $~lib/string/String#concat
     i32.const 5360
-    i32.const 226
+    i32.const 231
     i32.const 9
     call $~lib/builtins/abort
     unreachable
