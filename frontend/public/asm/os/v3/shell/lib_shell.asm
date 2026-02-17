@@ -213,9 +213,11 @@ run_command:
     jz RUN_COMMAND_END
 
     ; TODO: on a besoin de connaitre la longueur de chaque chaine a comparer (help, ls, ...) pour que strcmp_len soit coherent
+    ; on connait la longueur de la chaine tapée (F) mais pas la longueur de la chaine a comparer (STR_COMMAND_HELP, STR_COMMAND_LS, ...)
 
 
     ; HANDLE HELP
+    debug 7, 7
 
     ; recupere un pointer vers la chaine de caractere de la commande à executer
     lea al, bl, [shell_command_input]
@@ -223,12 +225,21 @@ run_command:
     ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
     lea cl, dl, [STR_COMMAND_HELP] ; (C,D) = [STR_COMMAND_HELP]
 
+    call strlen
     pop fl ; restaure la longueur de la chaine
     push fl ; sauvegarde la longueur de la chaine
+    push al
+
+    cmp al, fl
+    jne AFTER_CHECK_COMMAND_HELP ; si longueur de chaine differente, on passe a la commande suivante
+
+    pop al
     call strcmp_len
-    jne AFTER_CHECK_COMMAND_HELP
-    call run_command_help
+    jne AFTER_CHECK_COMMAND_HELP ; si chaine differente, on passe a la commande suivante
+
+    call run_command_help ; run command
     jmp RUN_COMMAND_END
+
     AFTER_CHECK_COMMAND_HELP:
 
 

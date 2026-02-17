@@ -210,10 +210,16 @@ export class Cpu {
             return;
         }
 
-        const action = fetchInstructionAction(opcode);
+        const actions: InstructionActions = fetchInstructionActions(opcode);
 
-        if (action) {
-            action(this)
+        if (actions.fetch && actions.execute) {
+            // New API
+            const data: Uint8Array = actions.fetch(this); // fetch data (read-only)
+            actions.execute(this, data); // execute instruction (write)
+
+        } else if (actions.run) {
+            // Old API
+            actions.run(this)
             return
         }
 
@@ -223,26 +229,65 @@ export class Cpu {
 
 
 
-function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
-    let action: ((cpu: Cpu) => void) | null = null;
+
+class InstructionActions {
+    run: ((cpu: Cpu) => void) | null;
+    fetch: ((cpu: Cpu) => Uint8Array) | null;
+    execute: ((cpu: Cpu, data: Uint8Array) => void) | null;
+
+    constructor(
+        run: ((cpu: Cpu) => void) | null = null,
+        fetch: ((cpu: Cpu) => Uint8Array) | null = null,
+        execute: ((cpu: Cpu, data: Uint8Array) => void) | null = null
+    ) {
+        this.run = run;
+        this.fetch = fetch;
+        this.execute = execute;
+    }
+}
+
+
+function fetchInstructionActions(opcode: u8): InstructionActions {
+    let run: ((cpu: Cpu) => void) | null = null; // Old API
+    let fetch: ((cpu: Cpu) => Uint8Array) | null = null; // New API
+    let execute: ((cpu: Cpu, data: Uint8Array) => void) | null = null; // New API
 
     switch (opcode) {
+
+        case <u8>Opcode.DEBUG_IMM: // TEST New API
+            fetch = (cpu: Cpu): Uint8Array => {
+                const data: Uint8Array = new Uint8Array(2);
+                data[0] = cpu.readMem8(cpu.registers.PC); // debugId
+                data[1] = cpu.readMem8(cpu.registers.PC + 1); // debugValue
+                //console.log(`DEBUG IMM (fetch) #${data[0]} : ${toHex(data[1])}`)
+                return data;
+            };
+
+            execute = (cpu: Cpu, data: Uint8Array): void => {
+                const debugId: u8 = data[0];
+                const debugValue: u8 = data[1];
+                console.log(`DEBUG IMM #${debugId} : ${toHex(debugValue)}`)
+                cpu.registers.PC += 3;
+            };
+            break;
+
+
         case <u8>Opcode.NOP:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 cpu.registers.PC++;
             };
             break;
 
         case <u8>Opcode.HALT:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 cpu.halted = true;
                 console.log(`CPU Halted`)
                 jsCpu.halted()
             };
             break;
 
-        case <u8>Opcode.DEBUG_IMM:
-            action = (cpu: Cpu) => {
+        case <u8>Opcode.DEBUG_IMM: // Old API
+            run = (cpu: Cpu) => {
                 const debugId = cpu.readMem8(cpu.registers.PC);
                 const debugValue = cpu.readMem8(cpu.registers.PC + 1);
                 console.log(`DEBUG IMM #${debugId} : ${toHex(debugValue)}`)
@@ -251,7 +296,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.DEBUG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const debugId = cpu.readMem8(cpu.registers.PC);
                 const regIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const regName = cpu.getRegisterNameByIdx(regIdx);
@@ -262,7 +307,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.DEBUG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const debugId = cpu.readMem8(cpu.registers.PC);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
                 const debugValue = cpu.readMemory(memAddress);
@@ -272,7 +317,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.INT3:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 console.log(`CPU Breakpoint`)
                 cpu.isOnBreakpoint = true;
                 jsCpu.breakpoint()
@@ -281,7 +326,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.SET_SP:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const imm16 = cpu.readMem16(cpu.registers.PC);
                 cpu.registers.SP = imm16
                 cpu.registers.PC += 3;
@@ -289,7 +334,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.CALL:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 // Adresse de retour = PC + 3 (opcode + 2 bytes d'adresse)
                 const returnAddr = cpu.registers.PC + 3;
 
@@ -312,7 +357,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.RET:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 // POP low byte
                 cpu.registers.SP++
                 const low = cpu.readMemory(cpu.registers.SP);
@@ -330,14 +375,14 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JMP:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 cpu.registers.PC = memAddress;
             };
             break;
 
         case <u8>Opcode.JC:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (cpu.getFlag('carry')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -349,7 +394,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JNC:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (!cpu.getFlag('carry')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -361,7 +406,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JZ:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (cpu.getFlag('zero')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -373,7 +418,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JNZ:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (!cpu.getFlag('zero')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -385,7 +430,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JL:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (!cpu.getFlag('zero') && cpu.getFlag('carry')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -397,7 +442,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JLE:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (cpu.getFlag('zero') || cpu.getFlag('carry')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -409,7 +454,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (!cpu.getFlag('zero') && !cpu.getFlag('carry')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -421,7 +466,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.JGE:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 if (cpu.getFlag('zero') || !cpu.getFlag('carry')) {
                     const memAddress = cpu.readMem16(cpu.registers.PC);
                     cpu.registers.PC = memAddress;
@@ -433,7 +478,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.MOV_MEM_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 2);
                 cpu.writeMemory(memAddress, immValue);
@@ -442,7 +487,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.MOV_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
                 cpu.setRegisterValueByIdx(regIdx, immValue);
@@ -451,7 +496,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.MOV_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const targetRegIdx = cpu.readMem8(cpu.registers.PC);
                 const sourceRegIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const sourceRegValue: u8 = cpu.getRegisterValueByIdx(sourceRegIdx);
@@ -461,7 +506,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.MOV_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
                 const memValue = cpu.readMemory(memAddress);
@@ -472,7 +517,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.MOV_MEM_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const regIdx = cpu.readMem8(cpu.registers.PC + 2);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
@@ -482,7 +527,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.PUSH_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 cpu.pushValue(regValue)
@@ -491,7 +536,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.POP_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const popValue = cpu.popValue()
                 cpu.setRegisterValueByIdx(regIdx, popValue);
@@ -500,7 +545,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.INC_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const aluResult = cpu.alu.inc(regValue);
@@ -511,7 +556,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.INC_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const aluResult = cpu.alu.inc(memValue);
@@ -522,7 +567,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.DEC_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const aluResult = cpu.alu.dec(regValue);
@@ -533,7 +578,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.DEC_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const aluResult = cpu.alu.dec(memValue);
@@ -544,7 +589,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.NOT_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const aluResult: AluResult = cpu.alu.not(regValue);
@@ -555,7 +600,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.NOT_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const aluResult = cpu.alu.not(memValue);
@@ -566,7 +611,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.ADD_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -578,7 +623,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.ADD_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const targetRegIdx = cpu.readMem8(cpu.registers.PC);
                 const targetRegValue: u8 = cpu.getRegisterValueByIdx(targetRegIdx);
                 const sourceRegIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -591,7 +636,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.ADD_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
@@ -604,7 +649,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.ADD_MEM_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -616,7 +661,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.ADD_MEM_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const regIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -629,7 +674,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.SUB_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -641,7 +686,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.SUB_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const targetRegIdx = cpu.readMem8(cpu.registers.PC);
                 const targetRegValue: u8 = cpu.getRegisterValueByIdx(targetRegIdx);
                 const sourceRegIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -654,7 +699,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.SUB_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
@@ -667,7 +712,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.SUB_MEM_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -679,7 +724,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.SUB_MEM_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const regIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -692,7 +737,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.AND_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -704,7 +749,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.AND_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const targetRegIdx = cpu.readMem8(cpu.registers.PC);
                 const targetRegValue: u8 = cpu.getRegisterValueByIdx(targetRegIdx);
                 const sourceRegIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -717,7 +762,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.AND_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
@@ -730,7 +775,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.AND_MEM_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -742,7 +787,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.AND_MEM_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const regIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -755,7 +800,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.OR_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -767,7 +812,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.OR_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const targetRegIdx = cpu.readMem8(cpu.registers.PC);
                 const targetRegValue: u8 = cpu.getRegisterValueByIdx(targetRegIdx);
                 const sourceRegIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -780,7 +825,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.OR_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
@@ -793,7 +838,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.OR_MEM_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -805,7 +850,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.OR_MEM_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const regIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -818,7 +863,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.XOR_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -830,7 +875,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.XOR_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const targetRegIdx = cpu.readMem8(cpu.registers.PC);
                 const targetRegValue: u8 = cpu.getRegisterValueByIdx(targetRegIdx);
                 const sourceRegIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -843,7 +888,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.XOR_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
@@ -856,7 +901,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.XOR_MEM_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -868,7 +913,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.XOR_MEM_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const memAddress = cpu.readMem16(cpu.registers.PC);
                 const memValue = cpu.readMemory(memAddress);
                 const regIdx = cpu.readMem8(cpu.registers.PC + 1);
@@ -881,7 +926,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.CMP_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -892,7 +937,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.CMP_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const reg1Idx = cpu.readMem8(cpu.registers.PC);
                 const reg1Value: u8 = cpu.getRegisterValueByIdx(reg1Idx);
                 const reg2Idx = cpu.readMem8(cpu.registers.PC + 1);
@@ -904,7 +949,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.CMP_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
@@ -916,7 +961,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.TEST_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const immValue: u8 = cpu.readMem8(cpu.registers.PC + 1);
@@ -927,7 +972,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.TEST_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const reg1Idx = cpu.readMem8(cpu.registers.PC);
                 const reg1Value: u8 = cpu.getRegisterValueByIdx(reg1Idx);
                 const reg2Idx = cpu.readMem8(cpu.registers.PC + 1);
@@ -939,7 +984,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.TEST_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
@@ -952,7 +997,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
 
 
         case <u8>Opcode.SHL_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const imm = cpu.readMem8(cpu.registers.PC + 1);
@@ -964,7 +1009,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.SHR_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
                 const regValue: u8 = cpu.getRegisterValueByIdx(regIdx);
                 const imm = cpu.readMem8(cpu.registers.PC + 1);
@@ -979,7 +1024,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
         // LEA_REG_REG_IMM: (regLow, regHigh) = imm16
         // Encoding: [opcode] [regLow] [regHigh] [imm16_low] [imm16_high]
         case <u8>Opcode.LEA_REG_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regLowIdx = cpu.readMem8(cpu.registers.PC);
                 const regHighIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const imm16 = cpu.readMem16(cpu.registers.PC + 2);
@@ -992,7 +1037,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
         // LEA_REG_REG_MEM: (regLow, regHigh) = mem16[addr] // Reads 2 bytes from memory (little-endian) into register pair
         // Encoding: [opcode] [regLow] [regHigh] [addr_low] [addr_high]
         case <u8>Opcode.LEA_REG_REG_MEM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regLowIdx = cpu.readMem8(cpu.registers.PC);
                 const regHighIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 2);
@@ -1007,7 +1052,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
         // LDI_REG_REG_REG: destReg = memory[regLow:regHigh] // Load indirect: read value at address formed by register pair
         // Encoding: [opcode] [destReg] [regLow] [regHigh]
         case <u8>Opcode.LDI_REG_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const destRegIdx = cpu.readMem8(cpu.registers.PC);
                 const regLowIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const regHighIdx = cpu.readMem8(cpu.registers.PC + 2);
@@ -1023,7 +1068,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
         // STI_REG_REG_REG: memory[regLow:regHigh] = srcReg // Store indirect: write value to address formed by register pair
         // Encoding: [opcode] [regLow] [regHigh] [srcReg]
         case <u8>Opcode.STI_REG_REG_REG:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regLowIdx = cpu.readMem8(cpu.registers.PC);
                 const regHighIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const srcRegIdx = cpu.readMem8(cpu.registers.PC + 2);
@@ -1037,7 +1082,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
 
         case <u8>Opcode.STI_REG_REG_IMM:
-            action = (cpu: Cpu) => {
+            run = (cpu: Cpu) => {
                 const regLowIdx = cpu.readMem8(cpu.registers.PC);
                 const regHighIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const immValue = cpu.readMem8(cpu.registers.PC + 2);
@@ -1050,7 +1095,7 @@ function fetchInstructionAction(opcode: u8): ((cpu: Cpu) => void) | null {
             break;
     }
 
-    return action;
+    return new InstructionActions(run, fetch, execute);
 }
 
 

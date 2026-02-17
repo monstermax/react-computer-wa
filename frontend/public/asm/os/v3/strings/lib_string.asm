@@ -18,7 +18,7 @@ _exit:
 
 
 
-; recupere la taille d'une chaine (terminée par \0). => A = longueur de la chaine située à l'adresse [C:D]
+; recupere la taille d'une chaine [C:D] (terminée par \0). => A = longueur de la chaine située à l'adresse [C:D]
 strlen:
     mov al, 0 ; A = longueur finale de la chaine à analyser
 
