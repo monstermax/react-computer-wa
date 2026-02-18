@@ -53,16 +53,16 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
     return (
         <>
 
+            {!panelEmulatorHidden && (
+                <button
+                    onClick={() => togglePanelEmulator()}
+                    className={`md:hidden px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
+                    Show Editor
+                </button>
+            )}
+
             {/* Emulator panel tabs */}
             <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 px-4">
-                {!panelEmulatorHidden && (
-                    <button
-                        onClick={() => togglePanelEmulator()}
-                        className={`md:hidden px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
-                        Editor
-                    </button>
-                )}
-
                 <button onClick={() => setEmulatorTab('devices')}
                     className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${emulatorTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>

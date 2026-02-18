@@ -306,7 +306,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     return (
-        <div className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200 overflow-hidden"
+        <div className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200"
             style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace" }}>
 
             {/* ── Header ── */}
@@ -321,10 +321,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 />
 
             {/* ── Main Content ── */}
-            <div className="flex overflow-hidden">
+            <div className="flex flex-wrap md:flex-nowrap md:overflow-hidden">
 
                 {/* ══════ Emulator ══════ */}
-                <div className={`flex-1 flex flex-col w-full md:min-w-[70vw] ${panelEmulatorHidden ? "hidden" : ""}`}>
+                <div className={`flex flex-col w-full md:min-w-[70vw] ${panelEmulatorHidden ? "hidden" : ""}`}>
                     <PanelEmulator
                         emulator={emulator}
                         registers8={registers8}
@@ -339,7 +339,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 </div>
 
                 {/* ══════ Assembly Editor Panel ══════ */}
-                <div className={`flex-1 flex flex-col w-full md:min-w-[450px] border-r border-zinc-800/60`}>
+                <div className={`flex-col w-full md:min-w-[450px] border-r border-zinc-800/60 ${panelEmulatorHidden ? "flex" : "hidden"} md:flex`}>
                     <PanelEditor
                         emulator={emulator}
                         logs={logs}
