@@ -4,19 +4,15 @@
 ; Description: Bootloader for React Machine (v2)
 
 
-.include "bootloader/lib_devices.asm"
 .include "bootloader/lib_math.asm"
-.include "bootloader/devices/lib_console.asm"
-.include "bootloader/devices/lib_dma.asm"
-.include "bootloader/devices/lib_leds.asm"
-.include "bootloader/devices/lib_os_disk.asm"
-.include "bootloader/devices/lib_screen.asm"
+.include "bootloader/lib_devices.asm"
+.include "bootloader/init_devices.asm"
 
 
 section .data
     ; Bootloader config
     BOOTLOADER_VERSION  equ 2
-    SKIP_PRINT_DEVICES  equ 0x01
+    SKIP_PRINT_DEVICES  equ 0x00
     SKIP_PRINT_INFO     equ 0x00
     SKIP_PRINT_GITHUB   equ 0x00
     SKIP_PRINT_WAITING  equ 0x00
@@ -78,14 +74,6 @@ _start:
 
     hlt
 
-
-init_devices:
-    call init_leds_device ; initialise le device LEDs
-    call init_os_disk_device ; initialise le device OS_DISK
-    call init_dma_device ; initialise le device DMA
-    call init_console_device ; initialise le device Console
-    call init_screen_device ; initialise le device Screen
-    ret
 
 
 intro:

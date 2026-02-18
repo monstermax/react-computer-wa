@@ -33,8 +33,80 @@ section .data
     _find_counter    db 0x00   ; variable contenant le compteur de loop
 
 
+
+
 section .text
+    global init_device
     global find_device_by_name
+
+
+
+; ─────────────────────────────────────────────────
+; init_device
+; ─────────────────────────────────────────────────
+; INPUT:
+;   A:B = address of device name string (null-terminated)
+;   C:D = address of device info block (3 bytes: idx, io_base_lo, io_base_hi)
+;
+; OUTPUT:
+;   Info block filled if device found, unchanged otherwise.
+;
+; CLOBBERS: A, B, C, D, E, F
+; ─────────────────────────────────────────────────
+init_device:
+    ; Save info block address (C:D) on stack
+    push cl
+    push dl
+
+    ; find_device_by_name: A:B = name string pointer
+    ; Returns C:D = pointer to table entry (or 0x0000)
+    call find_device_by_name
+
+    ; Check if found (C:D == 0?)
+    mov el, cl
+    or el, dl
+    jz .not_found
+
+    ; ── Read device index at table entry +0 ──
+    ldi fl, cl, dl          ; F = device idx
+
+    ; ── Read I/O base low byte at table entry +2 ──
+    mov el, 2
+    call add_cd_e
+    ldi al, cl, dl          ; A = io_base low
+
+    ; ── Read I/O base high byte at table entry +3 ──
+    mov el, 1
+    call add_cd_e
+    ldi bl, cl, dl          ; B = io_base high
+
+    ; ── Restore info block address into C:D ──
+    pop dl
+    pop cl
+
+    ; ── Store device idx at info block +0 ──
+    sti cl, dl, fl
+
+    ; ── Store io_base low at info block +1 ──
+    mov el, 1
+    call add_cd_e
+    sti cl, dl, al
+
+    ; ── Store io_base high at info block +2 ──
+    mov el, 1
+    call add_cd_e
+    sti cl, dl, bl
+
+    ret
+
+    .not_found:
+    pop dl
+    pop cl
+    ret
+
+
+
+
 
 ; -----------------------------------------------
 ; find_device_by_name

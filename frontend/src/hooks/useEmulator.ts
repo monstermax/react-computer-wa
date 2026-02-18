@@ -256,6 +256,8 @@ export const useEmulator = (params: useEmulatorParams) => {
         try {
             wasmExports.computerResetComputer(computerPointer)
 
+            startClock()
+
         } catch (err: any) {
             wasmError(err);
             throw new Error("Unreachable Error");

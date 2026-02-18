@@ -51,36 +51,3 @@ console_print_string:
     ret
 
 
-
-; Détecter le device CONSOLE => Sortie : (C:D) = pointeur vers l'entrée table (ou 0x0000)
-init_console_device:
-    lea al, bl, [str_console]
-    call find_device_by_name
-
-    ; C:D = pointeur entrée table (ou 0x0000)
-    ; Vérifier si trouvé
-    mov el, cl
-    or el, dl
-    jz CONSOLE_NOT_FOUND
-
-    ldi fl, cl, dl ; lit l'idx du device au 1er emplacement de l'entrée
-    mov [console_device_idx], fl ; enregistre l'idx du device à l'adresse console_device_idx
-
-    ; Lire l'adresse I/O base (offset +2 dans l'entrée)
-    mov el, 2
-    call add_cd_e
-    ldi fl, cl, dl           ; low byte de l'adresse I/O
-
-    mov el, 1
-    call add_cd_e
-    ldi el, cl, dl           ; high byte
-
-    ; Stocker dans console_io_base
-    mov [console_io_base], fl
-    mov [console_io_base + 1], el
-    ret
-
-    CONSOLE_NOT_FOUND:
-    ;hlt
-    ret ; CONSOLE not found
-
