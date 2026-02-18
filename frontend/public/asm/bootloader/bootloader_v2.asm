@@ -5,6 +5,7 @@
 
 
 .include "bootloader/lib_devices.asm"
+.include "bootloader/lib_math.asm"
 .include "bootloader/devices/lib_console.asm"
 .include "bootloader/devices/lib_dma.asm"
 .include "bootloader/devices/lib_leds.asm"

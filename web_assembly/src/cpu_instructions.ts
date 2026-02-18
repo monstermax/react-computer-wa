@@ -42,11 +42,12 @@ export enum Opcode {
     MOV_REG_MEM = 0x22,
     MOV_MEM_REG = 0x23,
     MOV_MEM_IMM = 0x24,
+    XCHG = 0x25, // exchange 2 registers
 
     // STACK
-    PUSH_REG = 0x25,
-    POP_REG = 0x26,
-    SET_SP = 0x27,
+    PUSH_REG = 0x26,
+    POP_REG = 0x27,
+    SET_SP = 0x28,
 
     // ALU
     INC_REG = 0x30,

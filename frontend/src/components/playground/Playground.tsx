@@ -138,7 +138,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const switchsDevice = useDevice<SwitchsDevice>(emulator.devicesManager, 'switchs', SwitchsDevice, {});
     const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
     const osDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
-    const userDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { data: [] });
+    const userDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { persistent: true });
     const dmaDevice = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
     const interruptDevice = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {  });
     const timerDevice = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {  });
@@ -791,14 +791,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                                     <Keyboard deviceInstance={keyboardDevice.instance} />
                                 </div>
 
-                                {/* LEDs */}
-                                <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                    <Leds deviceInstance={ledsDevice.instance} />
-                                </div>
-
                                 {/* Switchs */}
                                 <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
                                     <Switchs deviceInstance={switchsDevice.instance} />
+                                </div>
+
+                                {/* LEDs */}
+                                <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                                    <Leds deviceInstance={ledsDevice.instance} />
                                 </div>
                             </div>
 
@@ -812,6 +812,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                             {/* Disk ── */}
                             <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
                                 <Disk deviceInstance={osDiskDevice.instance} />
+                                <Disk deviceInstance={userDiskDevice.instance} />
                             </div>
                         </div>
                     </div>

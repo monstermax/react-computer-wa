@@ -152,6 +152,9 @@ const instructions: InstructionDef[] = [
         ],
     },
 
+    // XCHG
+    { mnemonic: 'XCHG', opcode: Opcode.XCHG, operands: 'REG_REG', size: 3 },
+
     // MOV
     {
         mnemonic: 'MOV', opcode: 0x00, operands: 'NONE', size: 1, variants: [

@@ -230,7 +230,7 @@ export class Cpu {
             return
         }
 
-        throw new Error(`Instruction not found: ${opcode}`);
+        throw new Error(`Instruction not found: ${toHex(opcode)} (${opcode})`);
     }
 }
 
@@ -273,7 +273,7 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             execute = (cpu: Cpu, data: Uint8Array): void => {
                 const debugId: u8 = data[0];
                 const debugValue: u8 = data[1];
-                console.log(`DEBUG IMM #${debugId} : ${toHex(debugValue)}`)
+                console.log(`DEBUG IMM #${debugId} : ${toHex(debugValue)} (${debugValue})`)
                 cpu.registers.PC += 3;
             };
             break;
@@ -297,7 +297,7 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             run = (cpu: Cpu) => {
                 const debugId = cpu.readMem8(cpu.registers.PC);
                 const debugValue = cpu.readMem8(cpu.registers.PC + 1);
-                console.log(`DEBUG IMM #${debugId} : ${toHex(debugValue)}`)
+                console.log(`DEBUG IMM #${debugId} : ${toHex(debugValue)} (${debugValue})`)
                 cpu.registers.PC += 3;
             };
             break;
@@ -308,7 +308,7 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 const regIdx = cpu.readMem8(cpu.registers.PC + 1);
                 const regName = cpu.getRegisterNameByIdx(regIdx);
                 const debugValue = cpu.getRegisterValueByIdx(regIdx);
-                console.log(`DEBUG REG #${debugId} : ${regName} = ${toHex(debugValue)}`)
+                console.log(`DEBUG REG #${debugId} : ${regName} = ${toHex(debugValue)} (${debugValue})`)
                 cpu.registers.PC += 3;
             };
             break;
@@ -318,7 +318,7 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 const debugId = cpu.readMem8(cpu.registers.PC);
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
                 const debugValue = cpu.readMemory(memAddress);
-                console.log(`DEBUG MEM #${debugId} : [${toHex(memAddress)}] = ${toHex(debugValue)}`)
+                console.log(`DEBUG MEM #${debugId} : [${toHex(memAddress)}] = ${toHex(debugValue)} (${debugValue})`)
                 cpu.registers.PC += 4;
             };
             break;
@@ -481,6 +481,27 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 } else {
                     cpu.registers.PC += 3;
                 }
+            };
+            break;
+
+        case <u8>Opcode.XCHG:
+            fetch = (cpu: Cpu): Uint8Array => {
+                const data: Uint8Array = new Uint8Array(4);
+                const reg1Idx = data[0] = cpu.readMem8(cpu.registers.PC);     // reg1Idx
+                const reg2Idx = data[1] = cpu.readMem8(cpu.registers.PC + 1); // reg2Idx
+                data[2] = cpu.getRegisterValueByIdx(reg1Idx); // reg1Value
+                data[3] = cpu.getRegisterValueByIdx(reg2Idx); // reg2Value
+                return data;
+            };
+
+            execute = (cpu: Cpu, data: Uint8Array): void => {
+                const reg1Idx: u8 = data[0];
+                const reg2Idx: u8 = data[1];
+                const reg1OldValue: u8 = data[2];
+                const reg2OldValue: u8 = data[3];
+                cpu.setRegisterValueByIdx(reg1Idx, reg2OldValue);
+                cpu.setRegisterValueByIdx(reg2Idx, reg1OldValue);
+                cpu.registers.PC += 3;
             };
             break;
 

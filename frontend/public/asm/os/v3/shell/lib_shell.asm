@@ -8,6 +8,7 @@
 .include "os/v3/drivers/lib_leds.asm"
 .include "os/v3/drivers/lib_keyboard.asm"
 .include "os/v3/drivers/lib_screen.asm"
+.include "os/v3/drivers/lib_switchs.asm"
 .include "os/v3/strings/lib_ascii.asm"
 .include "os/v3/strings/lib_string.asm"
 .include "os/v3/graphics/demo_screen.asm"
@@ -59,6 +60,7 @@ section .data
     LEDS_STATE_HALF_1     equ 0x55
     LEDS_STATE_HALF_2     equ 0xAA
     CUSTOM_CODE_LOAD_ADDR equ 0xA000
+    ASCII_EOL             equ 13
 
 
 section .bss
@@ -85,8 +87,81 @@ run_shell:
     lea cl, dl, [STR_CONSOLE_PROMPT]
     call console_print_string
 
+
     ; Boucle d'ecoute de touches clavier
     RUN_SHELL_READLINE:
+
+
+    ; ecoute les boutons du GUI
+    call get_switchs_pending
+    cmp al, 0xFF
+    je SKIP_HANDLE_BUTTONS
+
+    ; Lire l'état de ce switch
+    ;push al                    ; sauvegarder l'index
+    ;call get_switch_state      ; A = 1 si ON, 0 si OFF
+    ;pop bl                     ; BL = index
+
+    push al ; enregistre l'idx du bouton
+    mov al, 0
+    call set_switchs_value ; reinitialise la valeur du bouton
+    pop al
+
+
+    ; check si c'est bouton #0
+    cmp al, 0x00
+    jne SKIP_HANDLE_BUTTON_0
+
+    ; execute l'action du bouton #0 => help
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_help
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_0:
+
+
+    ; check si c'est bouton #1
+    cmp al, 0x01
+    jne SKIP_HANDLE_BUTTON_1
+
+    ; execute l'action du bouton #1 => custom
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_custom
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_1:
+
+
+    ; check si c'est bouton #2
+    cmp al, 0x02
+    jne SKIP_HANDLE_BUTTON_2
+
+    ; execute l'action du bouton #2 => pixels
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_pixels
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_2:
+
+
+    ; check si c'est bouton #3
+    cmp al, 0x03
+    jne SKIP_HANDLE_BUTTON_3
+
+    ; execute l'action du bouton #3 => sprite
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_sprite
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_3:
+
+
+    SKIP_HANDLE_BUTTONS:
+
 
 ;    ; Calcul l'adresse pour acceder à la lecture du statut clavier
 ;    mov cl, [keyboard_io_base]     ; low  byte de l'adresse de la variable keyboard_io_base

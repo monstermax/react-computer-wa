@@ -5,6 +5,7 @@ import { IoDevice } from "./IoDevice";
 import { high16, low16, toHex, U16 } from "@/lib/lib_numbers";
 
 import type { u16, u8 } from "@/types/computer.types";
+import { delayer } from "@/lib/lib_delayer";
 
 
 export type DiskDeviceParams = {
@@ -13,6 +14,7 @@ export type DiskDeviceParams = {
     model?: string;
     data?: Array<[u16, u8]> | Map<u16, u8>;
     maxSize?: u16;
+    persistent?: boolean;
 }
 
 export class DiskDevice extends IoDevice {
@@ -20,18 +22,57 @@ export class DiskDevice extends IoDevice {
     private currentAddress: u16 = 0 as u16;
     public storage: Map<u16, u8> = new Map;
     maxSize = 0xFFFF as u16;
+    persistent: boolean = false;
 
 
     constructor(idx: u8, name: string, params: DiskDeviceParams) {
         super(idx, name, params);
 
         this.maxSize = params.maxSize ?? this.maxSize;
+        this.persistent = params.persistent ?? this.persistent;
 
-        if (params.data) {
+        this.emit('state', { maxSize: this.maxSize })
+
+        if (this.persistent) {
+            // load localstorage
+            this.loadFromLocalStorage()
+        }
+
+        if (params.data && this.storage.size === 0) {
             this.loadRawData(new Map(params.data))
         }
 
-        this.emit('state', { maxSize: this.maxSize })
+    }
+
+
+    loadFromLocalStorage() {
+        if (!this.persistent) return;
+        const content = localStorage.getItem(`disk-${this.name}`);
+
+        if (content) {
+            //console.log('load content:', content)
+            const contents = content.split('').map((c, address) => [address as u16, c.charCodeAt(0) as u8]) as [u16, u8][]
+            this.storage = new Map(contents);
+
+            this.emit('state', { storage: this.storage })
+        }
+    }
+
+
+    saveToLocalStorageDelayed() {
+        console.log('saveToLocalStorageDelayed:', this.persistent)
+        if (!this.persistent) return;
+        delayer(`disk-${this.name}`, this.saveToLocalStorage.bind(this), 500, 2000, []);
+    }
+
+
+    saveToLocalStorage() {
+        console.log('saveToLocalStorage:', this.persistent)
+        if (!this.persistent) return;
+        const contents = [...this.storage.values()].map(value => String.fromCharCode(value));
+        const content = contents.join('');
+        console.log('save content:', content.length)
+        localStorage.setItem(`disk-${this.name}`, content);
     }
 
 
@@ -77,6 +118,7 @@ export class DiskDevice extends IoDevice {
                 this.currentAddress = U16(this.currentAddress + 1);
                 //console.log('💾 WRITE at', this.currentAddress, 'value', value);
                 this.emit('state', { storage: this.storage })
+                this.saveToLocalStorageDelayed()
                 break;
 
             case 3: // DISK_ADDR_LOW - définir adresse (low)
@@ -100,6 +142,7 @@ export class DiskDevice extends IoDevice {
         }
 
         this.emit('state', { storage: this.storage })
+        this.saveToLocalStorageDelayed()
     }
 
 
@@ -145,7 +188,7 @@ export const Disk: React.FC<DiskProps> = (props) => {
             //console.log('Disk state update', state)
 
             if (state.storage) {
-                setStorage(state.storage)
+                setStorage(new Map(state.storage))
             }
         };
 
