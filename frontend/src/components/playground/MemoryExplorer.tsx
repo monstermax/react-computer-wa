@@ -154,11 +154,11 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                         <span className="text-gray-400">Jump to:</span>
 
                         <div>ROM</div>
-                        {[0x0000, 0x0300].map(addr => (
+                        {[0x0000, 0x0200, 0x0400].map(addr => (
                             <button
                                 key={addr}
                                 onClick={() => setPage(Math.floor(addr / bytesPerPage))}
-                                className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded"
+                                className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer"
                             >
                                 {toHex(addr, 4)}
                             </button>
@@ -169,7 +169,7 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                             <button
                                 key={addr}
                                 onClick={() => setPage(Math.floor(addr / bytesPerPage))}
-                                className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded"
+                                className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer"
                             >
                                 {toHex(addr, 4)}
                             </button>

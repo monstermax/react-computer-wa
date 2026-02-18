@@ -3,14 +3,13 @@
 - os: parser les arguments de la commande shell
 - os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
-- persistent user disk (local storage) + import/export via json
+- import/export des io disk via json et/ou raw
 - os: filesystem
 
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 
 - cpu: interrupts
 - io sound/buzzer/speaker
-- io switches (8 toggles cliquables dans l'UI, lu comme un byte sur un port (utile pour configurer des paramètres au runtime))
 - io gamepad
 - io mouse
 - io lcd screen

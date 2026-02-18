@@ -13,7 +13,7 @@ export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator })
         const updateSpeed = () => {
             delayer('cpu-speed', (cyclesPerSecond: number) => {
                 setSpeed(cyclesPerSecond);
-            }, 100, 500, [emulator.cyclesPerSecondRef.current])
+            }, 100, 1000, [emulator.cyclesPerSecondRef.current])
         };
 
         // Mettre à jour à chaque tick

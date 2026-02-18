@@ -19,7 +19,6 @@ section .text
 
 
 _exit:
-    debug 7, dl
     ret
 
 

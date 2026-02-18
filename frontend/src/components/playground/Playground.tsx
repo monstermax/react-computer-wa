@@ -37,6 +37,8 @@ import { BuzzerDevice } from "../devices/buzzer";
 import { RngDevice } from "../devices/rng";
 import { RtcDevice } from "../devices/rtc";
 import { Switchs, SwitchsDevice } from "../devices/switchs";
+import { SpeakerDevice } from "../devices/speaker";
+import { Lcd, LcdDevice } from "../devices/lcd";
 
 
 declare global {
@@ -79,6 +81,12 @@ const defaultLoadAddress = '0xA000';
 //  Default user code
 const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
 
+const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
+; Type "custom" in the shell to run it.
+; IMPORTANT: end with "ret" !
+; ==                                ==
+`;
+
 
 // ─────────────────────────────────────────────
 //  Playground Component
@@ -87,8 +95,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const { autoStart = true } = props;
 
     // ── Clock ──
-    const [clockFrequency, setClockFrequency] = useState(100 as u32);   // nb tick per second
-    const [speedMultiplier, setSpeedMultiplier] = useState(0.3 * 10_000 as u32); // nb cycles per tick
+    const [clockFrequency, setClockFrequency] = useState(20 as u32);   // nb tick per second
+    const [speedMultiplier, setSpeedMultiplier] = useState(10_000 as u32); // nb cycles per tick
 
     // ── Registers & Memory (on-demand only via Dump buttons, NOT synced per tick) ──
     const [registers8, setRegisters8] = useState<Record<string, u8>>({});
@@ -119,6 +127,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const logEndRef = useRef<HTMLDivElement>(null);
 
     const [preferHdScreen, setPreferHdScreen] = useState(false);
+    const [selectedDisk, setselectedDisk] = useState('os_disk');
 
 
     //  Logging
@@ -126,9 +135,15 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         setLogs(prev => [...prev.slice(-300), `[${new Date().toLocaleTimeString()}] ${msg}`]);
     }, []);
 
+    const dumpRegisters = async () => {
+        if (!emulator.wasmExports || emulator.computerPointer === null) return;
+        setRegisters8(emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer));
+        setRegisters16(emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer));
+    };
+
 
     // ── Emulator ──
-    const emulator = useEmulator({ clockFrequency, speedMultiplier, addLog });
+    const emulator = useEmulator({ clockFrequency, speedMultiplier, addLog, dumpRegisters });
 
     // ── Devices ──
     const keyboardDevice = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
@@ -145,6 +160,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const rtcDevice = useDevice<RtcDevice>(emulator.devicesManager, 'rtc', RtcDevice, {  });
     const rngDevice = useDevice<RngDevice>(emulator.devicesManager, 'rng', RngDevice, {  });
     const buzzerDevice = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {  });
+    const speakerDevice = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
+    const lcdDevice = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {  });
 
 
     // Prevent GUI Tab key
@@ -283,6 +300,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 buzzerDevice,
                 switchsDevice,
                 screenHdDevice,
+                speakerDevice,
+                lcdDevice,
             ]);
 
             setDevicesLoaded(true);
@@ -316,12 +335,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         dumpRegisters()
     };
 
-
-    const dumpRegisters = async () => {
-        if (!emulator.wasmExports || emulator.computerPointer === null) return;
-        setRegisters8(emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer));
-        setRegisters16(emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer));
-    };
 
 
     const dumpMemory = () => {
@@ -359,10 +372,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // Load default editor code
     useEffect(() => {
+
         const _fetch = async () => {
             const response = await fetch(defaultCodeUrl);
             const content = await response.text();
-            setEditorInitialContent(content)
+            setEditorInitialContent(defaultCodePrefix + content)
         }
 
         const timer = setTimeout(_fetch, 100);
@@ -741,6 +755,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                                 </>
                             )}
 
+                            {/*
                             {rightTab === 'devices' && (
                                 <>
                                     <button onClick={() => dumpRegisters()}
@@ -749,6 +764,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                                     </button>
                                 </>
                             )}
+                            */}
                         </div>
                     </div>
 
@@ -804,15 +820,34 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
                             {/* CPU State */}
                             <div className="flex-1 ">
-                                <div className="flex flex-col gap-3 grow-0 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                    <Registers registers8={registers8} registers16={registers16} />
+                                <div className="flex flex-col gap-3">
+                                    <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                                        <Registers registers8={registers8} registers16={registers16} />
+                                    </div>
+
+                                    <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                                        <Lcd deviceInstance={lcdDevice.instance} />
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Disk ── */}
-                            <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                <Disk deviceInstance={osDiskDevice.instance} />
-                                <Disk deviceInstance={userDiskDevice.instance} />
+                            <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative">
+                                <button
+                                    className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
+                                    onClick={() => setselectedDisk(sel => sel === 'os_disk' ? 'user_disk' : 'os_disk')}
+                                    >
+                                    <div className={selectedDisk === 'os_disk' ? "" : "line-through"}>OS</div>
+                                    /
+                                    <div className={selectedDisk === 'user_disk' ? "" : "line-through"}>User</div>
+                                </button>
+
+                                <div className={`${selectedDisk === 'os_disk' ? "" : "hidden"}`}>
+                                    <Disk deviceInstance={osDiskDevice.instance} />
+                                </div>
+                                <div className={`${selectedDisk === 'user_disk' ? "" : "hidden"}`}>
+                                    <Disk deviceInstance={userDiskDevice.instance} />
+                                </div>
                             </div>
                         </div>
                     </div>

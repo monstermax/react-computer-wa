@@ -200,12 +200,23 @@ ret`
             <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider mb-2 mt-4">Example: Print to Console</h3>
             <pre className="bg-[#0a0a14] border border-zinc-800/50 rounded p-3 text-xs text-emerald-300/80 mb-6 overflow-x-auto">{
                 `; Print "Hi" followed by a newline
-mov cl, [console_io_base]
-mov dl, [console_io_base + 1]
-sti cl, dl, 'H'
-sti cl, dl, 'i'
-sti cl, dl, 13       ; CR = newline
-ret`
+
+section .data
+  ASCII_H db 'H'
+  ASCII_i db 'i'
+
+section .text
+    mov cl, [console_io_base]
+    mov dl, [console_io_base + 1]
+
+    mov al, ASCII_H ; 'H'
+    sti cl, dl, al
+
+    mov al, ASCII_i ; 'i'
+    sti cl, dl, al
+
+    sti cl, dl, 13       ; CR = newline
+    ret`
             }</pre>
 
         </>

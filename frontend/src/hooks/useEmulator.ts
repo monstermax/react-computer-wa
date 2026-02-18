@@ -11,6 +11,7 @@ import type { u32, u8, u16 } from "@/types/computer.types";
 import type { CompiledProgram } from "@/types/compiler.types";
 import type { IoDevice } from "@/components/devices/IoDevice";
 import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer";
+import { delayer } from "@/lib/lib_delayer";
 
 
 
@@ -20,12 +21,13 @@ export type WasmExports = typeof releaseModule.__AdaptedExports;
 export type useEmulatorParams = {
     clockFrequency: u32;
     speedMultiplier: u32;
+    dumpRegisters: () => Promise<void>
     addLog: (msg: string) => void;
 }
 
 
 export const useEmulator = (params: useEmulatorParams) => {
-    const { clockFrequency, speedMultiplier, addLog } = params
+    const { clockFrequency, speedMultiplier, addLog, dumpRegisters } = params
 
     // Wasm
     const [wasmExports, setWasmExports] = useState<WasmExports | null>(null);
@@ -161,6 +163,9 @@ export const useEmulator = (params: useEmulatorParams) => {
                 try {
                     // Run cycles
                     wasmExports.computerRunCycles(computerPointer, speedMultiplier);
+
+                    // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
+                    delayer('dump-registers', dumpRegisters, 100, 200, []);
 
                 } catch (err: any) {
                     wasmError(err);

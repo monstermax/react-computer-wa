@@ -1,9 +1,4 @@
 
-; == User Program (Loaded @ 0xA000) ==
-; Type "custom" in the shell to run it.
-; IMPORTANT: end with "ret" !
-
-
 section .data
     screen_io_base  dw 0xF030
 

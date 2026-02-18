@@ -1,8 +1,5 @@
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
 import { IoDevice } from "./IoDevice";
-import { high16, low16, toHex, U16, U8 } from "@/lib/lib_numbers";
 
 import type { u16, u8 } from "@/types/computer.types";
 
