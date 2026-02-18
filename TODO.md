@@ -1,20 +1,21 @@
 
 
 - os: parser les arguments de la commande shell
-- os: gestion des io devices (recuperer ce que le bootloader a initialisé)
++ os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
 - import/export des io disk via json et/ou raw
 - os: filesystem
 
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 
-- cpu: interrupts
++ cpu: interrupts
 - io gamepad
 - io mouse
 - io 7-segments display
 - io network/socket/websocket
 - os: interrupts
 - os: syscall
+- os: gestionnaire du root virtual system
 - os: gestionnaire de fichiers ouverts
 - os: gestionnaire de processus/threads
 - os: gestionnaire des users

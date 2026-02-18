@@ -9,10 +9,10 @@
 
 
 section .data
+    str_console         db "console", 0 ; libellé du device
     console_device_idx  db 0x00
     console_io_base     dw 0x0000
 
-    str_console         db "console", 0 ; libellé du device
 
 
 section .text

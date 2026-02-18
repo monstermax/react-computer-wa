@@ -5,10 +5,21 @@
 
 
 .include "bootloader/devices/lib_console.asm"
-.include "bootloader/devices/lib_dma.asm"
 .include "bootloader/devices/lib_leds.asm"
-.include "bootloader/devices/lib_os_disk.asm"
-.include "bootloader/devices/lib_screen.asm"
+
+
+section .data
+    str_screen          db "screen", 0 ; libellé du device
+    screen_device_idx   db 0x00
+    screen_io_base      dw 0x0000
+
+    str_os_disk         db "os_disk", 0 ; libellé du device
+    os_disk_device_idx  db 0x00
+    os_disk_io_base     dw 0x0000
+
+    str_dma             db "dma", 0 ; libellé du device
+    dma_device_idx      db 0x00
+    dma_io_base         dw 0x0000
 
 
 
