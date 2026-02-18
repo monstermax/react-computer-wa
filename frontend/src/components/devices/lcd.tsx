@@ -193,9 +193,9 @@ export const Lcd: React.FC<LcdProps> = (props) => {
 
             <div className="p-2 rounded flex gap-4 items-center">
 
-                <div className="bg-green-900 border-4 border-slate-600 rounded-lg p-3 mx-auto">
+                <div className="bg-green-900 border-4 border-slate-600 rounded p-3 mx-auto">
                     {display.map((row, rowIndex) => (
-                        <div key={rowIndex} className="font-mono text-lg leading-tight">
+                        <div key={rowIndex} className="font-mono text-lg leading-tight my-1">
                             {row.map((char, colIndex) => {
                                 const isCursor = cursorVisible &&
                                     rowIndex === cursorRow &&
@@ -204,12 +204,13 @@ export const Lcd: React.FC<LcdProps> = (props) => {
                                 return (
                                     <span
                                         key={colIndex}
-                                        className={`inline-block w-[1.2ch] text-center ${isCursor
-                                            ? 'bg-green-400 text-slate-900 animate-pulse'
-                                            : 'text-green-400'
-                                            }`}
+                                        className={`inline-block w-[1.2ch] text-center relative before:content-[''] before:absolute before:inset-0 before:bg-green-950 before:opacity-20 before:rounded mx-px
+                                                ${isCursor
+                                                    ? 'bg-green-400 text-slate-900 animate-pulse'
+                                                    : 'text-green-400'
+                                        }`}
                                     >
-                                        {char}
+                                        {char === ' ' ? <div className="opacity-10">.</div> : char}
                                     </span>
                                 );
                             })}

@@ -175,33 +175,11 @@ export const Screen: React.FC<ScreenProps> = (props) => {
         <>
             <h2>Screen</h2>
 
-            <div className="flex justify-between gap-4">
-
-                <div>
-                    <div className="flex flex-col gap-2">
-                        <div className="mt-3 text-xs text-slate-400 p-2 bg-slate-900/30 rounded">
-                            Cursor:
-                            <ul>
-                                <li>X={currentX}</li>
-                                <li>Y={currentY}</li>
-                            </ul>
-                        </div>
-
-                        <button
-                            onClick={handleClear}
-                            className="cursor-pointer bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors"
-                        >
-                            Clear
-                        </button>
-                    </div>
-                </div>
+            <div className="flex flex-col gap-2">
 
                 <div
                     className="bg-black border-4 border-slate-600 rounded-lg p-2 mx-auto"
-                    style={{
-                        imageRendering: 'pixelated',
-                        width: 'fit-content'
-                    }}
+                    style={{ imageRendering: 'pixelated', width: 'fit-content' }}
                 >
                     <div className="grid gap-0" style={{
                         gridTemplateColumns: `repeat(${width}, 1fr)`,
@@ -230,6 +208,19 @@ export const Screen: React.FC<ScreenProps> = (props) => {
                             })
                         )}
                     </div>
+                </div>
+
+                <div className="flex gap-2 justify-center">
+                    <div className="text-xs text-slate-400 p-2 bg-slate-900/30 rounded">
+                        Cursor [X={currentX} / Y={currentY}]
+                    </div>
+
+                    <button
+                        onClick={handleClear}
+                        className="cursor-pointer bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors"
+                    >
+                        Clear
+                    </button>
                 </div>
             </div>
         </>

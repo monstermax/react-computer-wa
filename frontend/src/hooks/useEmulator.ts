@@ -14,6 +14,13 @@ import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer"
 import { delayer } from "@/lib/lib_delayer";
 
 
+declare global {
+    interface Window {
+        wasmConsoleLog: (message: string) => void;
+        wasmConsoleWarn: (message: string) => void;
+    }
+}
+
 
 export type WasmExports = typeof releaseModule.__AdaptedExports;
 
@@ -85,6 +92,8 @@ export const useEmulator = (params: useEmulatorParams) => {
                     jsIoReset,
                     jsCpuHalted,
                     jsCpuBreakpoint,
+                    //console.log is mapped on window.wasmConsoleLog
+                    //console.warn is mapped on window.wasmConsoleWarn
                 },
             };
 
@@ -424,4 +433,30 @@ async function loadWasmExports(imports: { env: unknown }, debug=true) {
     const wasmExports = await releaseModule.instantiate(_module, imports);
     return wasmExports;
 }
+
+
+const wasmConsoleLog = (message: string) => {
+    let styles: string[] = [];
+
+    if (message?.startsWith('Executing instruction')) styles.push('color:cyan');
+    if (message?.startsWith('Reading Memory')) styles.push('color:green');
+    if (message?.startsWith('Writing Memory')) styles.push('color:yellow');
+    if (message?.startsWith('DEBUG')) styles.push('color:orange');
+    styles.push('color:blue')
+
+    const messages = styles.length
+        ? ["%c[WASM LOG]", styles.join(';'), message]
+        : ["[WASM LOG]", message];
+
+    console.log(...messages);
+}
+
+window.wasmConsoleLog = wasmConsoleLog; // used by wasmImports "console.log" callback as an external function of wasm
+
+
+const wasmConsoleWarn = (message: string) => {
+    console.warn("[WASM WARN]", message);
+}
+
+window.wasmConsoleWarn = wasmConsoleWarn; // used by wasmImports "console.warn" callback as an external function of wasm
 

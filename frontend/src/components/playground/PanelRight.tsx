@@ -23,14 +23,17 @@ export type PanelRightProps = {
     registers8: Record<string, u8>;
     registers16: Record<string, bigint | u8 | u16>;
     memory: Uint8Array<ArrayBuffer> | null;
-    dumpRam: () => void
-    dumpMemory: () => void
-    setMemory: (value: React.SetStateAction<Uint8Array<ArrayBuffer> | null>) => void;
+    panelLeftHidden: boolean;
+    dumpRam: () => void;
+    dumpMemory: () => void;
+    dumpDisk: (diskDevice: DiskDevice | null) => void;
+    togglePanelLeft: () => void;
 }
 
 
 export const PanelRight: React.FC<PanelRightProps> = (props) => {
-    const { emulator, registers8, registers16, memory, dumpRam, dumpMemory } = props;
+    const { emulator, registers8, registers16, memory, panelLeftHidden } = props;
+    const { dumpRam, dumpMemory, dumpDisk, togglePanelLeft } = props;
 
     const [preferHdScreen, setPreferHdScreen] = useState(false);
     const [selectedDisk, setselectedDisk] = useState('os_disk');
@@ -47,73 +50,79 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
     const userDiskDevice = emulator.devicesManager.getDeviceByName<DiskDevice>('user_disk');
     const lcdDevice = emulator.devicesManager.getDeviceByName<LcdDevice>('lcd');
 
-
     return (
         <>
 
             {/* Right panel tabs */}
-            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
+            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 px-4">
+                {panelLeftHidden && (
+                    <button
+                        onClick={() => togglePanelLeft()}
+                        className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
+                        Editor
+                    </button>
+                )}
+
                 <button onClick={() => setRightTab('devices')}
-                    className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Devices
                 </button>
 
                 <button onClick={() => setRightTab('memory')}
-                    className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'memory' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'memory' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Memory
                 </button>
 
-                {/*
-                        <button onClick={() => setRightTab('sources')}
-                            className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'sources' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
-                                }`}>
-                            Sources
-                        </button>
-                        */}
-
                 <button onClick={() => setRightTab('docs')}
-                    className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'docs' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'docs' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Docs
                 </button>
 
 
                 {/* ── Toolbar ── */}
-                <div className="ms-auto flex items-center gap-2 px-5 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap min-h-14">
+                <div className="ms-auto flex items-center gap-2 ps-2 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap min-h-14">
                     {rightTab === 'memory' && (
                         <>
+                            <button onClick={() => dumpDisk(osDiskDevice)}
+                                className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                                Dump Disk
+                            </button>
+
                             <button onClick={() => dumpRam()}
                                 className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
                                 Dump RAM
                             </button>
 
+                            {/*
                             <button onClick={() => dumpMemory()}
                                 className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
                                 Dump Wasm Memory
                             </button>
+                            */}
                         </>
                     )}
 
                     {/*
-                            {rightTab === 'devices' && (
-                                <>
-                                    <button onClick={() => dumpRegisters()}
-                                        className="px-3 py-1 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                                        Dump CPU State
-                                    </button>
-                                </>
-                            )}
-                            */}
+                    {rightTab === 'devices' && (
+                        <>
+                            <button onClick={() => dumpRegisters()}
+                                className="px-3 py-1 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                                Dump CPU State
+                            </button>
+                        </>
+                    )}
+                    */}
                 </div>
             </div>
 
-            <div className={`flex-1 overflow-y-auto p-4 ${rightTab === 'devices' ? "" : "hidden"}`}>
+            <div className={`overflow-y-auto p-4 ${rightTab === 'devices' ? "" : "hidden"}`}>
                 {/* ── Row 1: Console + Screen ── */}
                 <div className="flex flex-wrap gap-3 mb-3">
-                    {/* Console */}
-                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] w-full md:w-auto min-w-96">
+
+                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] md:w-auto min-w-96 flex justify-center items-center">
                         <Console deviceInstance={consoleDevice} />
                     </div>
 
@@ -127,53 +136,47 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
                             <div className={preferHdScreen ? "" : "line-through"}>HD</div>
                         </button>
 
-                        {/* Screen */}
                         <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
+                            {/* Screen */}
                             <Screen deviceInstance={screenDevice} />
                         </div>
 
-                        {/* Screen HD */}
                         <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
+                            {/* Screen HD */}
                             <ScreenCanvas deviceInstance={screenHdDevice} />
                         </div>
                     </div>
                 </div>
 
-                {/* ── Row 2: LEDs + Keyboard + CPU State ── */}
-                <div className="flex gap-3 mb-3 w-full">
+                {/* ── Row 2: LEDs + Keyboard + CPU State + Disks ── */}
+                <div className="flex flex-wrap gap-3 mb-3">
 
-                    <div className="flex-1 flex flex-col gap-3">
-                        {/* Keyboard */}
-                        <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] min-w-0 grow-0">
-                            <Keyboard deviceInstance={keyboardDevice} />
-                        </div>
-
-                        {/* Switchs */}
-                        <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                    <div className="flex flex-col gap-3 flex-1">
+                        <div className="min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
                             <Switchs deviceInstance={switchsDevice} />
                         </div>
 
-                        {/* LEDs */}
-                        <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                        <div className="min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
                             <Leds deviceInstance={ledsDevice} />
                         </div>
-                    </div>
 
-                    {/* CPU State */}
-                    <div className="flex-1 ">
-                        <div className="flex flex-col gap-3">
-                            <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                <Registers registers8={registers8} registers16={registers16} />
-                            </div>
-
-                            <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                <Lcd deviceInstance={lcdDevice} />
-                            </div>
+                        <div className="min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                            <Lcd deviceInstance={lcdDevice} />
                         </div>
                     </div>
 
-                    {/* Disk ── */}
-                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative">
+                    <div className="flex flex-col gap-3 flex-1">
+                        <div className="min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                            <Registers registers8={registers8} registers16={registers16} />
+                        </div>
+
+                        <div className="min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                            <Keyboard deviceInstance={keyboardDevice} />
+                        </div>
+                    </div>
+
+                    {/* Disks ── */}
+                    <div className="w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative flex-1">
                         <button
                             className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
                             onClick={() => setselectedDisk(sel => sel === 'os_disk' ? 'user_disk' : 'os_disk')}
@@ -193,7 +196,7 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
                 </div>
             </div>
 
-            <div className={`flex-1 overflow-y-auto p-4 ${rightTab === 'memory' ? "" : "hidden"}`}>
+            <div className={`overflow-y-auto p-4 ${rightTab === 'memory' ? "" : "hidden"}`}>
                 <MemoryExplorer
                     memory={memory}
                     offset={0x00}
@@ -203,11 +206,11 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
                 />
             </div>
 
-            <div className={`flex-1 overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'sources' ? "" : "hidden"}`}>
+            <div className={`overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'sources' ? "" : "hidden"}`}>
                 TODO: files explorer
             </div>
 
-            <div className={`flex-1 overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'docs' ? "" : "hidden"}`}>
+            <div className={`overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'docs' ? "" : "hidden"}`}>
                 <Docs loadAddress={"0xA000"} />
             </div> {/* .docs */}
 

@@ -304,59 +304,57 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
 
     return (
-        <div className="flex justify-end">
+        <div
+            className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-xl font-mono text-sm relative group"
+            style={{ height: `${deviceInstance.height * 1.15}em`, width: `${deviceInstance.width * 1.1}ch` }}
+        >
+            {/* Terminal Header */}
+            <div className="bg-[#2d2d2d] px-4 py-2 flex items-center border-b border-gray-700">
+                <div className="flex space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#ff3b30]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#ff9f0a]"></div>
+                    <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#34c759]"></div>
+                </div>
+                <div className="flex-1 text-center">
+                    <span className="text-xs text-gray-400">bash</span>
+                </div>
+                <div className="w-16"></div>
+            </div>
+
+            {/* Terminal Content */}
             <div
-                className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-xl font-mono text-sm relative group"
-                style={{ height: `${deviceInstance.height * 1.15}em`, width: `${deviceInstance.width * 1.1}ch` }}
+                ref={scrollContainerRef}
+                className="p-4 overflow-y-auto bg-[#1e1e1e] cursor-text relative"
+                style={{ height: `calc(${deviceInstance.height * 1.15}em - 41px)` }}
+                onClick={() => document.getElementById('device-keyboard')?.focus()}
             >
-                {/* Terminal Header */}
-                <div className="bg-[#2d2d2d] px-4 py-2 flex items-center border-b border-gray-700">
-                    <div className="flex space-x-2">
-                        <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#ff3b30]"></div>
-                        <div className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#ff9f0a]"></div>
-                        <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#34c759]"></div>
-                    </div>
-                    <div className="flex-1 text-center">
-                        <span className="text-xs text-gray-400">bash</span>
-                    </div>
-                    <div className="w-16"></div>
-                </div>
-
-                {/* Terminal Content */}
-                <div
-                    ref={scrollContainerRef}
-                    className="p-4 overflow-y-auto bg-[#1e1e1e] cursor-text relative"
-                    style={{ height: `calc(${deviceInstance.height * 1.15}em - 41px)` }}
-                    onClick={() => document.getElementById('device-keyboard')?.focus()}
+                {/* Clear button - appears on hover */}
+                <button
+                    onClick={handleClear}
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-700 hover:bg-red-600 px-2 py-0.5 rounded text-xs text-gray-200 border border-red-600"
                 >
-                    {/* Clear button - appears on hover */}
-                    <button
-                        onClick={handleClear}
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-700 hover:bg-red-600 px-2 py-0.5 rounded text-xs text-gray-200 border border-red-600"
-                    >
-                        Clear
-                    </button>
+                    Clear
+                </button>
 
-                    {lines.length === 0 && !currentLine ? (
-                        <div className=""></div>
-                    ) : (
-                        <>
-                            {lines.map((line, i) => (
-                                <div key={i} className="text-gray-300 whitespace-pre-wrap break-all">
-                                    {line || '\u00A0'}
-                                </div>
-                            ))}
-                            {currentLine && (
-                                <div className="text-gray-300 whitespace-pre-wrap break-all relative">
-                                    {currentLine}
-                                    {/* <span className={`absolute animate-pulse ml-0.5`} style={{ left: `${currentLinePosition % width}ch`, top: `${(1.2 * Math.floor(currentLinePosition / width)).toFixed(1)}rem` }}>▊</span> */}
-                                    <span className={`animate-pulse ml-0.5`}>▊</span>
-                                </div>
-                            )}
-                        </>
-                    )}
-                    <div ref={logEndRef} />
-                </div>
+                {lines.length === 0 && !currentLine ? (
+                    <div className=""></div>
+                ) : (
+                    <>
+                        {lines.map((line, i) => (
+                            <div key={i} className="text-gray-300 whitespace-pre-wrap break-all">
+                                {line || '\u00A0'}
+                            </div>
+                        ))}
+                        {currentLine && (
+                            <div className="text-gray-300 whitespace-pre-wrap break-all relative">
+                                {currentLine}
+                                {/* <span className={`absolute animate-pulse ml-0.5`} style={{ left: `${currentLinePosition % width}ch`, top: `${(1.2 * Math.floor(currentLinePosition / width)).toFixed(1)}rem` }}>▊</span> */}
+                                <span className={`animate-pulse ml-0.5`}>▊</span>
+                            </div>
+                        )}
+                    </>
+                )}
+                <div ref={logEndRef} />
             </div>
         </div>
     );

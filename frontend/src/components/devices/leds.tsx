@@ -108,7 +108,7 @@ export const Leds: React.FC<LedsProps> = (props) => {
 
                 <div className="flex gap-2 mx-auto">
                     {getLeds().map((on, i) => (
-                        <div key={i} className={`w-6 h-6 rounded-full ${on ? 'bg-yellow-500' : 'bg-gray-700'}`} />
+                        <div key={i} className={`w-6 h-6 border border-gray-600 rounded-full ${on ? 'bg-yellow-500' : 'bg-gray-700'}`} />
                     ))}
                 </div>
             </div>

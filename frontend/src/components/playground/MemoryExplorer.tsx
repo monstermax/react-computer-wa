@@ -150,30 +150,40 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                     </div>
 
                     {/* Quick jump */}
-                    <div className="mt-4 pt-2 border-t border-gray-700 flex gap-2 text-xs items-center">
+                    <div className="mt-4 pt-2 border-t border-gray-700 flex flex-col md:flex-row gap-4 text-xs">
                         <span className="text-gray-400">Jump to:</span>
 
-                        <div>ROM</div>
-                        {[0x0000, 0x0200, 0x0400].map(addr => (
-                            <button
-                                key={addr}
-                                onClick={() => setPage(Math.floor(addr / bytesPerPage))}
-                                className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer"
-                            >
-                                {toHex(addr, 4)}
-                            </button>
-                        ))}
+                        <div>
+                            <div>ROM</div>
 
-                        <div>RAM</div>
-                        {[0x0500, 0x0700, 0x1000, 0xA000].map(addr => (
-                            <button
-                                key={addr}
-                                onClick={() => setPage(Math.floor(addr / bytesPerPage))}
-                                className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer"
-                            >
-                                {toHex(addr, 4)}
-                            </button>
-                        ))}
+                            <div className="flex gap-1">
+                                {[0x0000, 0x0200, 0x0400].map(addr => (
+                                    <button
+                                        key={addr}
+                                        onClick={() => setPage(Math.floor(addr / bytesPerPage))}
+                                        className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer"
+                                    >
+                                        {toHex(addr, 4)}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div>RAM</div>
+
+                            <div className="flex gap-1">
+                                {[0x0500, 0x0700, 0x1000, 0xA000].map(addr => (
+                                    <button
+                                        key={addr}
+                                        onClick={() => setPage(Math.floor(addr / bytesPerPage))}
+                                        className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer"
+                                    >
+                                        {toHex(addr, 4)}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </>
             )}

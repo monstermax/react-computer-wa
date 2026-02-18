@@ -1,13 +1,12 @@
 
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Link } from "wouter";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
 import { compileCode, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
 
-import { useEmulator } from "@/hooks/useEmulator";
+import { useEmulator, type EmulatorHook } from "@/hooks/useEmulator";
 import { useDevice } from "@/hooks/useDevice";
 
 import { ScreenCanvasDevice } from "../devices/screen_canvas";
@@ -28,42 +27,10 @@ import { ScreenDevice } from "@/components/devices/screen";
 import { LedsDevice } from "@/components/devices/leds";
 import { DiskDevice } from "@/components/devices/disk";
 import { DmaDevice } from "@/components/devices/dma";
-import { SpeedDisplay } from "./SpeedDisplay";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
+import { Navbar } from "./Navbar";
 
-
-declare global {
-    interface Window {
-        wasmConsoleLog: (message: string) => void;
-        wasmConsoleWarn: (message: string) => void;
-    }
-}
-
-
-const wasmConsoleLog = (message: string) => {
-    let styles: string[] = [];
-
-    //const message = __liftString(ptr);
-    if (message?.startsWith('Executing instruction')) styles.push('color:cyan');
-    if (message?.startsWith('Reading Memory')) styles.push('color:green');
-    if (message?.startsWith('Writing Memory')) styles.push('color:yellow');
-    if (message?.startsWith('DEBUG')) styles.push('color:orange');
-    styles.push('color:blue')
-
-    const messages = styles.length
-        ? ["%c[WASM LOG]", styles.join(';'), message]
-        : ["[WASM LOG]", message];
-
-    console.log(...messages);
-}
-window.wasmConsoleLog = wasmConsoleLog;
-
-
-const wasmConsoleWarn = (message: string) => {
-    console.warn("[WASM WARN]", message);
-}
-window.wasmConsoleWarn = wasmConsoleWarn;
 
 
 
@@ -95,6 +62,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const addLog = useCallback((msg: string) => {
         setLogs(prev => [...prev.slice(-300), `[${new Date().toLocaleTimeString()}] ${msg}`]);
     }, []);
+
+    const [panelLeftHidden, setPanelLeftHidden] = useState(false);
 
     const dumpRegisters = async () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
@@ -294,7 +263,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             emulator.wasmError(err);
             throw new Error("Unreachable Error");
         }
-    };
+    }
+
+
+    const dumpDisk = (diskDevice: DiskDevice | null) => {
+        if (!diskDevice) return;
+        setMemory(new Uint8Array(diskDevice.storage.values()));
+    }
+
 
 
     // ════════════════════════
@@ -318,99 +294,36 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     };
 
 
+    const togglePanelLeft = () => {
+        setPanelLeftHidden(b => !b)
+    }
+
+
     return (
         <div className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200 overflow-hidden"
             style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace" }}>
 
             {/* ── Header ── */}
-            <header className="flex items-center px-5 py-0 border-b border-zinc-800/80 bg-[#0d0d14] shrink-0">
-                <div className="flex items-center gap-3">
-                    <Link to="/" className="flex gap-2 items-center">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                        <span className="text-sm font-semibold tracking-wider text-zinc-300 uppercase">
-                            8-bit Playground
-                        </span>
-                    </Link>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 tracking-wider">v3</span>
-                </div>
-
-                {/* ── Toolbar ── */}
-                <div className="flex items-center gap-2 px-5 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap">
-                    {/* Emulator controls */}
-                    <button
-                        disabled={emulator.clockStatus || emulator.cpuHalted}
-                        onClick={() => runCpuStep()}
-                        className="px-3 py-1.5 text-xs rounded bg-blue-700 hover:bg-blue-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
-                    >
-                        Step
-                    </button>
-                    <button
-                        disabled={emulator.clockStatus || emulator.cpuHalted}
-                        onClick={() => emulator.startClock()}
-                        className="px-3 py-1.5 text-xs rounded bg-emerald-700 hover:bg-emerald-600 disabled:bg-zinc-700 text-white transition-colors cursor-pointer"
-                    >
-                        Start
-                    </button>
-                    <button
-                        disabled={!emulator.clockStatus}
-                        onClick={() => emulator.stopClock()}
-                        className="px-3 py-1.5 text-xs rounded bg-red-800/80 hover:bg-red-700 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
-                    >
-                        Stop
-                    </button>
-
-                    <button
-                        disabled={false}
-                        onClick={() => handleResetComputer()}
-                        className="ms-8 px-3 py-1.5 text-xs rounded bg-red-800/80 hover:bg-red-700 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
-                    >
-                        Reset
-                    </button>
-                </div>
-
-                <div className="ms-auto me-4 flex gap-4 text-sm">
-                    <div className="flex gap-1">
-                        <div>Tick Freq</div>
-
-                        <input
-                            type="number"
-                            min={1}
-                            max={1000}
-                            step={1}
-                            className="w-16 bg-background-light px-1 rounded text-end"
-                            value={clockFrequency}
-                            onChange={(event) => setClockFrequency(Number(event.target.value) as u32)}
-                        />
-                    </div>
-
-                    <div className="flex gap-1">
-                        <div>Speed Multiplier</div>
-
-                        <input
-                            type="number"
-                            min={1}
-                            max={10_000}
-                            step={1}
-                            className="w-16 bg-background-light px-1 rounded text-end"
-                            value={speedMultiplier}
-                            onChange={(event) => setSpeedMultiplier(Number(event.target.value) as u32)}
-                        />
-                    </div>
-                </div>
-
-                <SpeedDisplay emulator={emulator} />
-            </header>
-
+            <Navbar
+                emulator={emulator}
+                clockFrequency={clockFrequency}
+                speedMultiplier={speedMultiplier}
+                setClockFrequency={setClockFrequency}
+                setSpeedMultiplier={setSpeedMultiplier}
+                runCpuStep={runCpuStep}
+                handleResetComputer={handleResetComputer}
+                />
 
             {/* ── Main Content ── */}
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex overflow-hidden">
 
                 {/* ══════ Left: ASM Editor Panel ══════ */}
-                <div className="w-[700px] max-w-[30vw] flex flex-col border-r border-zinc-800/60 shrink-0">
+                <div className={`flex-1 w-full md:min-w-[400px] md:max-w-[30vw] flex flex-col border-r border-zinc-800/60 ${panelLeftHidden ? "hidden" : ""}`}>
                     <PanelLeft
                         emulator={emulator}
                         logs={logs}
                         addLog={addLog}
+                        togglePanelLeft={togglePanelLeft}
                         />
                 </div>
 
@@ -421,9 +334,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         registers8={registers8}
                         registers16={registers16}
                         memory={memory}
+                        panelLeftHidden={panelLeftHidden}
                         dumpMemory={dumpMemory}
                         dumpRam={dumpRam}
-                        setMemory={setMemory}
+                        dumpDisk={dumpDisk}
+                        togglePanelLeft={togglePanelLeft}
                         />
                 </div>
             </div>
@@ -431,4 +346,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         </div>
     );
 };
+
+
+
 

@@ -33,11 +33,13 @@ export type PanelLeftProps = {
     emulator: EmulatorHook;
     logs: string[];
     addLog: (msg: string) => void;
+    togglePanelLeft: () => void;
 }
 
 
 export const PanelLeft: React.FC<PanelLeftProps> = (props) => {
-    const { emulator, logs, addLog } = props;
+    const { emulator, logs } = props;
+    const { addLog, togglePanelLeft } = props;
 
     // ── Editor ──
     const editorRef = useRef<PrismEditor>(null);
@@ -239,13 +241,15 @@ export const PanelLeft: React.FC<PanelLeftProps> = (props) => {
 
             {/* Tabs: Editor / Log */}
             <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
-                <button onClick={() => setActiveTab('editor')}
+                <button
+                    onClick={() => setActiveTab('editor')}
                     className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'editor' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Editor
                 </button>
 
-                <button onClick={() => setActiveTab('log')}
+                <button
+                    onClick={() => setActiveTab('log')}
                     className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'log' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Log
@@ -253,19 +257,27 @@ export const PanelLeft: React.FC<PanelLeftProps> = (props) => {
 
                 {!!bytecode && (
                     <>
-                        <button onClick={() => setActiveTab('compiled')}
+                        <button
+                            onClick={() => setActiveTab('compiled')}
                             className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'compiled' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
                                 }`}>
                             Compiled
                         </button>
 
-                        <button onClick={() => setActiveTab('labels')}
+                        <button
+                            onClick={() => setActiveTab('labels')}
                             className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'labels' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
                                 }`}>
                             Labels
                         </button>
                     </>
                 )}
+
+                <button
+                    onClick={() => togglePanelLeft()}
+                    className={`ms-auto px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
+                    Emulator
+                </button>
             </div>
 
             {/* Editor / Log content */}

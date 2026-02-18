@@ -26,15 +26,18 @@ export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator })
     }, [emulator]);
 
     return (
-        <div className="flex items-center gap-4 text-xs text-zinc-500 min-w-32 justify-end">
-            <div>Speed: </div>
-            {!emulator.clockStatus && (
-                <div>{emulator.cpuHalted ? "Halted" : "Stopped"}</div>
-            )}
+        <div className="flex flex-col items-center gap-1 min-w-32">
+            <div className="self-center">Current Speed</div>
 
-            {emulator.clockStatus && (
-                <div>{formatSpeed(speed)}</div>
-            )}
+            <div className="self-center text-zinc-500">
+                {!emulator.clockStatus && (
+                    <div>{emulator.cpuHalted ? "Halted" : "Stopped"}</div>
+                )}
+
+                {emulator.clockStatus && (
+                    <div>{formatSpeed(speed)}</div>
+                )}
+            </div>
         </div>
     );
 };
