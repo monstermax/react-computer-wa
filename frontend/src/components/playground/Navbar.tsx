@@ -38,11 +38,10 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
                                 8-bit Playground
                             </span>
                         </Link>
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 tracking-wider hidden md:block">v3</span>
                     </div>
 
                     {/* ── Toolbar ── */}
-                    <div className="ms-auto flex gap-2 px-2 py-2 border-zinc-800/60 bg-[#0b0b12] shrink-0 items-center">
+                    <div className="flex gap-2 px-2 py-2 border-zinc-800/60 bg-[#0b0b12] shrink-0 grow justify-center items-center">
                         {/* Emulator controls */}
                         <button
                             disabled={emulator.clockStatus || emulator.cpuHalted}

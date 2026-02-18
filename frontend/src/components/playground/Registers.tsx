@@ -17,15 +17,21 @@ export const Registers: React.FC<RegistersProps> = (props) => {
         <>
             <h2>CPU State</h2>
 
-            <div className="flex flex-col gap-1">
-                {Object.entries(registers16).map(([name, value]) => (
+            <div className="flex flex-col gap-1 border-t pt-1 mt-1">
+                <div>
+                    Cycles: {toHex(Number(registers16.cycles ?? 0))} ({Number(registers16.cycles ?? 0)})
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 border-t pt-1 mt-1">
+                {Object.entries(registers16).filter(([name, value]) => name !== 'cycles').map(([name, value]) => (
                     <div key={name}>
                         {name}: {toHex(Number(value))} ({Number(value)})
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-2">
+            <div className="grid grid-cols-2 border-t pt-1 mt-1">
                 {Object.entries(registers8).map(([name, value]) => (
                     <div key={name}>
                         {name}: {toHex(value)} ({Number(value)})

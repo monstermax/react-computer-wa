@@ -18,27 +18,27 @@ import type { EmulatorHook } from "@/hooks/useEmulator";
 import type { u16, u8, u32 } from "@/types/computer.types";
 
 
-export type PanelRightProps = {
+export type PanelEmulatorProps = {
     emulator: EmulatorHook;
     registers8: Record<string, u8>;
     registers16: Record<string, bigint | u8 | u16>;
     memory: Uint8Array<ArrayBuffer> | null;
-    panelLeftHidden: boolean;
+    panelEmulatorHidden: boolean;
     dumpRam: () => void;
     dumpMemory: () => void;
     dumpDisk: (diskDevice: DiskDevice | null) => void;
-    togglePanelLeft: () => void;
+    togglePanelEmulator: () => void;
 }
 
 
-export const PanelRight: React.FC<PanelRightProps> = (props) => {
-    const { emulator, registers8, registers16, memory, panelLeftHidden } = props;
-    const { dumpRam, dumpMemory, dumpDisk, togglePanelLeft } = props;
+export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
+    const { emulator, registers8, registers16, memory, panelEmulatorHidden } = props;
+    const { dumpRam, dumpMemory, dumpDisk, togglePanelEmulator } = props;
 
     const [preferHdScreen, setPreferHdScreen] = useState(false);
     const [selectedDisk, setselectedDisk] = useState('os_disk');
 
-    const [rightTab, setRightTab] = useState<'devices' | 'memory' | 'sources' | 'docs'>('devices');
+    const [emulatorTab, setEmulatorTab] = useState<'devices' | 'memory' | 'docs'>('devices');
 
     const keyboardDevice = emulator.devicesManager.getDeviceByName<KeyboardDevice>('keyboard');
     const consoleDevice = emulator.devicesManager.getDeviceByName<ConsoleDevice>('console');
@@ -53,30 +53,30 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
     return (
         <>
 
-            {/* Right panel tabs */}
+            {/* Emulator panel tabs */}
             <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 px-4">
-                {panelLeftHidden && (
+                {!panelEmulatorHidden && (
                     <button
-                        onClick={() => togglePanelLeft()}
-                        className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
+                        onClick={() => togglePanelEmulator()}
+                        className={`md:hidden px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
                         Editor
                     </button>
                 )}
 
-                <button onClick={() => setRightTab('devices')}
-                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                <button onClick={() => setEmulatorTab('devices')}
+                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${emulatorTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Devices
                 </button>
 
-                <button onClick={() => setRightTab('memory')}
-                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'memory' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                <button onClick={() => setEmulatorTab('memory')}
+                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${emulatorTab === 'memory' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Memory
                 </button>
 
-                <button onClick={() => setRightTab('docs')}
-                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'docs' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                <button onClick={() => setEmulatorTab('docs')}
+                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${emulatorTab === 'docs' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Docs
                 </button>
@@ -84,7 +84,7 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
 
                 {/* ── Toolbar ── */}
                 <div className="ms-auto flex items-center gap-2 ps-2 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap min-h-14">
-                    {rightTab === 'memory' && (
+                    {emulatorTab === 'memory' && (
                         <>
                             <button onClick={() => dumpDisk(osDiskDevice)}
                                 className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
@@ -118,7 +118,8 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
                 </div>
             </div>
 
-            <div className={`overflow-y-auto p-4 ${rightTab === 'devices' ? "" : "hidden"}`}>
+            {/* Devices Tab */}
+            <div className={`overflow-y-auto p-4 ${emulatorTab === 'devices' ? "" : "hidden"}`}>
                 {/* ── Row 1: Console + Screen ── */}
                 <div className="flex flex-wrap gap-3 mb-3">
 
@@ -196,7 +197,8 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
                 </div>
             </div>
 
-            <div className={`overflow-y-auto p-4 ${rightTab === 'memory' ? "" : "hidden"}`}>
+            {/* Memory Tab */}
+            <div className={`overflow-y-auto p-4 ${emulatorTab === 'memory' ? "" : "hidden"}`}>
                 <MemoryExplorer
                     memory={memory}
                     offset={0x00}
@@ -206,13 +208,10 @@ export const PanelRight: React.FC<PanelRightProps> = (props) => {
                 />
             </div>
 
-            <div className={`overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'sources' ? "" : "hidden"}`}>
-                TODO: files explorer
-            </div>
-
-            <div className={`overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'docs' ? "" : "hidden"}`}>
+            {/* Docs Tab */}
+            <div className={`overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${emulatorTab === 'docs' ? "" : "hidden"}`}>
                 <Docs loadAddress={"0xA000"} />
-            </div> {/* .docs */}
+            </div>
 
         </>
     );

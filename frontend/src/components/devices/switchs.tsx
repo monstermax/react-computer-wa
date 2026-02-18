@@ -141,6 +141,15 @@ export const Switchs: React.FC<SwitchsProps> = (props) => {
     const [switchs, setSwitchs] = useState<u8>(0 as u8)
     const [pendingSwitchIdx, setPendingSwitchIdx] = useState<u8>(0xFF as u8)
 
+    const predefinedActions = {
+        0: 'Help',
+        1: 'Run custom code',
+        2: 'Draw pixels art',
+        3: 'Draw a sprite',
+        4: 'Change LEDs status',
+        7: 'Halt the computer',
+    };
+
 
     useEffect(() => {
         if (!deviceInstance) return;
@@ -201,9 +210,13 @@ export const Switchs: React.FC<SwitchsProps> = (props) => {
                             `}
                             onClick={() => !isPending(i) && deviceInstance.toggleBit(i as u8)}
                             title={
-                                isPending(i)
-                                    ? `Switch ${i} (en attente du CPU...)`
-                                    : `Switch ${i} (${on ? 'ON' : 'OFF'})`
+                                (
+                                    isPending(i)
+                                        ? `Switch ${i} (waiting for CPU...)`
+                                        : `Switch ${i} (${on ? 'ON' : 'OFF'})`
+                                )
+                                +
+                                (predefinedActions[i] ? `\n\nPredefined action: ${predefinedActions[i]}` : "")
                             }
                         >{i}</div>
                     ))}

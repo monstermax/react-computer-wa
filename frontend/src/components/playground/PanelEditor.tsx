@@ -29,17 +29,18 @@ const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 
 
 
-export type PanelLeftProps = {
+export type PanelEditorProps = {
     emulator: EmulatorHook;
     logs: string[];
+    panelEmulatorHidden: boolean;
     addLog: (msg: string) => void;
-    togglePanelLeft: () => void;
+    togglePanelEditor: () => void;
 }
 
 
-export const PanelLeft: React.FC<PanelLeftProps> = (props) => {
-    const { emulator, logs } = props;
-    const { addLog, togglePanelLeft } = props;
+export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
+    const { emulator, logs, panelEmulatorHidden } = props;
+    const { addLog, togglePanelEditor } = props;
 
     // ── Editor ──
     const editorRef = useRef<PrismEditor>(null);
@@ -274,9 +275,9 @@ export const PanelLeft: React.FC<PanelLeftProps> = (props) => {
                 )}
 
                 <button
-                    onClick={() => togglePanelLeft()}
+                    onClick={() => togglePanelEditor()}
                     className={`ms-auto px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
-                    Emulator
+                    {panelEmulatorHidden ? "Show Emulator" : "Hide Emulator"}
                 </button>
             </div>
 

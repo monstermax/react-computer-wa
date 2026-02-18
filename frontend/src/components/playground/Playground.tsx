@@ -19,8 +19,8 @@ import { SwitchsDevice } from "../devices/switchs";
 import { SpeakerDevice } from "../devices/speaker";
 import { LcdDevice } from "../devices/lcd";
 
-import { PanelRight } from "./PanelRight";
-import { PanelLeft } from "./PanelLeft";
+import { PanelEmulator } from "./PanelEmulator";
+import { PanelEditor } from "./PanelEditor";
 import { KeyboardDevice } from "@/components/devices/keyboard";
 import { ConsoleDevice } from "@/components/devices/console";
 import { ScreenDevice } from "@/components/devices/screen";
@@ -63,7 +63,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         setLogs(prev => [...prev.slice(-300), `[${new Date().toLocaleTimeString()}] ${msg}`]);
     }, []);
 
-    const [panelLeftHidden, setPanelLeftHidden] = useState(false);
+    const [panelEmulatorHidden, setPanelEmulatorHidden] = useState(false);
 
     const dumpRegisters = async () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
@@ -237,6 +237,12 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }, [emulator.computerPointer, osDiskData, devicesLoaded]);
 
 
+    // Dump registers when computer is instanciated
+    useEffect(() => {
+        dumpRegisters()
+    }, [emulator.computerPointer, osDiskData, devicesLoaded]);
+
+
     const dumpMemory = () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
         const memoryUint8Array = new Uint8Array(emulator.wasmExports.memory.buffer);
@@ -294,8 +300,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     };
 
 
-    const togglePanelLeft = () => {
-        setPanelLeftHidden(b => !b)
+    const togglePanelEmulator = () => {
+        setPanelEmulatorHidden(b => !b)
     }
 
 
@@ -317,30 +323,32 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             {/* ── Main Content ── */}
             <div className="flex overflow-hidden">
 
-                {/* ══════ Left: ASM Editor Panel ══════ */}
-                <div className={`flex-1 w-full md:min-w-[400px] md:max-w-[30vw] flex flex-col border-r border-zinc-800/60 ${panelLeftHidden ? "hidden" : ""}`}>
-                    <PanelLeft
-                        emulator={emulator}
-                        logs={logs}
-                        addLog={addLog}
-                        togglePanelLeft={togglePanelLeft}
-                        />
-                </div>
-
-                {/* ══════ Right: Emulator ══════ */}
-                <div className="flex-1 flex flex-col overflow-hidden">
-                    <PanelRight
+                {/* ══════ Emulator ══════ */}
+                <div className={`flex-1 flex flex-col w-full md:min-w-[70vw] ${panelEmulatorHidden ? "hidden" : ""}`}>
+                    <PanelEmulator
                         emulator={emulator}
                         registers8={registers8}
                         registers16={registers16}
                         memory={memory}
-                        panelLeftHidden={panelLeftHidden}
+                        panelEmulatorHidden={panelEmulatorHidden}
                         dumpMemory={dumpMemory}
                         dumpRam={dumpRam}
                         dumpDisk={dumpDisk}
-                        togglePanelLeft={togglePanelLeft}
+                        togglePanelEmulator={togglePanelEmulator}
                         />
                 </div>
+
+                {/* ══════ Assembly Editor Panel ══════ */}
+                <div className={`flex-1 flex flex-col w-full md:min-w-[450px] border-r border-zinc-800/60`}>
+                    <PanelEditor
+                        emulator={emulator}
+                        logs={logs}
+                        panelEmulatorHidden={panelEmulatorHidden}
+                        addLog={addLog}
+                        togglePanelEditor={togglePanelEmulator}
+                        />
+                </div>
+
             </div>
 
         </div>
