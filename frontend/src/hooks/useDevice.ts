@@ -8,13 +8,28 @@ import type { EmulatorHook } from "./useEmulator";
 
 
 export function useDevicesManager() {
-    const devicesRef = useRef<Map<number, IoDevice>>(new Map);
+    const devicesRef = useRef<Map<u8, IoDevice>>(new Map);
     const [devicesMap, setDevicesMap] = useState<Map<string, u8>>(new Map)
+
+
+    const getDeviceByIdx = <T extends IoDevice>(deviceIdx: u8): T | null => {
+        const device = devicesRef.current.get(deviceIdx) as T | null ?? null;
+        return device;
+    }
+
+    const getDeviceByName = <T extends IoDevice>(deviceName: string): T | null => {
+        const deviceIdx: u8 | null = devicesMap.get(deviceName) ?? null
+        if (deviceIdx === null) return null;
+        const device = getDeviceByIdx<T>(deviceIdx) ?? null;
+        return device;
+    }
 
     const devicesManagerHook: DevicesManagerHook = {
         devicesRef,
         devicesMap,
         setDevicesMap,
+        getDeviceByIdx,
+        getDeviceByName,
     }
 
     return devicesManagerHook;
@@ -25,6 +40,8 @@ export type DevicesManagerHook = {
     devicesRef: React.RefObject<Map<number, IoDevice>>;
     devicesMap: Map<string, number>;
     setDevicesMap: React.Dispatch<React.SetStateAction<Map<string, number>>>;
+    getDeviceByIdx: <T extends IoDevice>(deviceIdx: number) => T | null
+    getDeviceByName: <T extends IoDevice>(deviceName: string) => T | null;
 }
 
 

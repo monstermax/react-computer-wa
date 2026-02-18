@@ -92,43 +92,25 @@ const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 //  Playground Component
 // ─────────────────────────────────────────────
 export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
-    const { autoStart = true } = props;
+    const { autoStart = false } = props;
 
     // ── Clock ──
     const [clockFrequency, setClockFrequency] = useState(20 as u32);   // nb tick per second
     const [speedMultiplier, setSpeedMultiplier] = useState(10_000 as u32); // nb cycles per tick
-
-    // ── Registers & Memory (on-demand only via Dump buttons, NOT synced per tick) ──
-    const [registers8, setRegisters8] = useState<Record<string, u8>>({});
-    const [registers16, setRegisters16] = useState<Record<string, u8 | u16 | bigint>>({});
-    const [memory, setMemory] = useState<Uint8Array<ArrayBuffer> | null>(null);
 
     // ── Boot state ──
     const [devicesLoaded, setDevicesLoaded] = useState(false);
     const [bootloaderLoaded, setBootloaderLoaded] = useState(false);
     const [osDiskData, setOsDiskData] = useState<[u16, u8][] | null>(null);
 
-    // ── Editor ──
-    const editorRef = useRef<PrismEditor>(null);
-    const [editorInitialContent, setEditorInitialContent] = useState("");
-    const [machineCode, setMachineCode] = useState<string | null>(null);
-    const [machineCodeLabels, setMachineCodeLabels] = useState<string | null>(null);
-    const [bytecode, setBytecode] = useState<Map<u16, u8> | null>(null);
-    const [editorContent, setEditorContent] = useState(editorInitialContent);
-    const [loadAddress, setLoadAddress] = useState(defaultLoadAddress);
-    const [editorError, setEditorError] = useState<string | null>(null);
-    const [editorStatus, setEditorStatus] = useState<string | null>(null);
-    const [isFileModalOpen, setIsFileModalOpen] = useState(false);
+    const [memory, setMemory] = useState<Uint8Array<ArrayBuffer> | null>(null);
+
+    // ── Registers & Memory (on-demand only via Dump buttons, NOT synced per tick) ──
+    const [registers8, setRegisters8] = useState<Record<string, u8>>({});
+    const [registers16, setRegisters16] = useState<Record<string, u8 | u16 | bigint>>({});
 
     // ── Logs ──
-    const [activeTab, setActiveTab] = useState<'editor' | 'compiled' | 'labels' | 'log'>('editor');
-    const [rightTab, setRightTab] = useState<'devices' | 'memory' | 'sources' | 'docs'>('devices');
     const [logs, setLogs] = useState<string[]>([]);
-    const logEndRef = useRef<HTMLDivElement>(null);
-
-    const [preferHdScreen, setPreferHdScreen] = useState(false);
-    const [selectedDisk, setselectedDisk] = useState('os_disk');
-
 
     //  Logging
     const addLog = useCallback((msg: string) => {
@@ -146,22 +128,22 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const emulator = useEmulator({ clockFrequency, speedMultiplier, addLog, dumpRegisters });
 
     // ── Devices ──
-    const keyboardDevice = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
-    const consoleDevice = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
-    const screenDevice = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
-    const screenHdDevice = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen_hd', ScreenCanvasDevice, { width: 256, height: 256, pixelSize: 2 });
-    const switchsDevice = useDevice<SwitchsDevice>(emulator.devicesManager, 'switchs', SwitchsDevice, {});
-    const ledsDevice = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
-    const osDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
-    const userDiskDevice = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { persistent: true });
-    const dmaDevice = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
-    const interruptDevice = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {  });
-    const timerDevice = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {  });
-    const rtcDevice = useDevice<RtcDevice>(emulator.devicesManager, 'rtc', RtcDevice, {  });
-    const rngDevice = useDevice<RngDevice>(emulator.devicesManager, 'rng', RngDevice, {  });
-    const buzzerDevice = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {  });
-    const speakerDevice = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
-    const lcdDevice = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {  });
+    const keyboardDeviceHook = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
+    const consoleDeviceHook = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
+    const screenDeviceHook = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
+    const screenHdDeviceHook = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen_hd', ScreenCanvasDevice, { width: 256, height: 256, pixelSize: 2 });
+    const switchsDeviceHook = useDevice<SwitchsDevice>(emulator.devicesManager, 'switchs', SwitchsDevice, {});
+    const ledsDeviceHook = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
+    const osDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
+    const userDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { persistent: true });
+    const dmaDeviceHook = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
+    const interruptDeviceHook = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {});
+    const timerDeviceHook = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {});
+    const rtcDeviceHook = useDevice<RtcDevice>(emulator.devicesManager, 'rtc', RtcDevice, {});
+    const rngDeviceHook = useDevice<RngDevice>(emulator.devicesManager, 'rng', RngDevice, {});
+    const buzzerDeviceHook = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {});
+    const speakerDeviceHook = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
+    const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
 
 
     // Prevent GUI Tab key
@@ -197,12 +179,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         if (!autoStart || !emulator.computerPointer || !devicesLoaded || !bootloaderLoaded) return;
         emulator.startClock();
     }, [emulator.computerPointer, devicesLoaded, bootloaderLoaded]);
-
-
-    // Handle Logs Scroll
-    useEffect(() => {
-        //logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); // TODO: a revoir: ca scroll la page entiere, à chaque nouveau caractere
-    }, [logs]);
 
 
     // Load bootloader ROM when computer is instanciated
@@ -248,11 +224,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     const handleResetComputer = async () => {
         // Reload OS on OS_DISK
-        if (osDiskDevice.instance) {
+        if (osDiskDeviceHook.instance) {
             const diskData = await compileAndLoadOsCode();
             setOsDiskData(diskData);
 
-            osDiskDevice.instance.loadRawData(new Map(diskData))
+            osDiskDeviceHook.instance.loadRawData(new Map(diskData))
         }
 
         // Reset Computer
@@ -286,22 +262,22 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
         const _loadDevices = async () => {
             emulator.addDevicesToComputer([
-                keyboardDevice,
-                consoleDevice,
-                ledsDevice,
-                screenDevice,
-                osDiskDevice,
-                userDiskDevice,
-                dmaDevice,
-                interruptDevice,
-                timerDevice,
-                rtcDevice,
-                rngDevice,
-                buzzerDevice,
-                switchsDevice,
-                screenHdDevice,
-                speakerDevice,
-                lcdDevice,
+                keyboardDeviceHook,
+                consoleDeviceHook,
+                ledsDeviceHook,
+                screenDeviceHook,
+                osDiskDeviceHook,
+                userDiskDeviceHook,
+                dmaDeviceHook,
+                interruptDeviceHook,
+                timerDeviceHook,
+                rtcDeviceHook,
+                rngDeviceHook,
+                buzzerDeviceHook,
+                switchsDeviceHook,
+                screenHdDeviceHook,
+                speakerDeviceHook,
+                lcdDeviceHook,
             ]);
 
             setDevicesLoaded(true);
@@ -311,30 +287,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const timer = setTimeout(_loadDevices, 100);
         return () => clearTimeout(timer);
     }, [emulator.computerPointer, osDiskData, devicesLoaded]);
-
-
-
-
-    // ════════════════════════
-    //  Clock & Cycle controls 
-    // ════════════════════════
-
-    const runCpuStep = () => {
-        if (!emulator.wasmExports || emulator.computerPointer === null) return;
-
-        const controlBefore = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
-        const dataBefore = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
-        console.log('BEFORE', controlBefore, dataBefore);
-
-        emulator.runCycles(1);
-
-        const controlAfter = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
-        const dataAfter = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
-        console.log('AFTER', controlAfter, dataAfter);
-
-        dumpRegisters()
-    };
-
 
 
     const dumpMemory = () => {
@@ -364,6 +316,177 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             throw new Error("Unreachable Error");
         }
     };
+
+
+    // ════════════════════════
+    //  Clock & Cycle controls 
+    // ════════════════════════
+
+    const runCpuStep = () => {
+        if (!emulator.wasmExports || emulator.computerPointer === null) return;
+
+        const controlBefore = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
+        const dataBefore = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
+        console.log('BEFORE', controlBefore, dataBefore);
+
+        emulator.runCycles(1);
+
+        const controlAfter = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
+        const dataAfter = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
+        console.log('AFTER', controlAfter, dataAfter);
+
+        dumpRegisters()
+    };
+
+
+    return (
+        <div className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200 overflow-hidden"
+            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace" }}>
+
+            {/* ── Header ── */}
+            <header className="flex items-center px-5 py-0 border-b border-zinc-800/80 bg-[#0d0d14] shrink-0">
+                <div className="flex items-center gap-3">
+                    <Link to="/" className="flex gap-2 items-center">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                        <span className="text-sm font-semibold tracking-wider text-zinc-300 uppercase">
+                            8-bit Playground
+                        </span>
+                    </Link>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 tracking-wider">v3</span>
+                </div>
+
+                {/* ── Toolbar ── */}
+                <div className="flex items-center gap-2 px-5 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap">
+                    {/* Emulator controls */}
+                    <button
+                        disabled={emulator.clockStatus || emulator.cpuHalted}
+                        onClick={() => runCpuStep()}
+                        className="px-3 py-1.5 text-xs rounded bg-blue-700 hover:bg-blue-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
+                    >
+                        Step
+                    </button>
+                    <button
+                        disabled={emulator.clockStatus || emulator.cpuHalted}
+                        onClick={() => emulator.startClock()}
+                        className="px-3 py-1.5 text-xs rounded bg-emerald-700 hover:bg-emerald-600 disabled:bg-zinc-700 text-white transition-colors cursor-pointer"
+                    >
+                        Start
+                    </button>
+                    <button
+                        disabled={!emulator.clockStatus}
+                        onClick={() => emulator.stopClock()}
+                        className="px-3 py-1.5 text-xs rounded bg-red-800/80 hover:bg-red-700 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
+                    >
+                        Stop
+                    </button>
+
+                    <button
+                        disabled={false}
+                        onClick={() => handleResetComputer()}
+                        className="ms-8 px-3 py-1.5 text-xs rounded bg-red-800/80 hover:bg-red-700 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
+                    >
+                        Reset
+                    </button>
+                </div>
+
+                <div className="ms-auto me-4 flex gap-4 text-sm">
+                    <div className="flex gap-1">
+                        <div>Tick Freq</div>
+
+                        <input
+                            type="number"
+                            min={1}
+                            max={1000}
+                            step={1}
+                            className="w-16 bg-background-light px-1 rounded text-end"
+                            value={clockFrequency}
+                            onChange={(event) => setClockFrequency(Number(event.target.value) as u32)}
+                        />
+                    </div>
+
+                    <div className="flex gap-1">
+                        <div>Speed Multiplier</div>
+
+                        <input
+                            type="number"
+                            min={1}
+                            max={10_000}
+                            step={1}
+                            className="w-16 bg-background-light px-1 rounded text-end"
+                            value={speedMultiplier}
+                            onChange={(event) => setSpeedMultiplier(Number(event.target.value) as u32)}
+                        />
+                    </div>
+                </div>
+
+                <SpeedDisplay emulator={emulator} />
+            </header>
+
+
+            {/* ── Main Content ── */}
+            <div className="flex-1 flex overflow-hidden">
+
+                {/* ══════ Left: ASM Editor Panel ══════ */}
+                <div className="w-[700px] max-w-[30vw] flex flex-col border-r border-zinc-800/60 shrink-0">
+                    <PanelLeft
+                        emulator={emulator}
+                        logs={logs}
+                        addLog={addLog}
+                        />
+                </div>
+
+                {/* ══════ Right: Emulator ══════ */}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                    <PanelRight
+                        emulator={emulator}
+                        registers8={registers8}
+                        registers16={registers16}
+                        memory={memory}
+                        dumpMemory={dumpMemory}
+                        dumpRam={dumpRam}
+                        setMemory={setMemory}
+                        />
+                </div>
+            </div>
+
+
+        </div>
+    );
+};
+
+
+
+type PanelLeftProps = {
+    emulator: EmulatorHook;
+    logs: string[];
+    addLog: (msg: string) => void;
+}
+
+const PanelLeft: React.FC<PanelLeftProps> = (props) => {
+    const { emulator, logs, addLog } = props;
+
+    // ── Editor ──
+    const editorRef = useRef<PrismEditor>(null);
+    const [editorInitialContent, setEditorInitialContent] = useState("");
+    const [machineCode, setMachineCode] = useState<string | null>(null);
+    const [machineCodeLabels, setMachineCodeLabels] = useState<string | null>(null);
+    const [bytecode, setBytecode] = useState<Map<u16, u8> | null>(null);
+    const [editorContent, setEditorContent] = useState(editorInitialContent);
+    const [loadAddress, setLoadAddress] = useState(defaultLoadAddress);
+    const [editorError, setEditorError] = useState<string | null>(null);
+    const [editorStatus, setEditorStatus] = useState<string | null>(null);
+    const [isFileModalOpen, setIsFileModalOpen] = useState(false);
+
+
+    // ── Logs ──
+    const [activeTab, setActiveTab] = useState<'editor' | 'compiled' | 'labels' | 'log'>('editor');
+    const logEndRef = useRef<HTMLDivElement>(null);
+
+    // Handle Logs Scroll
+    useEffect(() => {
+        //logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); // TODO: a revoir: ca scroll la page entiere, à chaque nouveau caractere
+    }, [logs]);
+
 
 
     // ═══════════════════════════════════════════
@@ -471,6 +594,13 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }
 
 
+    const openAssemblyFileInEditor = async (filePath: string) => {
+        const response = await fetch(`/asm/${filePath}`);
+        const value = await response.text();
+        setEditorInitialContent(value)
+    }
+
+
     const handleEditorUpdate = (value: string, editor: PrismEditor) => {
         setEditorContent(value);
         setBytecode(null)
@@ -483,248 +613,196 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }
 
 
-    const openAssemblyFileInEditor = async (filePath: string) => {
-        const response = await fetch(`/asm/${filePath}`);
-        const value = await response.text();
-        setEditorInitialContent(value)
-    }
+
+    return (
+        <>
+
+            {/* Editor Toolbar */}
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
+                <button
+                    onClick={() => handleOpenAssemblyFile()}
+                    className="cursor-pointer px-3 bg-indigo-600 hover:bg-indigo-500 rounded"
+                >
+                    Open File
+                </button>
+
+                <button
+                    disabled={!editorContent}
+                    onClick={handleCompileEditorCode}
+                    className="ms-auto px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
+                    Compile
+                </button>
+
+                <button
+                    disabled={!bytecode}
+                    onClick={handleLoadEditorCodeInRam}
+                    className="px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
+                    Load
+                </button>
+
+                <div className="flex items-center gap-1.5">
+                    <label className="text-[10px] text-zinc-500 uppercase tracking-wider">@</label>
+                    <input
+                        value={loadAddress}
+                        onChange={e => setLoadAddress(e.target.value)}
+                        className="w-20 px-2 py-1 text-xs bg-zinc-900 border border-zinc-700/50 rounded text-zinc-300 focus:outline-none focus:border-indigo-500/60"
+                    />
+                </div>
+            </div>
+
+            {/* Status / Error banners */}
+            {editorError && (
+                <div className="px-4 py-2 bg-red-950/60 border-b border-red-800/40 text-red-300 text-[11px] whitespace-pre-wrap">
+                    {editorError}
+                    <button onClick={() => setEditorError(null)} className="ml-3 text-red-500 hover:text-red-300 cursor-pointer">✕</button>
+                </div>
+            )}
+            {editorStatus && !editorError && (
+                <div className="px-4 py-1.5 bg-emerald-950/40 border-b border-emerald-800/30 text-emerald-300 text-[11px]">
+                    {editorStatus}
+                </div>
+            )}
+
+            {/* Tabs: Editor / Log */}
+            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
+                <button onClick={() => setActiveTab('editor')}
+                    className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'editor' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
+                        }`}>
+                    Editor
+                </button>
+
+                <button onClick={() => setActiveTab('log')}
+                    className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'log' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
+                        }`}>
+                    Log
+                </button>
+
+                {!!bytecode && (
+                    <>
+                        <button onClick={() => setActiveTab('compiled')}
+                            className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'compiled' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
+                                }`}>
+                            Compiled
+                        </button>
+
+                        <button onClick={() => setActiveTab('labels')}
+                            className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'labels' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
+                                }`}>
+                            Labels
+                        </button>
+                    </>
+                )}
+            </div>
+
+            {/* Editor / Log content */}
+            <div className={`flex-1 overflow-auto ${activeTab === 'editor' ? "" : "hidden"}`}>
+                <Editor
+                    ref={editorRef}
+                    className="h-full"
+                    language="nasm"
+                    value={editorInitialContent}
+                    onUpdate={handleEditorUpdate}
+                    tabSize={4}
+                    insertSpaces={true}
+                >
+                </Editor>
+            </div>
+
+            <div className={`flex-1 overflow-auto ${activeTab === 'compiled' ? "" : "hidden"}`}>
+                <Editor
+                    className="h-full"
+                    language="nasm"
+                    value={machineCode ?? ''}
+                    tabSize={4}
+                    insertSpaces={true}
+                    readOnly
+                >
+                </Editor>
+            </div>
+
+            <div className={`flex-1 overflow-auto ${activeTab === 'labels' ? "" : "hidden"}`}>
+                <Editor
+                    className="h-full"
+                    language="nasm"
+                    value={machineCodeLabels ?? ''}
+                    tabSize={4}
+                    insertSpaces={true}
+                    readOnly
+                >
+                </Editor>
+            </div>
+
+            <div className={`flex-1 overflow-y-auto p-4 bg-[#08080d] text-[11px] leading-5 ${activeTab === 'log' ? "" : "hidden"}`}>
+                {logs.length === 0 ? (
+                    <div className="text-zinc-600 italic">No logs yet.</div>
+                ) : (
+                    logs.map((l, i) => (
+                        <div key={i} className="text-zinc-400">{l}</div>
+                    ))
+                )}
+                <div ref={logEndRef} />
+            </div>
+
+
+            <FileModal
+                isOpen={isFileModalOpen}
+                onClose={() => setIsFileModalOpen(false)}
+                onSelectFile={openAssemblyFileInEditor}
+            />
+        </>
+    );
+}
+
+
+
+
+type PanelRightProps = {
+    emulator: EmulatorHook;
+    registers8: Record<string, u8>;
+    registers16: Record<string, bigint | u8 | u16>;
+    memory: Uint8Array<ArrayBuffer> | null;
+    dumpRam: () => void
+    dumpMemory: () => void
+    setMemory: (value: React.SetStateAction<Uint8Array<ArrayBuffer> | null>) => void;
+}
+
+const PanelRight: React.FC<PanelRightProps> = (props) => {
+    const { emulator, registers8, registers16, memory, dumpRam, dumpMemory } = props;
+
+    const [preferHdScreen, setPreferHdScreen] = useState(false);
+    const [selectedDisk, setselectedDisk] = useState('os_disk');
+
+    const [rightTab, setRightTab] = useState<'devices' | 'memory' | 'sources' | 'docs'>('devices');
+
+    const keyboardDevice = emulator.devicesManager.getDeviceByName<KeyboardDevice>('keyboard');
+    const consoleDevice = emulator.devicesManager.getDeviceByName<ConsoleDevice>('console');
+    const screenDevice = emulator.devicesManager.getDeviceByName<ScreenDevice>('screen');
+    const screenHdDevice = emulator.devicesManager.getDeviceByName<ScreenCanvasDevice>('screen_hd');
+    const switchsDevice = emulator.devicesManager.getDeviceByName<SwitchsDevice>('switchs');
+    const ledsDevice = emulator.devicesManager.getDeviceByName<LedsDevice>('leds');
+    const osDiskDevice = emulator.devicesManager.getDeviceByName<DiskDevice>('os_disk');
+    const userDiskDevice = emulator.devicesManager.getDeviceByName<DiskDevice>('user_disk');
+    const lcdDevice = emulator.devicesManager.getDeviceByName<LcdDevice>('lcd');
 
 
     return (
-        <div className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200 overflow-hidden"
-            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace" }}>
+        <>
 
-            {/* ── Header ── */}
-            <header className="flex items-center px-5 py-0 border-b border-zinc-800/80 bg-[#0d0d14] shrink-0">
-                <div className="flex items-center gap-3">
-                    <Link to="/" className="flex gap-2 items-center">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                        <span className="text-sm font-semibold tracking-wider text-zinc-300 uppercase">
-                            8-bit Playground
-                        </span>
-                    </Link>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-500 tracking-wider">v3</span>
-                </div>
+            {/* Right panel tabs */}
+            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
+                <button onClick={() => setRightTab('devices')}
+                    className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                        }`}>
+                    Devices
+                </button>
 
-                {/* ── Toolbar ── */}
-                <div className="flex items-center gap-2 px-5 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap">
-                    {/* Emulator controls */}
-                    <button
-                        disabled={emulator.clockStatus || emulator.cpuHalted}
-                        onClick={() => runCpuStep()}
-                        className="px-3 py-1.5 text-xs rounded bg-blue-700 hover:bg-blue-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
-                    >
-                        Step
-                    </button>
-                    <button
-                        disabled={emulator.clockStatus || emulator.cpuHalted}
-                        onClick={() => emulator.startClock()}
-                        className="px-3 py-1.5 text-xs rounded bg-emerald-700 hover:bg-emerald-600 disabled:bg-zinc-700 text-white transition-colors cursor-pointer"
-                    >
-                        Start
-                    </button>
-                    <button
-                        disabled={!emulator.clockStatus}
-                        onClick={() => emulator.stopClock()}
-                        className="px-3 py-1.5 text-xs rounded bg-red-800/80 hover:bg-red-700 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
-                    >
-                        Stop
-                    </button>
+                <button onClick={() => setRightTab('memory')}
+                    className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'memory' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                        }`}>
+                    Memory
+                </button>
 
-                    <button
-                        disabled={false}
-                        onClick={() => handleResetComputer()}
-                        className="ms-8 px-3 py-1.5 text-xs rounded bg-red-800/80 hover:bg-red-700 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
-                    >
-                        Reset
-                    </button>
-                </div>
-
-                <div className="ms-auto me-4 flex gap-4 text-sm">
-                    <div className="flex gap-1">
-                        <div>Tick Freq</div>
-
-                        <input
-                            type="number"
-                            min={1}
-                            max={1000}
-                            step={1}
-                            className="w-16 bg-background-light px-1 rounded text-end"
-                            value={clockFrequency}
-                            onChange={(event) => setClockFrequency(Number(event.target.value) as u32)}
-                        />
-                    </div>
-
-                    <div className="flex gap-1">
-                        <div>Speed Multiplier</div>
-
-                        <input
-                            type="number"
-                            min={1}
-                            max={10_000}
-                            step={1}
-                            className="w-16 bg-background-light px-1 rounded text-end"
-                            value={speedMultiplier}
-                            onChange={(event) => setSpeedMultiplier(Number(event.target.value) as u32)}
-                        />
-                    </div>
-                </div>
-
-                <SpeedDisplay emulator={emulator} />
-            </header>
-
-
-            {/* ── Main Content ── */}
-            <div className="flex-1 flex overflow-hidden">
-
-                {/* ══════ Left: ASM Editor Panel ══════ */}
-                <div className="w-[700px] max-w-[50vw] flex flex-col border-r border-zinc-800/60 shrink-0">
-
-                    {/* Editor Toolbar */}
-                    <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
-                        <button
-                            onClick={() => handleOpenAssemblyFile()}
-                            className="cursor-pointer px-3 bg-indigo-600 hover:bg-indigo-500 rounded"
-                        >
-                            Open File
-                        </button>
-
-                        <button
-                            disabled={!editorContent}
-                            onClick={handleCompileEditorCode}
-                            className="ms-auto px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
-                            Compile
-                        </button>
-
-                        <button
-                            disabled={!bytecode}
-                            onClick={handleLoadEditorCodeInRam}
-                            className="px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
-                            Load
-                        </button>
-
-                        <div className="flex items-center gap-1.5">
-                            <label className="text-[10px] text-zinc-500 uppercase tracking-wider">@</label>
-                            <input
-                                value={loadAddress}
-                                onChange={e => setLoadAddress(e.target.value)}
-                                className="w-20 px-2 py-1 text-xs bg-zinc-900 border border-zinc-700/50 rounded text-zinc-300 focus:outline-none focus:border-indigo-500/60"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Status / Error banners */}
-                    {editorError && (
-                        <div className="px-4 py-2 bg-red-950/60 border-b border-red-800/40 text-red-300 text-[11px] whitespace-pre-wrap">
-                            {editorError}
-                            <button onClick={() => setEditorError(null)} className="ml-3 text-red-500 hover:text-red-300 cursor-pointer">✕</button>
-                        </div>
-                    )}
-                    {editorStatus && !editorError && (
-                        <div className="px-4 py-1.5 bg-emerald-950/40 border-b border-emerald-800/30 text-emerald-300 text-[11px]">
-                            {editorStatus}
-                        </div>
-                    )}
-
-                    {/* Tabs: Editor / Log */}
-                    <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
-                        <button onClick={() => setActiveTab('editor')}
-                            className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'editor' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
-                                }`}>
-                            Editor
-                        </button>
-
-                        <button onClick={() => setActiveTab('log')}
-                            className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'log' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
-                                }`}>
-                            Log
-                        </button>
-
-                        {!!bytecode && (
-                            <>
-                                <button onClick={() => setActiveTab('compiled')}
-                                    className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'compiled' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
-                                        }`}>
-                                    Compiled
-                                </button>
-
-                                <button onClick={() => setActiveTab('labels')}
-                                    className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'labels' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
-                                        }`}>
-                                    Labels
-                                </button>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Editor / Log content */}
-                    <div className={`flex-1 overflow-auto ${activeTab === 'editor' ? "" : "hidden"}`}>
-                        <Editor
-                            ref={editorRef}
-                            className="h-full"
-                            language="nasm"
-                            value={editorInitialContent}
-                            onUpdate={handleEditorUpdate}
-                            tabSize={4}
-                            insertSpaces={true}
-                        >
-                        </Editor>
-                    </div>
-
-                    <div className={`flex-1 overflow-auto ${activeTab === 'compiled' ? "" : "hidden"}`}>
-                        <Editor
-                            className="h-full"
-                            language="nasm"
-                            value={machineCode ?? ''}
-                            tabSize={4}
-                            insertSpaces={true}
-                            readOnly
-                        >
-                        </Editor>
-                    </div>
-
-                    <div className={`flex-1 overflow-auto ${activeTab === 'labels' ? "" : "hidden"}`}>
-                        <Editor
-                            className="h-full"
-                            language="nasm"
-                            value={machineCodeLabels ?? ''}
-                            tabSize={4}
-                            insertSpaces={true}
-                            readOnly
-                        >
-                        </Editor>
-                    </div>
-
-                    <div className={`flex-1 overflow-y-auto p-4 bg-[#08080d] text-[11px] leading-5 ${activeTab === 'log' ? "" : "hidden"}`}>
-                        {logs.length === 0 ? (
-                            <div className="text-zinc-600 italic">No logs yet.</div>
-                        ) : (
-                            logs.map((l, i) => (
-                                <div key={i} className="text-zinc-400">{l}</div>
-                            ))
-                        )}
-                        <div ref={logEndRef} />
-                    </div>
-                </div>
-
-                {/* ══════ Right: Emulator ══════ */}
-                <div className="flex-1 flex flex-col overflow-hidden">
-
-                    {/* Right panel tabs */}
-                    <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
-                        <button onClick={() => setRightTab('devices')}
-                            className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
-                                }`}>
-                            Devices
-                        </button>
-
-                        <button onClick={() => setRightTab('memory')}
-                            className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'memory' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
-                                }`}>
-                            Memory
-                        </button>
-
-                        {/*
+                {/*
                         <button onClick={() => setRightTab('sources')}
                             className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'sources' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
                                 }`}>
@@ -732,30 +810,30 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         </button>
                         */}
 
-                        <button onClick={() => setRightTab('docs')}
-                            className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'docs' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
-                                }`}>
-                            Docs
-                        </button>
+                <button onClick={() => setRightTab('docs')}
+                    className={`px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${rightTab === 'docs' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                        }`}>
+                    Docs
+                </button>
 
 
-                        {/* ── Toolbar ── */}
-                        <div className="ms-auto flex items-center gap-2 px-5 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap min-h-14">
-                            {rightTab === 'memory' && (
-                                <>
-                                    <button onClick={() => dumpRam()}
-                                        className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                                        Dump RAM
-                                    </button>
+                {/* ── Toolbar ── */}
+                <div className="ms-auto flex items-center gap-2 px-5 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap min-h-14">
+                    {rightTab === 'memory' && (
+                        <>
+                            <button onClick={() => dumpRam()}
+                                className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                                Dump RAM
+                            </button>
 
-                                    <button onClick={() => dumpMemory()}
-                                        className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                                        Dump Wasm Memory
-                                    </button>
-                                </>
-                            )}
+                            <button onClick={() => dumpMemory()}
+                                className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                                Dump Wasm Memory
+                            </button>
+                        </>
+                    )}
 
-                            {/*
+                    {/*
                             {rightTab === 'devices' && (
                                 <>
                                     <button onClick={() => dumpRegisters()}
@@ -765,123 +843,111 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                                 </>
                             )}
                             */}
-                        </div>
-                    </div>
-
-                    <div className={`flex-1 overflow-y-auto p-4 ${rightTab === 'devices' ? "" : "hidden"}`}>
-                        {/* ── Row 1: Console + Screen ── */}
-                        <div className="flex gap-3 mb-3">
-                            {/* Console */}
-                            <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] min-w-0">
-                                <Console deviceInstance={consoleDevice.instance} />
-                            </div>
-
-                            <div className="flex-1 relative">
-                                <button
-                                    className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
-                                    onClick={() => setPreferHdScreen(b => !b)}
-                                    >
-                                    <div className={!preferHdScreen ? "" : "line-through"}>SD</div>
-                                    /
-                                    <div className={preferHdScreen ? "" : "line-through"}>HD</div>
-                                </button>
-
-                                {/* Screen */}
-                                <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
-                                    <Screen deviceInstance={screenDevice.instance} />
-                                </div>
-
-                                {/* Screen HD */}
-                                <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
-                                    <ScreenCanvas deviceInstance={screenHdDevice.instance} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* ── Row 2: LEDs + Keyboard + CPU State ── */}
-                        <div className="flex gap-3 mb-3 w-full">
-
-                            <div className="flex-1 flex flex-col gap-3">
-                                {/* Keyboard */}
-                                <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] min-w-0 grow-0">
-                                    <Keyboard deviceInstance={keyboardDevice.instance} />
-                                </div>
-
-                                {/* Switchs */}
-                                <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                    <Switchs deviceInstance={switchsDevice.instance} />
-                                </div>
-
-                                {/* LEDs */}
-                                <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                    <Leds deviceInstance={ledsDevice.instance} />
-                                </div>
-                            </div>
-
-                            {/* CPU State */}
-                            <div className="flex-1 ">
-                                <div className="flex flex-col gap-3">
-                                    <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                        <Registers registers8={registers8} registers16={registers16} />
-                                    </div>
-
-                                    <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                                        <Lcd deviceInstance={lcdDevice.instance} />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Disk ── */}
-                            <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative">
-                                <button
-                                    className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
-                                    onClick={() => setselectedDisk(sel => sel === 'os_disk' ? 'user_disk' : 'os_disk')}
-                                    >
-                                    <div className={selectedDisk === 'os_disk' ? "" : "line-through"}>OS</div>
-                                    /
-                                    <div className={selectedDisk === 'user_disk' ? "" : "line-through"}>User</div>
-                                </button>
-
-                                <div className={`${selectedDisk === 'os_disk' ? "" : "hidden"}`}>
-                                    <Disk deviceInstance={osDiskDevice.instance} />
-                                </div>
-                                <div className={`${selectedDisk === 'user_disk' ? "" : "hidden"}`}>
-                                    <Disk deviceInstance={userDiskDevice.instance} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className={`flex-1 overflow-y-auto p-4 ${rightTab === 'memory' ? "" : "hidden"}`}>
-                        <MemoryExplorer
-                            memory={memory}
-                            offset={0x00}
-                            bytesPerLine={16}
-                            linesPerPage={16}
-                            open={true}
-                        />
-                    </div>
-
-                    <div className={`flex-1 overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'sources' ? "" : "hidden"}`}>
-                        TODO: files explorer
-                    </div>
-
-                    <div className={`flex-1 overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'docs' ? "" : "hidden"}`}>
-                        <Docs loadAddress={loadAddress} />
-                    </div> {/* .docs */}
-
                 </div>
             </div>
 
+            <div className={`flex-1 overflow-y-auto p-4 ${rightTab === 'devices' ? "" : "hidden"}`}>
+                {/* ── Row 1: Console + Screen ── */}
+                <div className="flex flex-wrap gap-3 mb-3">
+                    {/* Console */}
+                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] w-full md:w-auto min-w-96">
+                        <Console deviceInstance={consoleDevice} />
+                    </div>
 
-            <FileModal
-                isOpen={isFileModalOpen}
-                onClose={() => setIsFileModalOpen(false)}
-                onSelectFile={openAssemblyFileInEditor}
-            />
-        </div>
+                    <div className="flex-1 relative">
+                        <button
+                            className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
+                            onClick={() => setPreferHdScreen(b => !b)}
+                        >
+                            <div className={!preferHdScreen ? "" : "line-through"}>SD</div>
+                            /
+                            <div className={preferHdScreen ? "" : "line-through"}>HD</div>
+                        </button>
+
+                        {/* Screen */}
+                        <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
+                            <Screen deviceInstance={screenDevice} />
+                        </div>
+
+                        {/* Screen HD */}
+                        <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
+                            <ScreenCanvas deviceInstance={screenHdDevice} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Row 2: LEDs + Keyboard + CPU State ── */}
+                <div className="flex gap-3 mb-3 w-full">
+
+                    <div className="flex-1 flex flex-col gap-3">
+                        {/* Keyboard */}
+                        <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] min-w-0 grow-0">
+                            <Keyboard deviceInstance={keyboardDevice} />
+                        </div>
+
+                        {/* Switchs */}
+                        <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                            <Switchs deviceInstance={switchsDevice} />
+                        </div>
+
+                        {/* LEDs */}
+                        <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                            <Leds deviceInstance={ledsDevice} />
+                        </div>
+                    </div>
+
+                    {/* CPU State */}
+                    <div className="flex-1 ">
+                        <div className="flex flex-col gap-3">
+                            <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                                <Registers registers8={registers8} registers16={registers16} />
+                            </div>
+
+                            <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
+                                <Lcd deviceInstance={lcdDevice} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Disk ── */}
+                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative">
+                        <button
+                            className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
+                            onClick={() => setselectedDisk(sel => sel === 'os_disk' ? 'user_disk' : 'os_disk')}
+                        >
+                            <div className={selectedDisk === 'os_disk' ? "" : "line-through"}>OS</div>
+                            /
+                            <div className={selectedDisk === 'user_disk' ? "" : "line-through"}>User</div>
+                        </button>
+
+                        <div className={`${selectedDisk === 'os_disk' ? "" : "hidden"}`}>
+                            <Disk deviceInstance={osDiskDevice} />
+                        </div>
+                        <div className={`${selectedDisk === 'user_disk' ? "" : "hidden"}`}>
+                            <Disk deviceInstance={userDiskDevice} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className={`flex-1 overflow-y-auto p-4 ${rightTab === 'memory' ? "" : "hidden"}`}>
+                <MemoryExplorer
+                    memory={memory}
+                    offset={0x00}
+                    bytesPerLine={16}
+                    linesPerPage={16}
+                    open={true}
+                />
+            </div>
+
+            <div className={`flex-1 overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'sources' ? "" : "hidden"}`}>
+                TODO: files explorer
+            </div>
+
+            <div className={`flex-1 overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${rightTab === 'docs' ? "" : "hidden"}`}>
+                <Docs loadAddress={"0xA000"} />
+            </div> {/* .docs */}
+
+        </>
     );
-};
-
-
-
+}

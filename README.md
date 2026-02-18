@@ -125,6 +125,7 @@ frontend/
 
 ### Assembly Script
 - https://www.assemblyscript.org/
+- https://opensource.com/article/21/3/hello-world-webassembly
 
 ### CPU Emulator
 - https://app.x64.halb.it/
