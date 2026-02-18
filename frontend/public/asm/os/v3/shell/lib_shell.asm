@@ -27,15 +27,15 @@ section .data
     STR_RUN_COMMAND       db "Running command...", 13, 0
     STR_COMMAND_NOT_FOUND db "Command not found", 13, 0
     STR_COMMAND_HELP_TEST db "Commands:", 13
-                          db " - help : Print help message (this message)", 13
-                          db " - halt : Halt the computer", 13
+                          db " - help (0) : Print help message (this message)", 13
+                          db " - halt (7) : Halt the computer", 13
                           db " - reboot : Reboot the computer ( /!\ buggy )", 13
-                          db " - leds : Toggle LEDs", 13
+                          db " - leds (4) : Toggle LEDs", 13
                           db " - ls : Display files list (Not yet available)", 13
                           db " - ps : Display processes list (Not yet available)", 13
-                          db " - pixels : Screen pixels demo", 13
-                          db " - sprite : Screen sprite demo", 13
-                          db " - custom : Run custom code", 13
+                          db " - pixels (2) : Screen pixels demo", 13
+                          db " - sprite (3) : Screen sprite demo", 13
+                          db " - custom (1) : Run custom code", 13
                           db 0
     STR_COMMAND_LS_TEST   db "Files list here...", 13, 0
     STR_COMMAND_PS_TEST   db "Processes list here...", 13, 0
@@ -158,6 +158,32 @@ run_shell:
     call run_command_sprite
     jmp CALL_RUN_COMMAND_END
     SKIP_HANDLE_BUTTON_3:
+
+
+    ; check si c'est bouton #4
+    cmp al, 0x04
+    jne SKIP_HANDLE_BUTTON_4
+
+    ; execute l'action du bouton #4 => sprite
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_leds
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_4:
+
+
+    ; check si c'est bouton #7
+    cmp al, 0x07
+    jne SKIP_HANDLE_BUTTON_7
+
+    ; execute l'action du bouton #5 => halt
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_halt
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_7:
 
 
     SKIP_HANDLE_BUTTONS:

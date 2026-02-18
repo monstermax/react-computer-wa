@@ -9,10 +9,8 @@
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 
 - cpu: interrupts
-- io sound/buzzer/speaker
 - io gamepad
 - io mouse
-- io lcd screen
 - io 7-segments display
 - io network/socket/websocket
 - os: interrupts

@@ -510,14 +510,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 <div className="flex items-center gap-2 px-5 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap">
                     {/* Emulator controls */}
                     <button
-                        disabled={emulator.clockStatus}
+                        disabled={emulator.clockStatus || emulator.cpuHalted}
                         onClick={() => runCpuStep()}
                         className="px-3 py-1.5 text-xs rounded bg-blue-700 hover:bg-blue-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
                     >
                         Step
                     </button>
                     <button
-                        disabled={emulator.clockStatus}
+                        disabled={emulator.clockStatus || emulator.cpuHalted}
                         onClick={() => emulator.startClock()}
                         className="px-3 py-1.5 text-xs rounded bg-emerald-700 hover:bg-emerald-600 disabled:bg-zinc-700 text-white transition-colors cursor-pointer"
                     >

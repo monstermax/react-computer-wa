@@ -39,6 +39,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     const [clock] = useState(() => new Clock(clockFrequency));
     const [clockStatus, setClockStatus] = useState<boolean>(false);
     const cyclesPerSecondRef = useRef(0);
+    const [cpuHalted, setCpuHalted] = useState(false);
 
     // ── Devices Manager ──
     const devicesManager = useDevicesManager();
@@ -140,6 +141,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         clock.stop();
         setClockStatus(false)
         cyclesPerSecondRef.current = 0
+        setCpuHalted(true)
         addLog('CPU halted');
     };
 
@@ -369,6 +371,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         cyclesPerSecondRef,
         clockStatus,
         devicesManager,
+        cpuHalted,
         addDevicesToComputer,
         runCycles,
         setClockStatus,
@@ -394,6 +397,7 @@ export type EmulatorHook = {
     cyclesPerSecondRef: React.RefObject<number>;
     clockStatus: boolean;
     devicesManager: DevicesManagerHook;
+    cpuHalted: boolean;
     addDevicesToComputer: (deviceHooks: DeviceHook<IoDevice>[]) => void;
     runCycles: (cyclesCount?: number) => void;
     setClockStatus: (value: React.SetStateAction<boolean>) => void;

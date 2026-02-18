@@ -190,7 +190,7 @@ export const Switchs: React.FC<SwitchsProps> = (props) => {
                         <div
                             key={i}
                             className={`
-                                w-8 h-8 cursor-pointer rounded transition-all
+                                w-8 h-8 cursor-pointer rounded transition-all flex items-center justify-center
                                 ${isPending(i)
                                     ? 'bg-gray-500 animate-pulse ring-2 ring-yellow-400'
                                     : on
@@ -205,7 +205,7 @@ export const Switchs: React.FC<SwitchsProps> = (props) => {
                                     ? `Switch ${i} (en attente du CPU...)`
                                     : `Switch ${i} (${on ? 'ON' : 'OFF'})`
                             }
-                        />
+                        >{i}</div>
                     ))}
                 </div>
 

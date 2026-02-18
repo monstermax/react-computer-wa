@@ -9,7 +9,7 @@ export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator })
     const [speed, setSpeed] = useState(0);
 
     useEffect(() => {
-        // Fonction pour mettre à jour l'affichage
+        // Fonction pour mettre à jour l'affichage (max freq = 10x/sec | min freq = 1x/sec)
         const updateSpeed = () => {
             delayer('cpu-speed', (cyclesPerSecond: number) => {
                 setSpeed(cyclesPerSecond);
@@ -29,7 +29,7 @@ export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator })
         <div className="flex items-center gap-4 text-xs text-zinc-500 min-w-32 justify-end">
             <div>Speed: </div>
             {!emulator.clockStatus && (
-                <div>Stopped</div>
+                <div>{emulator.cpuHalted ? "Halted" : "Stopped"}</div>
             )}
 
             {emulator.clockStatus && (
