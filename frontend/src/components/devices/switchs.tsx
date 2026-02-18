@@ -195,31 +195,35 @@ export const Switchs: React.FC<SwitchsProps> = (props) => {
 
             <div className="p-2 rounded flex gap-4 items-center">
                 <div className="flex gap-2 mx-auto">
-                    {getSwitchs().map((on, i) => (
-                        <div
-                            key={i}
-                            className={`
-                                w-8 h-8 cursor-pointer rounded transition-all flex items-center justify-center
-                                ${isPending(i)
-                                    ? 'bg-gray-500 animate-pulse ring-2 ring-yellow-400'
-                                    : on
-                                        ? 'bg-green-500 hover:bg-green-600'
-                                        : 'bg-red-700 hover:bg-red-800'
+                    {getSwitchs().map((on, i) => {
+                        const predefinedAction = predefinedActions[i as keyof typeof predefinedActions];
+
+                        return (
+                            <div
+                                key={i}
+                                className={`
+                                    w-8 h-8 cursor-pointer rounded transition-all flex items-center justify-center
+                                    ${isPending(i)
+                                        ? 'bg-gray-500 animate-pulse ring-2 ring-yellow-400'
+                                        : on
+                                            ? 'bg-green-500 hover:bg-green-600'
+                                            : 'bg-red-700 hover:bg-red-800'
+                                    }
+                                    ${!isPending(i) && 'hover:scale-110'}
+                                `}
+                                onClick={() => !isPending(i) && deviceInstance.toggleBit(i as u8)}
+                                title={
+                                    (
+                                        isPending(i)
+                                            ? `Switch ${i} (waiting for CPU...)`
+                                            : `Switch ${i} (${on ? 'ON' : 'OFF'})`
+                                    )
+                                    +
+                                    (predefinedAction ? `\n\nPredefined action: ${predefinedAction}` : "")
                                 }
-                                ${!isPending(i) && 'hover:scale-110'}
-                            `}
-                            onClick={() => !isPending(i) && deviceInstance.toggleBit(i as u8)}
-                            title={
-                                (
-                                    isPending(i)
-                                        ? `Switch ${i} (waiting for CPU...)`
-                                        : `Switch ${i} (${on ? 'ON' : 'OFF'})`
-                                )
-                                +
-                                (predefinedActions[i] ? `\n\nPredefined action: ${predefinedActions[i]}` : "")
-                            }
-                        >{i}</div>
-                    ))}
+                            >{i}</div>
+                        )
+                    })}
                 </div>
 
                 {/* Indicateur de queue */}
