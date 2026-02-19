@@ -115,12 +115,14 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                     </div>
                 )}
 
+                {/*
                 <button
                     className="bg-background px-2 py-1 rounded cursor-pointer"
                     onClick={() => setIsOpen(b => !b)}
                 >
                     {isOpen ? "▲" : "▼"}
                 </button>
+                */}
             </div>
 
             {isOpen && (

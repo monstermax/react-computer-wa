@@ -34,13 +34,13 @@ export type PanelEditorProps = {
     logs: string[];
     panelEmulatorHidden: boolean;
     addLog: (msg: string) => void;
-    togglePanelEditor: () => void;
+    togglePanelEmulator: () => void;
 }
 
 
 export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     const { emulator, logs, panelEmulatorHidden } = props;
-    const { addLog, togglePanelEditor } = props;
+    const { addLog, togglePanelEmulator } = props;
 
     // ── Editor ──
     const editorRef = useRef<PrismEditor>(null);
@@ -275,8 +275,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 )}
 
                 <button
-                    onClick={() => togglePanelEditor()}
-                    className={`ms-auto px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
+                    onClick={() => togglePanelEmulator()}
+                    className={`ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer`}>
                     {panelEmulatorHidden ? "Show Emulator" : "Hide Emulator"}
                 </button>
             </div>

@@ -324,9 +324,9 @@ export const Console: React.FC<ConsoleProps> = (props) => {
             {/* Terminal Content */}
             <div
                 ref={scrollContainerRef}
-                className="p-4 overflow-y-auto bg-[#1e1e1e] cursor-text relative"
+                className="p-4 overflow-y-auto overscroll-contain bg-[#1e1e1e] cursor-text relative"
                 style={{ height: `calc(${deviceInstance.height * 1.15}em - 41px)` }}
-                onClick={() => document.getElementById('device-keyboard')?.focus()}
+                onClick={() => document.getElementById('device-keyboard')?.focus({ preventScroll: true })}
             >
                 {/* Clear button - appears on hover */}
                 <button

@@ -29,13 +29,18 @@ export const SpeedDisplay: React.FC<{ emulator: EmulatorHook }> = ({ emulator })
         <div className="flex flex-col items-center gap-1 min-w-32">
             <div className="self-center">Current Speed</div>
 
-            <div className="self-center text-zinc-500">
+            <div className="self-center">
                 {!emulator.clockStatus && (
-                    <div>{emulator.cpuHalted ? "Halted" : "Stopped"}</div>
+                    <div>
+                        {emulator.cpuHalted
+                            ? <div className="text-red-500">Halted</div>
+                            : <div className="text-yellow-500">Stopped</div>
+                        }
+                    </div>
                 )}
 
                 {emulator.clockStatus && (
-                    <div>{formatSpeed(speed)}</div>
+                    <div className="text-green-500">{formatSpeed(speed)}</div>
                 )}
             </div>
         </div>

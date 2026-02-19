@@ -41,7 +41,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const { autoStart = false } = props;
 
     // ── Clock ──
-    const [clockFrequency, setClockFrequency] = useState(20 as u32);   // nb tick per second
+    const [clockFrequency, setClockFrequency] = useState(10 as u32);       // nb tick per second
     const [speedMultiplier, setSpeedMultiplier] = useState(10_000 as u32); // nb cycles per tick
 
     // ── Boot state ──
@@ -64,6 +64,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }, []);
 
     const [panelEmulatorHidden, setPanelEmulatorHidden] = useState(false);
+    const [panelEditorHidden, setPanelEditorHidden] = useState(false);
 
     const dumpRegisters = async () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
@@ -304,6 +305,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         setPanelEmulatorHidden(b => !b)
     }
 
+    const togglePanelEditor = () => {
+        setPanelEditorHidden(b => !b)
+    }
+
 
     return (
         <div className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200"
@@ -324,28 +329,30 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             <div className="flex flex-wrap md:flex-nowrap md:overflow-hidden">
 
                 {/* ══════ Emulator ══════ */}
-                <div className={`flex flex-col w-full md:min-w-[70vw] ${panelEmulatorHidden ? "hidden" : ""}`}>
+                <div className={`flex flex-col w-full ${panelEmulatorHidden ? "hidden" : ""}`}>
                     <PanelEmulator
                         emulator={emulator}
                         registers8={registers8}
                         registers16={registers16}
                         memory={memory}
                         panelEmulatorHidden={panelEmulatorHidden}
+                        panelEditorHidden={panelEditorHidden}
                         dumpMemory={dumpMemory}
                         dumpRam={dumpRam}
                         dumpDisk={dumpDisk}
                         togglePanelEmulator={togglePanelEmulator}
+                        togglePanelEditor={togglePanelEditor}
                         />
                 </div>
 
                 {/* ══════ Assembly Editor Panel ══════ */}
-                <div className={`flex-col w-full md:min-w-[500px] border-r border-zinc-800/60 ${panelEmulatorHidden ? "flex" : "hidden"} md:flex`}>
+                <div className={`flex-col w-full md:min-w-[600px] border-r border-zinc-800/60 ${(panelEmulatorHidden) ? "flex" : "hidden"} ${panelEditorHidden ? "hidden" : "md:flex"}`}>
                     <PanelEditor
                         emulator={emulator}
                         logs={logs}
                         panelEmulatorHidden={panelEmulatorHidden}
                         addLog={addLog}
-                        togglePanelEditor={togglePanelEmulator}
+                        togglePanelEmulator={togglePanelEmulator}
                         />
                 </div>
 

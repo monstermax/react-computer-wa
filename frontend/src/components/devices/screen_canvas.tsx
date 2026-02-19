@@ -205,26 +205,7 @@ export const ScreenCanvas: React.FC<ScreenCanvasProps> = (props) => {
         <>
             <h2>Screen</h2>
 
-            <div className="flex justify-between gap-4">
-                <div>
-                    <div className="flex flex-col gap-2">
-                        <div className="mt-3 text-xs text-slate-400 p-2 bg-slate-900/30 rounded">
-                            Cursor:
-                            <ul>
-                                <li>X={currentX}</li>
-                                <li>Y={currentY}</li>
-                            </ul>
-                        </div>
-
-                        <button
-                            onClick={handleClear}
-                            className="cursor-pointer bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors"
-                        >
-                            Clear
-                        </button>
-                    </div>
-                </div>
-
+            <div className="flex flex-col gap-2">
                 <canvas
                     ref={canvasRef}
                     width={width * PIXEL_SIZE}
@@ -232,6 +213,19 @@ export const ScreenCanvas: React.FC<ScreenCanvasProps> = (props) => {
                     className="bg-black border-4 border-slate-600 rounded-lg"
                     style={{ imageRendering: 'pixelated' }}
                 />
+
+                <div className="flex gap-2 justify-center">
+                    <div className="text-xs text-slate-400 p-2 bg-slate-900/30 rounded">
+                        Cursor [X={currentX} / Y={currentY}]
+                    </div>
+
+                    <button
+                        onClick={handleClear}
+                        className="cursor-pointer bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm transition-colors"
+                    >
+                        Clear
+                    </button>
+                </div>
             </div>
         </>
     );

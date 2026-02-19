@@ -265,6 +265,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         try {
             wasmExports.computerResetComputer(computerPointer)
 
+            setCpuHalted(false)
             startClock()
 
         } catch (err: any) {
