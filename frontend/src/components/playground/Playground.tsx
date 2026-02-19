@@ -311,8 +311,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     return (
-        <div className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200"
-            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace" }}>
+        <div
+            className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200"
+            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', monospace" }}
+        >
 
             {/* ── Header ── */}
             <Navbar
@@ -326,10 +328,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 />
 
             {/* ── Main Content ── */}
-            <div className="flex flex-wrap md:flex-nowrap md:overflow-hidden">
+            <div className="flex h-full overflow-hidden">
 
                 {/* ══════ Emulator ══════ */}
-                <div className={`flex flex-col w-full ${panelEmulatorHidden ? "hidden" : ""}`}>
+                <div className={`flex flex-col w-full h-full flex-2 ${panelEmulatorHidden ? "hidden" : ""}`}>
                     <PanelEmulator
                         emulator={emulator}
                         registers8={registers8}
@@ -346,7 +348,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 </div>
 
                 {/* ══════ Assembly Editor Panel ══════ */}
-                <div className={`flex-col w-full md:min-w-[600px] border-r border-zinc-800/60 ${(panelEmulatorHidden) ? "flex" : "hidden"} ${panelEditorHidden ? "hidden" : "md:flex"}`}>
+                <div className={`flex-col w-full md:min-w-[600px] h-full flex-1 border-r border-zinc-800/60 ${(panelEmulatorHidden) ? "flex" : "hidden"} ${panelEditorHidden ? "hidden" : "md:flex"}`}>
                     <PanelEditor
                         emulator={emulator}
                         logs={logs}

@@ -153,12 +153,12 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                             <div className={preferHdScreen ? "" : "line-through"}>HD</div>
                         </button>
 
-                        <div className={`min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`md:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen */}
                             <Screen deviceInstance={screenDevice} />
                         </div>
 
-                        <div className={`min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`md:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen HD */}
                             <ScreenCanvas deviceInstance={screenHdDevice} />
                         </div>
@@ -193,6 +193,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                     </div>
 
                     {/* Disks ── */}
+                    {/*
                     <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative w-[350px]">
                         <button
                             className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
@@ -210,6 +211,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                             <Disk deviceInstance={userDiskDevice} />
                         </div>
                     </div>
+                    */}
                 </div>
             </div>
 
