@@ -55,42 +55,45 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
     return (
         <>
 
-            {!panelEmulatorHidden && (
-                <button
-                    onClick={() => togglePanelEmulator()}
-                    className={`md:hidden px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointertext-zinc-500 hover:text-zinc-400 cursor-pointer`}>
-                    Show Editor
-                </button>
-            )}
-
             {/* Emulator panel tabs */}
             <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 px-4">
                 <button
                     onClick={() => setEmulatorTab('devices')}
-                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${emulatorTab === 'devices' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                    className={`px-2 md:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
+                        ${emulatorTab === 'devices'
+                            ? 'text-zinc-200 border-b-2 border-emerald-500'
+                            : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Devices
                 </button>
 
                 <button
                     onClick={() => setEmulatorTab('memory')}
-                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${emulatorTab === 'memory' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
+                    className={`px-2 md:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
+                        ${emulatorTab === 'memory'
+                            ? 'text-zinc-200 border-b-2 border-emerald-500'
+                            : 'text-zinc-500 hover:text-zinc-400'
                         }`}>
                     Memory
                 </button>
 
                 <button
                     onClick={() => setEmulatorTab('docs')}
-                    className={`px-2 md:px-4 py-2 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${emulatorTab === 'docs' ? 'text-zinc-200 border-b-2 border-emerald-500' : 'text-zinc-500 hover:text-zinc-400'
-                        }`}>
+                    className={`px-2 md:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
+                        ${emulatorTab === 'docs'
+                            ? 'text-zinc-200 border-b-2 border-emerald-500'
+                            : 'text-zinc-500 hover:text-zinc-400'
+                        }
+                    `}>
                     Docs
                 </button>
 
 
                 {/* ── Toolbar ── */}
-                <div className="ms-auto flex items-center gap-2 ps-2 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap min-h-14">
+                <div className="ms-auto flex items-center gap-2 ps-2 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap">
                     {emulatorTab === 'memory' && (
                         <>
+                            {/*
                             <button
                                 onClick={() => dumpDisk(osDiskDevice)}
                                 className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
@@ -102,6 +105,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                                 className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
                                 Dump RAM
                             </button>
+                            */}
 
                             {/*
                             <button
@@ -126,10 +130,25 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                     */}
 
                     <button 
+                        onClick={() => togglePanelEmulator()}
+                        className={`md:hidden px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                            ${!panelEditorHidden
+                                ? 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
+                                : 'text-zinc-200 border-b-2 border-b-emerald-800'
+                        }`}
+                    >
+                        {panelEditorHidden ? "Show Emulator (2)" : "Show Editor"}
+                    </button>
+
+                    <button 
                         onClick={() => togglePanelEditor()}
-                        className="hidden md:block px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer"
-                        >
-                        {panelEditorHidden ? "Show Editor" : "Hide Editor"}
+                        className={`hidden md:block px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                            ${!panelEditorHidden
+                                ? 'text-zinc-200 border-b-2 border-b-orange-800'
+                                : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-emerald-800'
+                        }`}
+                    >
+                        {panelEditorHidden ? "Editor" : "Expand"}
                     </button>
                 </div>
             </div>

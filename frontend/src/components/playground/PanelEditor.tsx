@@ -276,8 +276,13 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
                 <button
                     onClick={() => togglePanelEmulator()}
-                    className={`ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer`}>
-                    {panelEmulatorHidden ? "Show Emulator" : "Hide Emulator"}
+                    className={`ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                        ${!panelEmulatorHidden
+                            ? 'text-zinc-200 border-b-2 border-b-emerald-800'
+                            : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
+                    }`}
+                >
+                    {panelEmulatorHidden ? "Show Emulator" : "Expand"}
                 </button>
             </div>
 
