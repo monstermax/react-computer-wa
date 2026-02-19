@@ -156,7 +156,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
             </div>
 
             {/* Devices Tab */}
-            <div className={`overflow-y-auto p-4 ${emulatorTab === 'devices' ? "" : "hidden"}`}>
+            <div className={`overflow-y-auto overscroll-contain p-4 ${emulatorTab === 'devices' ? "" : "hidden"}`}>
                 {/* ── Row 1: Console + Screen ── */}
                 <div className="flex flex-wrap gap-3 mb-3">
 
@@ -237,7 +237,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
             </div>
 
             {/* Memory Tab */}
-            <div className={`flex-1 overflow-y-auto flex flex-col ${emulatorTab === 'memory' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto overscroll-contain flex flex-col ${emulatorTab === 'memory' ? "" : "hidden"}`}>
                 <MemoryExplorer
                     memory={memory}
                     offset={0x00}
@@ -252,7 +252,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
             </div>
 
             {/* Docs Tab */}
-            <div className={`overflow-y-auto p-4 text-sm leading-relaxed text-zinc-300 ${emulatorTab === 'docs' ? "" : "hidden"}`}>
+            <div className={`overflow-y-auto overscroll-contain p-4 text-sm leading-relaxed text-zinc-300 ${emulatorTab === 'docs' ? "" : "hidden"}`}>
                 <Docs loadAddress={"0xA000"} />
             </div>
 
