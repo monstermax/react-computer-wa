@@ -253,7 +253,9 @@ export const Keyboard: React.FC<KeyboardProps> = (props) => {
                 tabIndex={0}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                className={`grid grid-cols-2 gap-4 p-3 bg-slate-900/50 rounded outline-none cursor-pointer transition-all min-h-28 ${
+                contentEditable
+                suppressContentEditableWarning={true}
+                className={`grid grid-cols-2 gap-4 p-3 bg-slate-900/50 rounded outline-none cursor-pointer transition-all min-h-28 caret-transparent ${
                     isFocused
                         ? 'ring-2 ring-green-500/50'
                         : 'ring-1 ring-transparent hover:ring-slate-600/50'

@@ -328,7 +328,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 />
 
             {/* ── Main Content ── */}
-            <div className="flex h-full overflow-hidden">
+            <div className="flex gap-4 h-full overflow-hidden">
 
                 {/* ══════ Emulator ══════ */}
                 <div className={`flex flex-col w-full h-full flex-2 ${panelEmulatorHidden ? "hidden" : ""}`}>

@@ -53,6 +53,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     const [editorError, setEditorError] = useState<string | null>(null);
     const [editorStatus, setEditorStatus] = useState<string | null>(null);
     const [isFileModalOpen, setIsFileModalOpen] = useState(false);
+    const [codeLoaded, setCodeLoaded] = useState(false);
 
 
     // ── Logs ──
@@ -128,6 +129,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
             const _bytecode: Map<u16, u8> = getBytecodeArray(compiled);
             setBytecode(_bytecode)
+            setCodeLoaded(false)
 
             const msg = `Compiled ${_bytecode.size} bytes`;
             setEditorStatus(msg);
@@ -161,6 +163,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
             const msg = `Loaded ${bytecode.size} bytes @ ${toHex(addr, 4)}`;
             setEditorStatus(msg);
+            setCodeLoaded(true)
             addLog(msg);
             addLog(`Type "custom" in the shell to run your code (call ${toHex(addr, 4)})`);
 
@@ -181,6 +184,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     const handleEditorUpdate = (value: string, editor: PrismEditor) => {
         setEditorContent(value);
         setBytecode(null)
+        setCodeLoaded(false)
         setMachineCode(null)
     };
 
@@ -194,54 +198,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     return (
         <>
 
-            {/* Editor Toolbar */}
-            <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
-                <button
-                    onClick={() => handleOpenAssemblyFile()}
-                    className="cursor-pointer px-3 bg-indigo-600 hover:bg-indigo-500 rounded"
-                >
-                    Open File
-                </button>
-
-                <button
-                    disabled={!editorContent}
-                    onClick={handleCompileEditorCode}
-                    className="ms-auto px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
-                    Compile
-                </button>
-
-                <button
-                    disabled={!bytecode}
-                    onClick={handleLoadEditorCodeInRam}
-                    className="px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
-                    Load
-                </button>
-
-                <div className="flex items-center gap-1.5">
-                    <label className="text-[10px] text-zinc-500 uppercase tracking-wider">@</label>
-                    <input
-                        value={loadAddress}
-                        onChange={e => setLoadAddress(e.target.value)}
-                        className="w-20 px-2 py-1 text-xs bg-zinc-900 border border-zinc-700/50 rounded text-zinc-300 focus:outline-none focus:border-indigo-500/60"
-                    />
-                </div>
-            </div>
-
-            {/* Status / Error banners */}
-            {editorError && (
-                <div className="px-4 py-2 bg-red-950/60 border-b border-red-800/40 text-red-300 text-[11px] whitespace-pre-wrap">
-                    {editorError}
-                    <button onClick={() => setEditorError(null)} className="ml-3 text-red-500 hover:text-red-300 cursor-pointer">✕</button>
-                </div>
-            )}
-            {editorStatus && !editorError && (
-                <div className="px-4 py-1.5 bg-emerald-950/40 border-b border-emerald-800/30 text-emerald-300 text-[11px]">
-                    {editorStatus}
-                </div>
-            )}
-
             {/* Tabs: Editor / Log */}
-            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
+            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 h-10">
                 <button
                     onClick={() => setActiveTab('editor')}
                     className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'editor' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
@@ -274,23 +232,85 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                     </>
                 )}
 
+                {/* Button "togglePanelEmulator" for Mobile-only */}
                 <button
                     onClick={() => togglePanelEmulator()}
-                    className={`ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                    className={`md:hidden ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
                         ${!panelEmulatorHidden
                             ? 'text-zinc-200 border-b-2 border-b-emerald-800'
                             : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
-                    }`}
+                        }`}
                 >
-                    {panelEmulatorHidden ? "Show Emulator" : "Expand"}
+                    {panelEmulatorHidden ? "➤ Emulator" : "Expand (2)"}
+                </button>
+
+                {/* Button "togglePanelEmulator" for Desktop-only */}
+                <button
+                    onClick={() => togglePanelEmulator()}
+                    className={`hidden md:block ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                        ${!panelEmulatorHidden
+                            ? 'text-zinc-200 border-b-2 border-b-emerald-800'
+                            : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
+                        }`}
+                >
+                    {panelEmulatorHidden ? "↩" : "⛶"}
                 </button>
             </div>
 
             {/* Editor / Log content */}
-            <div className={`flex-1 overflow-auto ${activeTab === 'editor' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto flex flex-col ${activeTab === 'editor' ? "" : "hidden"}`}>
+
+                <div>
+                    {/* Editor Toolbar */}
+                    <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800/50 bg-[#0c0c13] shrink-0">
+                        <button
+                            onClick={() => handleOpenAssemblyFile()}
+                            className="cursor-pointer px-3 bg-indigo-600 hover:bg-indigo-500 rounded"
+                        >
+                            Open File
+                        </button>
+
+                        <button
+                            disabled={!editorContent}
+                            onClick={handleCompileEditorCode}
+                            className="ms-auto px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
+                            Compile
+                        </button>
+
+                        <button
+                            disabled={!bytecode}
+                            onClick={handleLoadEditorCodeInRam}
+                            className="px-3.5 py-1.5 text-xs font-medium rounded bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-700 text-white transition-colors cursor-pointer">
+                            Load
+                        </button>
+
+                        <div className="flex items-center gap-1.5">
+                            <label className="text-[10px] text-zinc-500 uppercase tracking-wider">@</label>
+                            <input
+                                value={loadAddress}
+                                onChange={e => setLoadAddress(e.target.value)}
+                                className={`w-20 px-2 py-1 text-xs bg-zinc-900 border border-zinc-700/50 rounded focus:outline-none focus:border-indigo-500/60 ${codeLoaded ? "text-emerald-300" : "text-zinc-500"}`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Status / Error banners */}
+                    {editorError && (
+                        <div className="px-4 py-2 bg-red-950/60 border-b border-red-800/40 text-red-300 text-[11px] whitespace-pre-wrap">
+                            {editorError}
+                            <button onClick={() => setEditorError(null)} className="ml-3 text-red-500 hover:text-red-300 cursor-pointer">✕</button>
+                        </div>
+                    )}
+                    {!editorError && (
+                        <div className="px-4 py-1.5 bg-emerald-950/40 border-b border-emerald-800/30 text-emerald-300 text-[11px]">
+                            {editorStatus || 'Ready to compile'}
+                        </div>
+                    )}
+                </div>
+
                 <Editor
                     ref={editorRef}
-                    className="h-full"
+                    className=""
                     language="nasm"
                     value={editorInitialContent}
                     onUpdate={handleEditorUpdate}

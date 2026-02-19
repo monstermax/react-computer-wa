@@ -129,6 +129,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                     )}
                     */}
 
+                    {/* Button "togglePanelEmulator" for Mobile-only */}
                     <button 
                         onClick={() => togglePanelEmulator()}
                         className={`md:hidden px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
@@ -137,18 +138,19 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                                 : 'text-zinc-200 border-b-2 border-b-emerald-800'
                         }`}
                     >
-                        {panelEditorHidden ? "Show Emulator (2)" : "Show Editor"}
+                        {panelEditorHidden ? "Show Emulator (2)" : "➤ Editor"}
                     </button>
 
+                    {/* Button "togglePanelEmulator" for Desktop-only */}
                     <button 
                         onClick={() => togglePanelEditor()}
                         className={`hidden md:block px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
                             ${!panelEditorHidden
-                                ? 'text-zinc-200 border-b-2 border-b-orange-800'
-                                : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-emerald-800'
+                                ? 'text-zinc-200 border-b-2 border-b-emerald-800'
+                                : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
                         }`}
                     >
-                        {panelEditorHidden ? "Editor" : "Expand"}
+                        {panelEditorHidden ? "↩" : "⛶"}
                     </button>
                 </div>
             </div>
@@ -235,13 +237,17 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
             </div>
 
             {/* Memory Tab */}
-            <div className={`overflow-y-auto p-4 ${emulatorTab === 'memory' ? "" : "hidden"}`}>
+            <div className={`overflow-y-auto p-2 ${emulatorTab === 'memory' ? "" : "hidden"}`}>
                 <MemoryExplorer
                     memory={memory}
                     offset={0x00}
                     bytesPerLine={16}
                     linesPerPage={16}
                     open={true}
+                    dumpDisk={dumpDisk}
+                    dumpRam={dumpRam}
+                    dumpMemory={dumpMemory}
+                    disks={[osDiskDevice, userDiskDevice]}
                 />
             </div>
 

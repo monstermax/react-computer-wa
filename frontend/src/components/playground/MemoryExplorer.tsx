@@ -3,28 +3,38 @@ import { useEffect, useState } from 'react';
 
 import { toHex } from '@/lib/lib_numbers';
 
+import type { DiskDevice } from '../devices/disk';
+
 
 interface MemoryExplorerProps {
-    memory: Uint8Array<ArrayBuffer> | null;
-    offset?: number;
     bytesPerLine?: number;
     linesPerPage?: number;
     open?: boolean;
+    memory: Uint8Array<ArrayBuffer> | null;
+    disks: (DiskDevice | null)[];
+    offset?: number;
+    dumpDisk: (diskDevice: DiskDevice | null) => void;
+    dumpRam: () => void;
+    dumpMemory: () => void;
 }
 
 
 export const MemoryExplorer = (props: MemoryExplorerProps) => {
-    const { memory, offset = 0, bytesPerLine = 16, linesPerPage = 16, open = false } = props;
+    const { bytesPerLine = 16, linesPerPage = 16, open = false, memory, disks, offset = 0 } = props;
+    const { dumpDisk, dumpRam, dumpMemory } = props;
 
     const [data, setData] = useState<Uint8Array>(new Uint8Array());
     const [page, setPage] = useState(0);
     const [searchValue, setSearchValue] = useState('');
     const [showQuickJump, setShowQuickJump] = useState(true);
+    const [selectedSource, setSelectedSource] = useState<'ram' | 'disk' | 'wasm'>('ram');
+
 
     useEffect(() => {
         if (!memory) return;
         setData(memory);
     }, [memory]);
+
 
     const bytesPerPage = bytesPerLine * linesPerPage;
     const totalPages = Math.ceil(data.length / bytesPerPage);
@@ -95,7 +105,30 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
     if (!open) return null;
 
     return (
-        <div className="bg-[#0c0c14] border border-zinc-800/50 rounded-lg overflow-hidden">
+        <div className="bg-[#0c0c14] border border-zinc-800/50 rounded-lg overflow-hidden p-1">
+
+            <div className="flex justify-center gap-4">
+                {disks.slice(0, 3).map(disk => (
+                    <button
+                        disabled={!disk}
+                        onClick={() => dumpDisk(disk)}
+                        className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                        Dump "{disk?.name}" Disk
+                    </button>
+                ))}
+
+                <button
+                    onClick={() => dumpRam()}
+                    className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                    Dump RAM
+                </button>
+
+                <button
+                    onClick={() => dumpMemory()}
+                    className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                    Dump Wasm Memory
+                </button>
+            </div>
 
             {/* Header responsive */}
             <div className="flex justify-between items-center">
@@ -104,7 +137,7 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                     <div className="flex items-center gap-2">
 
                         <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                            Memory Explorer
+                            Memory
                         </span>
 
                         {/*
