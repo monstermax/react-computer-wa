@@ -1,5 +1,6 @@
 
 - compiler: mapping entre addresses finales et numero de ligne et nom de fichier source
+- os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - os: parser les arguments de la commande shell
 + os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
@@ -23,9 +24,13 @@
 
 - jeux: t-rex, pong, arkanoid, snake, tetris, sokoban, pacman, game of life
 
-- partage de code entre utilisateurs
+- partage de code & devices entre utilisateurs
 
+- créer github doc emulateur
+- créer paquet npm pour code assembleur (bootloader + OS)
+- créer github code assembleur & devices io communautaire
 
+- créer gamification (levels & badges)
 
 
 Périphériques créatifs
