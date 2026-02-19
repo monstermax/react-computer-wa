@@ -137,6 +137,13 @@ frontend/
 ### ASCII Table
 - https://www.ascii-code.com/fr
 
+### Syscalls
+- https://man7.org/linux/man-pages/man2/syscalls.2.html
+- https://syscalls.mebeim.net/?table=x86/64/x64/latest
+- https://x86.syscall.sh/
+- https://thevivekpandey.github.io/posts/2017-09-25-linux-system-calls.html
+- https://0xax.gitbooks.io/linux-insides/content/SysCall/linux-syscall-2.html
+- https://blog.packagecloud.io/the-definitive-guide-to-linux-system-calls/
 
 ## License
 
