@@ -32,6 +32,9 @@
 
 - créer gamification (levels & badges)
 
+- créer serveur discord
+- créer chaine youtube
+
 
 Périphériques créatifs
 - Clavier virtuel sur le screen, cliquable à la souris (pour tablettes/tactile)
@@ -40,3 +43,33 @@ Périphériques créatifs
 - Horloge/timer : Réveil avec alarme (buzzer) et affichage 7-segments
 - Météo : Récupérer la météo via network et l'afficher
 - Terminal chat : Discussion entre deux navigateurs via WebSocket
+
+
+
+idées noms chaine youtube / discord:
+- Assembly Required
+- Illegal Opcode
+- ByteForge
+- Out of Memory
+- Illegal Instruction
+- OpCode Only
+- The NOP
+- BitShift
+- 8-bit Lab
+- 8-bit Forge
+- ByteCraft
+
+- Bare Metal JS
+- Silicon in JavaScript
+- Build Your CPU
+- The Virtual Machine Lab
+- Crafting a Computer
+- From Bits to OS
+
+- 8 bits suffisent
+- Carrément 8-bit
+- Bit à Bit
+- L'Assembleur du Dimanche
+- RétroCode
+- La Guerre des Bits
+- Le Bastion 8-bit
