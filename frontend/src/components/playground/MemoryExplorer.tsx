@@ -227,7 +227,7 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                 </div>
             </div>
 
-            <div className="overflow-auto">
+            <div className="overflow-auto scroll-contain">
                 {/* Column Headers - cachés sur mobile, visibles sur tablette+ */}
                 <div className="hidden sm:grid grid-cols-[80px_1fr_auto] gap-2 px-4 py-2 bg-[#0a0a12] border-b border-zinc-800/30 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
                     <div>Offset</div>
