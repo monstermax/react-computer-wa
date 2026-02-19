@@ -320,7 +320,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 </Editor>
             </div>
 
-            <div className={`flex-1 overflow-y-auto ${activeTab === 'compiled' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto overscroll-contain ${activeTab === 'compiled' ? "" : "hidden"}`}>
                 <Editor
                     className="h-full"
                     language="nasm"
@@ -332,7 +332,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 </Editor>
             </div>
 
-            <div className={`flex-1 overflow-y-auto ${activeTab === 'labels' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto overscroll-contain ${activeTab === 'labels' ? "" : "hidden"}`}>
                 <Editor
                     className="h-full"
                     language="nasm"
@@ -344,7 +344,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 </Editor>
             </div>
 
-            <div className={`flex-1 overflow-y-auto p-4 bg-[#08080d] text-[11px] leading-5 ${activeTab === 'log' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto overscroll-contain p-4 bg-[#08080d] text-[11px] leading-5 ${activeTab === 'log' ? "" : "hidden"}`}>
                 {logs.length === 0 ? (
                     <div className="text-zinc-600 italic">No logs yet.</div>
                 ) : (
