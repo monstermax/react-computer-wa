@@ -137,12 +137,12 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                             <div className={preferHdScreen ? "" : "line-through"}>HD</div>
                         </button>
 
-                        <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen */}
                             <Screen deviceInstance={screenDevice} />
                         </div>
 
-                        <div className={`border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen HD */}
                             <ScreenCanvas deviceInstance={screenHdDevice} />
                         </div>
@@ -177,7 +177,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                     </div>
 
                     {/* Disks ── */}
-                    <div className="w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative flex-1">
+                    <div className="border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] flex flex-col gap-4 relative w-[350px]">
                         <button
                             className={`absolute top-0 right-0 px-2 py-0 bg-background m-1 rounded cursor-pointer flex gap-1`}
                             onClick={() => setselectedDisk(sel => sel === 'os_disk' ? 'user_disk' : 'os_disk')}
@@ -187,10 +187,10 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                             <div className={selectedDisk === 'user_disk' ? "" : "line-through"}>User</div>
                         </button>
 
-                        <div className={`${selectedDisk === 'os_disk' ? "" : "hidden"}`}>
+                        <div className={`w-[350px] ${selectedDisk === 'os_disk' ? "" : "hidden"}`}>
                             <Disk deviceInstance={osDiskDevice} />
                         </div>
-                        <div className={`${selectedDisk === 'user_disk' ? "" : "hidden"}`}>
+                        <div className={`w-[350px] ${selectedDisk === 'user_disk' ? "" : "hidden"}`}>
                             <Disk deviceInstance={userDiskDevice} />
                         </div>
                     </div>
