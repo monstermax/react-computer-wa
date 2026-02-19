@@ -20,11 +20,13 @@ import type { u16, u8, u32 } from "@/types/computer.types";
 
 export type PanelEmulatorProps = {
     emulator: EmulatorHook;
+    cyclesCount: number;
     registers8: Record<string, u8>;
     registers16: Record<string, bigint | u8 | u16>;
     memory: Uint8Array<ArrayBuffer> | null;
     panelEmulatorHidden: boolean;
     panelEditorHidden: boolean;
+    modifiedRegisters: string[];
     dumpRam: () => void;
     dumpMemory: () => void;
     dumpDisk: (diskDevice: DiskDevice | null) => void;
@@ -34,7 +36,7 @@ export type PanelEmulatorProps = {
 
 
 export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
-    const { emulator, registers8, registers16, memory, panelEmulatorHidden, panelEditorHidden } = props;
+    const { emulator, cyclesCount, registers8, registers16, modifiedRegisters, memory, panelEmulatorHidden, panelEditorHidden } = props;
     const { dumpRam, dumpMemory, dumpDisk, togglePanelEmulator, togglePanelEditor } = props;
 
     const [preferHdScreen, setPreferHdScreen] = useState(false);
@@ -91,43 +93,6 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
 
                 {/* ── Toolbar ── */}
                 <div className="ms-auto flex items-center gap-2 ps-2 py-2 border-b border-zinc-800/60 bg-[#0b0b12] shrink-0 flex-wrap">
-                    {emulatorTab === 'memory' && (
-                        <>
-                            {/*
-                            <button
-                                onClick={() => dumpDisk(osDiskDevice)}
-                                className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                                Dump Disk
-                            </button>
-
-                            <button
-                                onClick={() => dumpRam()}
-                                className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                                Dump RAM
-                            </button>
-                            */}
-
-                            {/*
-                            <button
-                                onClick={() => dumpMemory()}
-                                className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                                Dump Wasm Memory
-                            </button>
-                            */}
-                        </>
-                    )}
-
-                    {/*
-                    {rightTab === 'devices' && (
-                        <>
-                            <button
-                                onClick={() => dumpRegisters()}
-                                className="px-3 py-1 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                                Dump CPU State
-                            </button>
-                        </>
-                    )}
-                    */}
 
                     {/* Button "togglePanelEmulator" for Mobile-only */}
                     <button 
@@ -205,7 +170,12 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
 
                     <div className="flex flex-col gap-3 flex-1">
                         <div className="min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">
-                            <Registers registers8={registers8} registers16={registers16} />
+                            <Registers
+                                cyclesCount={cyclesCount}
+                                registers8={registers8}
+                                registers16={registers16}
+                                modifiedRegisters={modifiedRegisters}
+                            />
                         </div>
 
                         <div className="min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14]">

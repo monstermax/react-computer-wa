@@ -1,5 +1,5 @@
 
-
+- compiler: mapping entre addresses finales et numero de ligne et nom de fichier source
 - os: parser les arguments de la commande shell
 + os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)

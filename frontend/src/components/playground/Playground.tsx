@@ -52,8 +52,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const [memory, setMemory] = useState<Uint8Array<ArrayBuffer> | null>(null);
 
     // ── Registers & Memory (on-demand only via Dump buttons, NOT synced per tick) ──
+    const [modifiedRegisters, setModifiedRegisters] = useState<string[]>([]);
     const [registers8, setRegisters8] = useState<Record<string, u8>>({});
     const [registers16, setRegisters16] = useState<Record<string, u8 | u16 | bigint>>({});
+    const [cyclesCount, setCyclesCount] = useState<number>(0);
 
     // ── Logs ──
     const [logs, setLogs] = useState<string[]>([]);
@@ -68,8 +70,26 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     const dumpRegisters = async () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
-        setRegisters8(emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer));
-        setRegisters16(emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer));
+
+        const registers8_new = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
+        const registers16_new = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
+        const cyclesCount_new = Number(emulator.getCyclesCount(emulator.wasmExports, emulator.computerPointer));
+
+        const _modifiedRegisters: string[] = [];
+
+        Object.entries(registers8).forEach(([regName, regValueOld]) => {
+            const regValueNew = registers8_new[regName as keyof typeof registers8_new];
+
+            if (regValueNew !== regValueOld) {
+                _modifiedRegisters.push(regName);
+            }
+        })
+
+        setModifiedRegisters(_modifiedRegisters)
+
+        setRegisters8(registers8_new);
+        setRegisters16(registers16_new);
+        setCyclesCount(cyclesCount_new);
     };
 
 
@@ -334,8 +354,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 <div className={`flex flex-col w-full h-full flex-2 ${panelEmulatorHidden ? "hidden" : ""}`}>
                     <PanelEmulator
                         emulator={emulator}
+                        cyclesCount={cyclesCount}
                         registers8={registers8}
                         registers16={registers16}
+                        modifiedRegisters={modifiedRegisters}
                         memory={memory}
                         panelEmulatorHidden={panelEmulatorHidden}
                         panelEditorHidden={panelEditorHidden}

@@ -279,10 +279,21 @@ export const useEmulator = (params: useEmulatorParams) => {
     //  Register & memory dump (on demand only)
     // ═══════════════════════════════════════════
 
+    //cyclesCount
+    const getCyclesCount = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4): bigint => {
+        try {
+            return wasmExports.computerGetCycles(computerPtr)
+
+        } catch (err: any) {
+            wasmError(err);
+            throw new Error("Unreachable Error");
+        }
+    }
+
+
     const readControlRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
         try {
             return {
-                cycles: wasmExports.computerGetCycles(computerPtr),
                 PC: wasmExports.computerGetRegisterPC(computerPtr) as u16,
                 SP: wasmExports.computerGetRegisterSP(computerPtr) as u16,
                 IR: wasmExports.computerGetRegisterIR(computerPtr) as u8,
@@ -389,6 +400,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         setClockStatus,
         startClock,
         stopClock,
+        getCyclesCount,
         readControlRegisters,
         readDataRegisters,
         readRam,
@@ -415,7 +427,8 @@ export type EmulatorHook = {
     setClockStatus: (value: React.SetStateAction<boolean>) => void;
     startClock: () => void;
     stopClock: () => void;
-    readControlRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { cycles: bigint, PC: u16, SP: u16, IR: u8 };
+    getCyclesCount: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => bigint;
+    readControlRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { PC: u16, SP: u16, IR: u8 };
     readDataRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { A: u8, B: u8, C: u8, D: u8, E: u8, F: u8 };
     readRam: (address: u16) => u8;
     writeRam: (address: u16, value: u8) => void;
