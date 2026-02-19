@@ -258,7 +258,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             </div>
 
             {/* Editor / Log content */}
-            <div className={`flex-1 overflow-y-auto flex flex-col ${activeTab === 'editor' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto overscroll-contain flex flex-col ${activeTab === 'editor' ? "" : "hidden"}`}>
 
                 <div>
                     {/* Editor Toolbar */}
