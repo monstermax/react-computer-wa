@@ -109,8 +109,9 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
 
             <div>
                 <div className="flex justify-center gap-4 m-1 mt-2">
-                    {disks.slice(0, 3).map(disk => (
+                    {disks.slice(0, 3).map((disk, idx) => (
                         <button
+                            key={`${idx}-${disk?.name}`}
                             disabled={!disk}
                             onClick={() => dumpDisk(disk)}
                             className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">

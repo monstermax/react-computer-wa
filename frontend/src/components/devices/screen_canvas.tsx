@@ -72,7 +72,7 @@ export class ScreenCanvasDevice extends IoDevice {
                     const color = value;
                     this.pixels[this.currentY][this.currentX] = color;
 
-                    this.emit('state', { pixels: this.pixels })
+                    this.emit('state', { pixels: this.pixels, pixelX: this.currentX, pixelY: this.currentY })
                 }
                 break;
         }
@@ -89,7 +89,8 @@ export class ScreenCanvasDevice extends IoDevice {
 
     clear() {
         this.pixels = Array(this.height).fill(null).map(() => new Uint8Array(this.width));
-        this.emit('state', { pixels: this.pixels })
+        this.emit('state', { pixels: this.pixels, pixelX: null, pixelY: null })
+        this.emit('clear');
     }
 
 
@@ -99,10 +100,8 @@ export class ScreenCanvasDevice extends IoDevice {
         this.currentX = 0 as u8;
         this.currentY = 0 as u8;
 
-        this.emit('state', {
-            currentX: this.currentX,
-            currentY: this.currentY,
-        })
+        this.emit('state', { currentX: this.currentX, currentY: this.currentY })
+        this.clear();
     }
 }
 
@@ -118,12 +117,34 @@ export const ScreenCanvas: React.FC<ScreenCanvasProps> = (props) => {
     const { deviceInstance } = props;
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [pixels, setPixels] = useState<Uint8Array[]>([]);
     const [currentX, setCurrentX] = useState<number>(0);
     const [currentY, setCurrentY] = useState<number>(0);
 
     const PIXEL_SIZE = useMemo(() => deviceInstance?.pixelSize, [deviceInstance]);
     const width = useMemo(() => deviceInstance?.width, [deviceInstance]);
     const height = useMemo(() => deviceInstance?.height, [deviceInstance]);
+
+
+    const drawPixel = useCallback((pixels: Uint8Array[], pixelX: u8 | null, pixelY: u8 | null) => {
+        if (!PIXEL_SIZE || !width || !height) return;
+        if (pixelX === null || pixelY === null) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const x = pixelX;
+        const y = pixelY;
+        const row = pixels[y];
+        const color = row ? row[x] : 0;
+
+        ctx.fillStyle = hslFromByte(color as u8);
+        ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+
+    }, [width, height, currentX, currentY]);
 
 
     // Draw the full screen from pixel data
@@ -158,7 +179,9 @@ export const ScreenCanvas: React.FC<ScreenCanvasProps> = (props) => {
 
         const stateHandler = (state: any) => {
             if (state.pixels !== undefined) {
-                drawScreen(state.pixels);
+                //drawScreen(state.pixels);
+                setPixels(state.pixels);
+                drawPixel(state.pixels, state.pixelX, state.pixelY);
             }
 
             if (state.currentX !== undefined) {
@@ -171,9 +194,11 @@ export const ScreenCanvas: React.FC<ScreenCanvasProps> = (props) => {
         };
 
         deviceInstance.on('state', stateHandler);
+        deviceInstance.on('clear', () => drawScreen([]));
 
         return () => {
             deviceInstance.off('state', stateHandler);
+            deviceInstance.off('clear', () => drawScreen([]));
         };
     }, [deviceInstance, drawScreen]);
 
