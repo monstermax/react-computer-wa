@@ -19,7 +19,8 @@ import "prism-react-editor/themes/github-dark.css";
 
 const defaultLoadAddress = '0xA000';
 
-const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
+//const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
+const defaultCodeUrl = "/asm/user/tests/lcd_test.asm";
 
 const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 ; Type "custom" in the shell to run it.
