@@ -198,8 +198,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     return (
         <>
 
-            {/* Tabs: Editor / Log */}
-            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 h-10">
+            {/* Editor Tabs: Editor / Log */}
+            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 h-12">
                 <button
                     onClick={() => setActiveTab('editor')}
                     className={`px-4 py-1.5 text-[11px] tracking-wider uppercase transition-colors cursor-pointer ${activeTab === 'editor' ? 'text-zinc-200 border-b-2 border-indigo-500' : 'text-zinc-500 hover:text-zinc-400'
@@ -320,7 +320,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 </Editor>
             </div>
 
-            <div className={`flex-1 overflow-auto ${activeTab === 'compiled' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto ${activeTab === 'compiled' ? "" : "hidden"}`}>
                 <Editor
                     className="h-full"
                     language="nasm"
@@ -332,7 +332,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 </Editor>
             </div>
 
-            <div className={`flex-1 overflow-auto ${activeTab === 'labels' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto ${activeTab === 'labels' ? "" : "hidden"}`}>
                 <Editor
                     className="h-full"
                     language="nasm"

@@ -55,8 +55,8 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
     return (
         <>
 
-            {/* Emulator panel tabs */}
-            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 px-4">
+            {/* Emulator Tabs: Devices / Memory / Docs */}
+            <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 px-4 h-12">
                 <button
                     onClick={() => setEmulatorTab('devices')}
                     className={`px-2 md:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
@@ -237,7 +237,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
             </div>
 
             {/* Memory Tab */}
-            <div className={`overflow-y-auto p-2 ${emulatorTab === 'memory' ? "" : "hidden"}`}>
+            <div className={`flex-1 overflow-y-auto flex flex-col ${emulatorTab === 'memory' ? "" : "hidden"}`}>
                 <MemoryExplorer
                     memory={memory}
                     offset={0x00}

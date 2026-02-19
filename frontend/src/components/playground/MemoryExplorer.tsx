@@ -105,215 +105,221 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
     if (!open) return null;
 
     return (
-        <div className="bg-[#0c0c14] border border-zinc-800/50 rounded-lg overflow-hidden p-1">
+        <>
 
-            <div className="flex justify-center gap-4">
-                {disks.slice(0, 3).map(disk => (
-                    <button
-                        disabled={!disk}
-                        onClick={() => dumpDisk(disk)}
-                        className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                        Dump "{disk?.name}" Disk
-                    </button>
-                ))}
-
-                <button
-                    onClick={() => dumpRam()}
-                    className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                    Dump RAM
-                </button>
-
-                <button
-                    onClick={() => dumpMemory()}
-                    className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
-                    Dump Wasm Memory
-                </button>
-            </div>
-
-            {/* Header responsive */}
-            <div className="flex justify-between items-center">
-
-                <div className="flex flex-col justify-between gap-2 px-3 sm:px-4 py-2">
-                    <div className="flex items-center gap-2">
-
-                        <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                            Memory
-                        </span>
-
-                        {/*
-                        <span className="text-[10px] sm:text-xs text-zinc-600">
-                            {data.length.toLocaleString()} bytes
-                        </span>
-                        */}
-                    </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3 sm:px-4 py-2 bg-[#0a0a12] border-b border-zinc-800/50">
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] sm:text-xs text-zinc-600">Page</span>
-                        <div className="flex items-center gap-1">
-                            <button
-                                onClick={() => goToPage(0)}
-                                disabled={page === 0}
-                                className="hidden xs:block px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
-                            >
-                                ⟪
-                            </button>
-                            <button
-                                onClick={() => goToPage(page - 1)}
-                                disabled={page === 0}
-                                className="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
-                            >
-                                ←
-                            </button>
-                            <input
-                                type="number"
-                                value={page + 1}
-                                onChange={(e) => goToPage(Number(e.target.value) - 1)}
-                                className="w-12 px-1 py-1 text-[10px] sm:text-xs bg-zinc-900 border border-zinc-700/50 rounded text-center text-zinc-300 focus:outline-none focus:border-emerald-500/60"
-                                min={1}
-                                max={totalPages}
-                            />
-                            <button
-                                onClick={() => goToPage(page + 1)}
-                                disabled={page >= totalPages - 1}
-                                className="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
-                            >
-                                →
-                            </button>
-                            <button
-                                onClick={() => goToPage(totalPages - 1)}
-                                disabled={page >= totalPages - 1}
-                                className="hidden xs:block px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
-                            >
-                                ⟫
-                            </button>
-                        </div>
-                        <span className="text-[10px] sm:text-xs text-zinc-600 text-nowrap">/ {totalPages || 1}</span>
-                    </div>
-
-
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <form onSubmit={handleSearch} className="flex items-center">
-                        <input
-                            type="text"
-                            value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value /*.replace(/[^0-9A-Fa-f]/g, '')*/)}
-                            placeholder="addr"
-                            className="w-16 sm:w-20 px-1 sm:px-2 py-1 text-[10px] sm:text-xs bg-zinc-900 border border-zinc-700/50 rounded text-zinc-300 focus:outline-none focus:border-emerald-500/60 font-mono"
-                        />
+            <div>
+                <div className="flex justify-center gap-4 m-1 mt-2">
+                    {disks.slice(0, 3).map(disk => (
                         <button
-                            type="submit"
-                            className="ml-1 px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 transition-colors"
-                        >
-                            Go
+                            disabled={!disk}
+                            onClick={() => dumpDisk(disk)}
+                            className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                            Dump "{disk?.name}" Disk
                         </button>
-                    </form>
+                    ))}
+
+                    <button
+                        onClick={() => dumpRam()}
+                        className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                        Dump RAM
+                    </button>
 
                     {/*
                     <button
-                        onClick={() => setShowQuickJump(!showQuickJump)}
-                        className="sm:hidden px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 transition-colors"
-                    >
-                        {showQuickJump ? '▲' : '▼'}
+                        onClick={() => dumpMemory()}
+                        className="px-3 py-1.5 text-xs rounded bg-orange-700 hover:bg-orange-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer">
+                        Dump Wasm Memory
                     </button>
                     */}
                 </div>
-            </div>
 
-            {/* Column Headers - cachés sur mobile, visibles sur tablette+ */}
-            <div className="hidden sm:grid grid-cols-[80px_1fr_auto] gap-2 px-4 py-2 bg-[#0a0a12] border-b border-zinc-800/30 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
-                <div>Offset</div>
-                <div>Hex</div>
-                <div>ASCII</div>
-            </div>
+                {/* Header responsive */}
+                <div className="flex justify-between items-center">
 
-            {/* Memory view responsive */}
-            <div className="divide-y divide-zinc-800/20 overflow-x-auto">
-                {Array.from({ length: linesPerPage }).map((_, i) => {
-                    const addr = startOffset + i * bytesPerLine;
-                    if (addr >= data.length) return null;
+                    <div className="flex flex-col justify-between gap-2 px-3 sm:px-4 py-2">
+                        <div className="flex items-center gap-2">
 
-                    return (
-                        <div key={addr} className="px-2 sm:px-4 py-1.5 hover:bg-zinc-800/20 transition-colors min-w-[320px] sm:min-w-0">
-                            {/* Mobile: stacked layout */}
-                            <div className="sm:hidden space-y-1">
-                                <div className="font-mono text-[10px] text-emerald-400/70">
-                                    0x{addr.toString(16).padStart(4, '0')}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[8px] text-zinc-600 uppercase w-6">Hex</span>
-                                    {bytesToHex(data, addr, bytesPerLine)}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[8px] text-zinc-600 uppercase w-6">Asc</span>
-                                    {bytesToAscii(data, addr, bytesPerLine)}
-                                </div>
-                            </div>
+                            <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                                Memory
+                            </span>
 
-                            {/* Tablet/Desktop: grid layout */}
-                            <div className="hidden sm:grid grid-cols-[80px_1fr_auto] gap-2">
-                                <div className="font-mono text-[11px] text-emerald-400/70">
-                                    0x{addr.toString(16).padStart(4, '0')}
-                                </div>
-                                <div>
-                                    {bytesToHex(data, addr, bytesPerLine)}
-                                </div>
-                                <div>
-                                    {bytesToAscii(data, addr, bytesPerLine)}
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Quick jump - caché sur mobile par défaut, expandable */}
-            <div className={`${showQuickJump ? 'block' : 'hidden sm:block'} px-3 sm:px-4 py-3 bg-[#0a0a12] border-t border-zinc-800/30`}>
-                <div className="text-[10px] font-medium text-zinc-600 uppercase tracking-wider mb-2">
-                    Quick Jump
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    <div className="space-y-1">
-                        <div className="text-[10px] text-emerald-400/60 uppercase">ROM</div>
-                        <div className="flex flex-wrap gap-1">
-                            {[0x0000, 0x0200, 0x0400].map(addr => (
-                                <button
-                                    key={addr}
-                                    onClick={() => {
-                                        goToPage(Math.floor(addr / bytesPerPage));
-                                        //setShowQuickJump(false);
-                                    }}
-                                    className="px-2 py-1 text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 hover:text-emerald-400 transition-colors"
-                                >
-                                    {toHex(addr, 4)}
-                                </button>
-                            ))}
+                            {/*
+                            <span className="text-[10px] sm:text-xs text-zinc-600">
+                                {data.length.toLocaleString()} bytes
+                            </span>
+                            */}
                         </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <div className="text-[10px] text-emerald-400/60 uppercase">RAM</div>
-                        <div className="flex flex-wrap gap-1">
-                            {[0x0500, 0x0700, 0x1000, 0xA000, 0xC000, 0xF000].map(addr => (
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3 sm:px-4 py-2 bg-[#0a0a12] my-1 border-b border-zinc-800/50">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] sm:text-xs text-zinc-600">Page</span>
+                            <div className="flex items-center gap-1">
                                 <button
-                                    key={addr}
-                                    onClick={() => {
-                                        goToPage(Math.floor(addr / bytesPerPage));
-                                        //setShowQuickJump(false);
-                                    }}
-                                    className="px-2 py-1 text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 hover:text-emerald-400 transition-colors"
+                                    onClick={() => goToPage(0)}
+                                    disabled={page === 0}
+                                    className="hidden xs:block px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
                                 >
-                                    {toHex(addr, 4)}
+                                    ⟪
                                 </button>
-                            ))}
+                                <button
+                                    onClick={() => goToPage(page - 1)}
+                                    disabled={page === 0}
+                                    className="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
+                                >
+                                    ←
+                                </button>
+                                <input
+                                    type="number"
+                                    value={page + 1}
+                                    onChange={(e) => goToPage(Number(e.target.value) - 1)}
+                                    className="w-12 px-1 py-1 text-[10px] sm:text-xs bg-zinc-900 border border-zinc-700/50 rounded text-center text-zinc-300 focus:outline-none focus:border-emerald-500/60"
+                                    min={1}
+                                    max={totalPages}
+                                />
+                                <button
+                                    onClick={() => goToPage(page + 1)}
+                                    disabled={page >= totalPages - 1}
+                                    className="px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
+                                >
+                                    →
+                                </button>
+                                <button
+                                    onClick={() => goToPage(totalPages - 1)}
+                                    disabled={page >= totalPages - 1}
+                                    className="hidden xs:block px-2 py-1 text-xs bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:hover:bg-zinc-800 rounded text-zinc-400 transition-colors"
+                                >
+                                    ⟫
+                                </button>
+                            </div>
+                            <span className="text-[10px] sm:text-xs text-zinc-600 text-nowrap">/ {totalPages || 1}</span>
+                        </div>
+
+
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <form onSubmit={handleSearch} className="flex items-center">
+                            <input
+                                type="text"
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value /*.replace(/[^0-9A-Fa-f]/g, '')*/)}
+                                placeholder="addr"
+                                className="w-16 sm:w-20 px-1 sm:px-2 py-1 text-[10px] sm:text-xs bg-zinc-900 border border-zinc-700/50 rounded text-zinc-300 focus:outline-none focus:border-emerald-500/60 font-mono"
+                            />
+                            <button
+                                type="submit"
+                                className="ml-1 px-1.5 sm:px-2 py-1 text-[10px] sm:text-xs bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 transition-colors"
+                            >
+                                Go
+                            </button>
+                        </form>
+
+                        {/*
+                        <button
+                            onClick={() => setShowQuickJump(!showQuickJump)}
+                            className="sm:hidden px-2 py-1 text-[10px] bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 transition-colors"
+                        >
+                            {showQuickJump ? '▲' : '▼'}
+                        </button>
+                        */}
+                    </div>
+                </div>
+            </div>
+
+            <div className="overflow-auto">
+                {/* Column Headers - cachés sur mobile, visibles sur tablette+ */}
+                <div className="hidden sm:grid grid-cols-[80px_1fr_auto] gap-2 px-4 py-2 bg-[#0a0a12] border-b border-zinc-800/30 text-[10px] font-medium text-zinc-500 uppercase tracking-wider">
+                    <div>Offset</div>
+                    <div>Hex</div>
+                    <div>ASCII</div>
+                </div>
+
+                {/* Memory view responsive */}
+                <div className="divide-y divide-zinc-800/20 overflow-x-auto">
+                    {Array.from({ length: linesPerPage }).map((_, i) => {
+                        const addr = startOffset + i * bytesPerLine;
+                        if (addr >= data.length) return null;
+
+                        return (
+                            <div key={addr} className="px-2 sm:px-4 py-1.5 hover:bg-zinc-800/20 transition-colors min-w-[320px] sm:min-w-0">
+                                {/* Mobile: stacked layout */}
+                                <div className="sm:hidden space-y-1">
+                                    <div className="font-mono text-[10px] text-emerald-400/70">
+                                        0x{addr.toString(16).padStart(4, '0')}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[8px] text-zinc-600 uppercase w-6">Hex</span>
+                                        {bytesToHex(data, addr, bytesPerLine)}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[8px] text-zinc-600 uppercase w-6">Asc</span>
+                                        {bytesToAscii(data, addr, bytesPerLine)}
+                                    </div>
+                                </div>
+
+                                {/* Tablet/Desktop: grid layout */}
+                                <div className="hidden sm:grid grid-cols-[80px_1fr_auto] gap-2">
+                                    <div className="font-mono text-[11px] text-emerald-400/70">
+                                        0x{addr.toString(16).padStart(4, '0')}
+                                    </div>
+                                    <div>
+                                        {bytesToHex(data, addr, bytesPerLine)}
+                                    </div>
+                                    <div>
+                                        {bytesToAscii(data, addr, bytesPerLine)}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Quick jump - caché sur mobile par défaut, expandable */}
+                <div className={`${showQuickJump ? 'block' : 'hidden sm:block'} px-3 sm:px-4 py-3 bg-[#0a0a12] border-t border-zinc-800/30`}>
+                    <div className="text-[10px] font-medium text-zinc-600 uppercase tracking-wider mb-2">
+                        Quick Jump
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        <div className="space-y-1">
+                            <div className="text-[10px] text-emerald-400/60 uppercase">ROM</div>
+                            <div className="flex flex-wrap gap-1">
+                                {[0x0000, 0x0200, 0x0400].map(addr => (
+                                    <button
+                                        key={addr}
+                                        onClick={() => {
+                                            goToPage(Math.floor(addr / bytesPerPage));
+                                            //setShowQuickJump(false);
+                                        }}
+                                        className="px-2 py-1 text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 hover:text-emerald-400 transition-colors"
+                                    >
+                                        {toHex(addr, 4)}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-1">
+                            <div className="text-[10px] text-emerald-400/60 uppercase">RAM</div>
+                            <div className="flex flex-wrap gap-1">
+                                {[0x0500, 0x0700, 0x1000, 0xA000, 0xC000, 0xF000].map(addr => (
+                                    <button
+                                        key={addr}
+                                        onClick={() => {
+                                            goToPage(Math.floor(addr / bytesPerPage));
+                                            //setShowQuickJump(false);
+                                        }}
+                                        className="px-2 py-1 text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 hover:text-emerald-400 transition-colors"
+                                    >
+                                        {toHex(addr, 4)}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
