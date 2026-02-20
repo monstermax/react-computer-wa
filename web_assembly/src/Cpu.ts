@@ -230,7 +230,7 @@ export class Cpu {
             return
         }
 
-        throw new Error(`Instruction not found: ${toHex(opcode)} (${opcode})`);
+        throw new Error(`Instruction not found: ${toHex(opcode)} (${opcode}) at address ${toHex(this.registers.PC, 4)}`);
     }
 }
 

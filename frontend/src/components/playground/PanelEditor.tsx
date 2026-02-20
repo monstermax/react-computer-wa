@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Editor, type PrismEditor } from "prism-react-editor";
 
 import { toHex } from "@/lib/lib_numbers";
-import { compileCode, formatBytecode, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
+import { compileCode, compileCodeV2, formatBytecode, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
 
 import { FileModal } from "./FileModal";
@@ -100,7 +100,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         try {
             addLog(`Compiling user code... (target @ ${toHex(addr, 4)})`);
 
-            const compiled = await compileCode(editorContent, CUSTOM_CPU, { startAddress: addr });
+            //const compiled = await compileCode(editorContent, { startAddress: addr, architecture: CUSTOM_CPU });
+            const compiled = await compileCodeV2(editorContent, undefined, { startAddress: addr, architecture: CUSTOM_CPU });
 
             if (compiled.errors.length > 0) {
                 //const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');

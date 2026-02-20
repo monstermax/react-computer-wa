@@ -1,11 +1,11 @@
 
-import type { CompilerOptions, CPUArchitecture, InstructionDef } from "@/types/compiler.types";
-import { MEMORY_MAP } from "../../../web_assembly/src/memory_map";
-import { CUSTOM_CPU } from "./arch_custom";
-import { Compiler } from "./compiler";
-
 import { Lexer, type Token } from "./compiler_lexer";
 import { loadSourceCodeFromFile } from "./compiler_utils";
+
+import type { CPUArchitecture, InstructionDef } from "@/types/compiler.types";
+
+
+// Used by CompierV2 (only)
 
 
 export type ParsedFiles = {

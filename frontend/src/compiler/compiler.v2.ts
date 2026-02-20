@@ -2,17 +2,18 @@ import { Lexer, type Token } from './compiler_lexer';
 
 import { toHex } from '@/lib/lib_numbers';
 
-import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant } from '@/types/compiler.types';
+import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant, CompileInstruction } from '@/types/compiler.types';
 import type { u16 } from '@/types/computer.types';
 
 
-export class Compiler {
+export class CompilerV2 {
     private arch: CPUArchitecture; // CPU architecture definition (registers, instructions, endianness)
     private tokens: Token[] = [];  // All tokens from lexer
     private pos = 0; // Current position in token stream
 
     private sections: Map<string, Section> = new Map(); // Memory sections (.text for code, .data for initialized data, .bss for uninitialized)
-    private currentSection: string = '.text'; // Currently active section
+    private currentSection: Section | null = null; // Currently active section
+    private currentSectionName: string = ''; // Currently active section
     private currentAddress = 0; // Current memory address being written
 
     private labels: Map<string, { section: string, address: u16, values?: any[] | null, dataSize: number | null }> = new Map(); // Label definitions with their addresses and optional data values
@@ -43,33 +44,44 @@ export class Compiler {
         this.caseSensitive = options.caseSensitive || false;
         this.startAddress = options.startAddress || 0;
         this.startLine = options.startLine || 0;
+        //console.log('this.startAddress:', this.startAddress)
 
         // Build lookup maps for registers and instructions
         this.buildRegisterMap();
         this.buildInstructionMap();
 
         // Initialize standard sections
+        //this.currentSection = '.text';
+
+        this.sections.set('', {
+            name: 'None Section',
+            type: 'code',
+            startAddress: null,
+            compileInstructions: [],
+            data: [],
+        });
+
         this.sections.set('.text', {
             name: '.text',
             type: 'code',
-            startAddress: options.startAddress || 0,
-            compileInstructions: [], // for CompilerV2. Not used in V1
+            startAddress: null,
+            compileInstructions: [],
             data: [],
         });
 
         this.sections.set('.data', {
             name: '.data',
             type: 'data',
-            startAddress: 0,
-            compileInstructions: [], // for CompilerV2. Not used in V1
+            startAddress: null,
+            compileInstructions: [],
             data: [],
         });
 
         this.sections.set('.bss', {
             name: '.bss',
             type: 'bss',
-            startAddress: 0,
-            compileInstructions: [], // for CompilerV2. Not used in V1
+            startAddress: null,
+            compileInstructions: [],
             data: [],
         });
     }
@@ -109,11 +121,11 @@ export class Compiler {
 
 
     // Main compilation entry point - performs two-pass compilation
-    public async compile(source: string, tokens?: Token[]): Promise<CompiledProgram> {
+    public async compile(source: string, initialTokens?: Token[]): Promise<CompiledProgram> {
         // should be called externally
 
-        if (tokens) {
-            this.tokens = tokens;
+        if (initialTokens) {
+            this.tokens = initialTokens;
 
         } else {
             // Define all recognized token types for lexer
@@ -137,9 +149,16 @@ export class Compiler {
         // Pass 1: collect all symbols and calculate addresses
         this.pass1CollectSymbols();
 
+
+//console.log('tokens:', this.tokens)
+
         // Reset for pass 2
-        this.pos = 0;
-        this.resetSections();
+        this.dispatchTokens();
+
+//console.log('.data', this.sections.get('.data'))
+//console.log('.text', this.sections.get('.text'))
+//console.log('tokens:', this.tokens)
+//throw new Error('DEBUG')
 
         // Pass 2: generate actual machine code
         this.pass2GenerateCode();
@@ -148,7 +167,7 @@ export class Compiler {
         this.resolveReferences();
 
         // Sync line numbers with expected offset
-        const syncLines: boolean = true; // synchronise les numéros de ligne avec les offset et non avec les addresses
+        const syncLines: boolean = false; // synchronise les numéros de ligne avec les offset et non avec les addresses
 
         if (syncLines && this.startLine !== this.startAddress) {
             const offset = this.startAddress - this.startLine
@@ -161,7 +180,11 @@ export class Compiler {
                     s.data.forEach(d => {
                         d.address -= offset;
                     })
+
+                } else if (s.data.length > 0) {
+                    throw new Error("Missing startAddress (compile)")
                 }
+
             })
         }
 
@@ -176,18 +199,22 @@ export class Compiler {
 
 
     // Clear section data between passes while preserving structure
-    private resetSections(): void {
+    private dispatchTokens(): void {
         // called by compile
 
-        //const textEnd = this.currentAddress;  // Sauvegarde où .text se termine
-        //const dataSection = this.sections.get('.data')!;
-        //dataSection.startAddress = textEnd;
+        const tokens: Token[] = [];
+        const sectionsNames = [ '.text', '.data', '.bss'];
 
-        for (const section of this.sections.values()) {
-            section.data = [];
+        for (const sectionName of sectionsNames) {
+            const section = this.sections.get(sectionName);
+            if (!section) throw new Error(`Missing section "${sectionName}"`);
+
+            for (const compiledInstruction of section.compileInstructions) {
+                tokens.push(...compiledInstruction.tokens);
+            }
         }
-        this.currentSection = '.text';
-        this.currentAddress = this.sections.get('.text')!.startAddress ?? 0;
+
+        this.tokens = tokens;
     }
 
 
@@ -198,16 +225,17 @@ export class Compiler {
     private pass1CollectSymbols(): void {
         // called by compile (pass1)
 
+        this.setCurrentSection('')
         this.pos = 0;
-        this.currentSection = '.text';
-        this.currentAddress = this.sections.get('.text')!.startAddress ?? 0;
+        this.currentAddress = this.startAddress;
 
         // Track last instruction/identifier address for comment association
         let lastInstructionOrIdentifierAddress: number | null = null;
+        let lastInstructionOrIdentifierPos: number | null = null;
 
 
         while (!this.isAtEnd()) {
-            const prev = this.peek(-1);
+            //const prev = this.peek(-1);
             const token = this.peek();
 
             // DIRECTIVE: Handle section directives, .org, global, extern
@@ -223,7 +251,7 @@ export class Compiler {
                 const labelName = token.value;
 
                 this.labels.set(labelName, {
-                    section: this.currentSection,
+                    section: this.currentSectionName,
                     address: this.currentAddress as u16,
                     values: null,
                     dataSize: null,
@@ -231,7 +259,7 @@ export class Compiler {
 
                 this.symbols.set(labelName, {
                     address: this.currentAddress,
-                    section: this.currentSection,
+                    section: this.currentSectionName,
                     type: 'label'
                 });
 
@@ -245,12 +273,32 @@ export class Compiler {
             if (token.type === 'INSTRUCTION') {
                 // example => "mov eax, 4"
                 lastInstructionOrIdentifierAddress = this.currentAddress;
+                lastInstructionOrIdentifierPos = this.pos;
 
                 const size = this.calculateInstructionSize();
 
                 //console.log(`[pass1] ${token.value} at ${this.currentAddress}, size=${size}`);
                 this.debugAddresses.set(this.currentAddress, size)
                 this.currentAddress += size;
+
+                this.appendInstructionCommentAndNewline()
+
+                const instructionData: CompileInstruction = {
+                    section: this.currentSectionName,
+                    type: token.type, // INSTRUCTION
+                    instruction: token.value,
+                    size,
+                    startPos: lastInstructionOrIdentifierPos,
+                    endPos: this.pos,
+                    tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+                };
+
+                //if (this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1)[0].line > 65) debugger;
+
+                //console.log("New Instruction:", instructionData);
+                if (!this.currentSection) throw new Error(`Missing currentSection`);
+                this.currentSection.compileInstructions.push(instructionData);
+
                 continue;
             }
 
@@ -269,11 +317,12 @@ export class Compiler {
                         const itemSize = getDirectiveDataSize(directive);
 
                         lastInstructionOrIdentifierAddress = this.currentAddress;
+                        lastInstructionOrIdentifierPos = this.pos;
 
                         const valueStartAddress = this.currentAddress as u16;
 
                         this.labels.set(varName, {
-                            section: this.currentSection,
+                            section: this.currentSectionName,
                             address: valueStartAddress,
                             values: null,
                             dataSize: itemSize,
@@ -281,13 +330,15 @@ export class Compiler {
 
                         this.symbols.set(varName, {
                             address: valueStartAddress,
-                            section: this.currentSection,
+                            section: this.currentSectionName,
                             type: 'variable'
                         });
 
                         this.advance(); // passe l'IDENTIFIER... pour arriver sur la DIRECTIVE
 
-                        this.currentAddress += this.calculateDataSize(itemSize);
+                        const size = this.calculateDataSize(itemSize);
+                        this.currentAddress += size;
+
                         this.advance();  // Passe la DIRECTIVE
 
 
@@ -329,6 +380,25 @@ export class Compiler {
 
                         const endAddress = this.currentAddress as u16;
 
+                        this.appendInstructionCommentAndNewline()
+
+                        const instructionData: CompileInstruction = {
+                            section: this.currentSectionName,
+                            type: next.type, // DIRECTIVE ("my_var db 0x12")
+                            instruction: token.value,
+                            size,
+                            startPos: lastInstructionOrIdentifierPos,
+                            endPos: this.pos,
+                            tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+                        };
+
+                        //if (this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1)[0].line > 40) debugger;
+
+                        //console.log("New Instruction:", instructionData);
+                        if (!this.currentSection) throw new Error(`Missing currentSection`);
+                        this.currentSection.compileInstructions.push(instructionData);
+
+
                         continue;
                     }
                 }
@@ -353,7 +423,7 @@ export class Compiler {
             if (token.type === 'EOF') {
                 this.advance();
                 lastInstructionOrIdentifierAddress = null;
-                this.currentSection = ".text";
+                this.setCurrentSection(".text")
                 continue;
             }
 
@@ -365,39 +435,61 @@ export class Compiler {
     }
 
 
+    private setCurrentSection(sectionName: string): void {
+        this.currentSectionName = sectionName;
+        const currentSection = this.sections.get(sectionName);
+
+        if (!currentSection) {
+            throw new Error(`Section "${sectionName} not found"`);
+        }
+
+        this.currentSection = currentSection;
+    }
+
+
     // Handle directives during pass 1 (section changes, .org, global/extern)
     private handleDirectivePass1(): void {
         // called by pass1CollectSymbols (pass1)
 
         const directiveToken = this.peek();
         const directive = this.normalize(directiveToken.value);
+        const lastInstructionOrIdentifierPos: number | null = this.pos;
 
         // Switch to different section (.text, .data, .bss)
         if (directive === 'SECTION' || directive.startsWith('.')) {
             this.advance();
 
+            // toutes les directives commencant par "." (autre que ".include") sont compaté comme le nom d'une section
+
             let sectionName = directive;
+
             if (directive === 'SECTION' && !this.isAtEnd()) {
-                // example ?
                 const nameToken = this.peek();
 
-                if (nameToken.type === 'IDENTIFIER' || nameToken.type === 'DIRECTIVE') {
+                if (nameToken.type === 'IDENTIFIER') {
+                    throw new Error("utile ?");
+                    sectionName = this.normalize(nameToken.value);
+                    this.advance();
+                }
+
+                if (nameToken.type === 'DIRECTIVE') {
+                    // defini le nom de la section d'apres le token qui suit une DIRECTIVE "section"
                     sectionName = this.normalize(nameToken.value);
                     this.advance();
                 }
             }
 
             if (sectionName === '.DATA' || sectionName === 'DATA') {
-                this.currentSection = '.data';
-console.log(`[STEP1] new section : ".data" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                this.setCurrentSection(".data")
+                console.log(`[STEP1] new section : ".data" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.BSS' || sectionName === 'BSS') {
-                this.currentSection = '.bss';
-console.log(`[STEP1] new section : ".bss" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                this.setCurrentSection(".bss")
+                console.log(`[STEP1] new section : ".bss" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.TEXT' || sectionName === 'TEXT') {
-                this.currentSection = '.text';
-console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                this.setCurrentSection(".text")
+                console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
                 this.skip('STRING')
@@ -407,18 +499,27 @@ console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddre
                 throw new Error(`Unknown case : Unknown section "${sectionName}"`)
             }
 
-            const section = this.sections.get(this.currentSection);
-            if (section) {
-                // Set data/bss section start address to current position
+            const section = this.sections.get(this.currentSectionName);
 
-                if (section.type !== 'code') {
-                    //console.log(`[pass1] start of ${this.currentSection} : ${this.currentAddress}`)
-                    section.startAddress = this.currentAddress;
-                }
-
-            } else {
-                throw new Error(`Unknown case : section "${sectionName}" not found`)
+            if (!section) {
+                throw new Error(`Unknown  section "${sectionName}" not found`)
             }
+
+            this.appendInstructionCommentAndNewline()
+
+            const instructionData: CompileInstruction = {
+                section: this.currentSectionName,
+                type: directiveToken.type as 'DIRECTIVE', // DIRECTIVE (section)
+                instruction: directiveToken.value,
+                size: 0,
+                startPos: lastInstructionOrIdentifierPos,
+                endPos: this.pos,
+                tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+            };
+
+            //console.log("New Instruction:", instructionData);
+            if (!this.currentSection) throw new Error(`Missing currentSection`);
+            this.currentSection.compileInstructions.push(instructionData);
 
             return;
         }
@@ -488,8 +589,30 @@ console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddre
         //       db _X, _X, _X
         //       db _X, _X, _X
         if (['DB', 'DW', 'DD', 'DQ'].includes(directive)) {
+            let lastInstructionOrIdentifierPos: number | null = this.pos;
+
+            const token = directiveToken;
             const itemSize = getDirectiveDataSize(directive);
-            this.currentAddress += this.calculateDataSize(itemSize);
+            const size = this.calculateDataSize(itemSize)
+            this.currentAddress += size;
+
+            this.appendInstructionCommentAndNewline()
+
+            const instructionData: CompileInstruction = {
+                section: this.currentSectionName,
+                type: token.type as 'DIRECTIVE', // DIRECTIVE (DB/DW/DD/DQ without preceding identifier => "db 0x12")
+                instruction: token.value,
+                size,
+                startPos: lastInstructionOrIdentifierPos,
+                endPos: this.pos,
+                tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+            };
+
+            //console.log("New Instruction:", instructionData);
+            if (!this.currentSection) throw new Error(`Missing currentSection`);
+            this.currentSection.compileInstructions.push(instructionData);
+
+
             this.advance(); // consume the directive
 
             // Skip over the values (they'll be processed in pass2)
@@ -515,6 +638,33 @@ console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddre
         this.error(token, `Unknown directive: ${directive}`)
 
         this.advance();
+    }
+
+
+    private appendInstructionCommentAndNewline() {
+        const currentToken = this.peek();
+
+        if (! ['EOF', 'NEWLINE'].includes(currentToken.type)) {
+            // on cherche le NEWLINE ou EOF suivant et on l'ajoute
+
+            let nextToken = this.peek(1);
+            //if (currentToken.value.includes('indique au disk')) debugger
+
+            if (['COMMENT'].includes(nextToken.type)) {
+                this.advance()
+                nextToken = this.peek();
+            }
+
+            if (['NEWLINE'].includes(nextToken.type)) {
+                this.advance()
+                nextToken = this.peek();
+            }
+
+            if (['EOF'].includes(nextToken.type)) {
+                this.advance()
+                nextToken = this.peek();
+            }
+        }
     }
 
 
@@ -587,9 +737,9 @@ console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddre
     private pass2GenerateCode(): void {
         // called by compile
 
+        this.setCurrentSection('')
         this.pos = 0;
-        this.currentSection = '.text';
-        this.currentAddress = this.sections.get('.text')!.startAddress ?? 0;
+        this.currentAddress = this.startAddress;
 
         while (!this.isAtEnd()) {
             const token = this.peek();
@@ -645,15 +795,35 @@ console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddre
 
                 const size = this.currentAddress - addressBefore;
 
+                // TODO: ce code ne fonctionne plus depuis compiler V2
+
                 //console.log(`[pass2] ${token.value} at ${before}, emitted=${size}`);
                 const expectedSize = this.debugAddresses.get(addressBefore)
-                if (expectedSize !== size) {
-                    const currentLineTokens = this.extractCurrentLine()
-                    console.log('currentLineTokens:', currentLineTokens)
-                    throw new Error(`Emitted size mismatch (${expectedSize} vs ${size}) at address ${addressBefore} (instruction "${token.value}")`);
+
+                if (expectedSize === undefined) {
+
+                } else if (expectedSize !== size) {
+                    //const currentLineTokens = this.extractCurrentLine()
+                    //console.log('currentLineTokens:', currentLineTokens)
+                    //throw new Error(`Emitted size mismatch (${expectedSize} vs ${size}) at address ${addressBefore} (instruction "${token.value}")`);
                 }
                 continue;
             }
+
+            // NEWLINE
+            if (token.type === 'NEWLINE') {
+                this.advance();
+                continue;
+            }
+
+
+            console.log('currentSection:', this.currentSection)
+
+            const currentLineTokens = this.extractCurrentLine()
+            console.log('currentLineTokens:', currentLineTokens)
+
+            debugger
+            throw new Error(`unknown token: ${token.type} (${token.value})`)
 
             this.advance();
         }
@@ -681,31 +851,36 @@ console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddre
             }
 
             if (sectionName === '.DATA' || sectionName === 'DATA') {
-                this.currentSection = '.data';
-console.log(`[STEP2] new section : ".data" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //this.currentSectionName = '.data';
+                this.setCurrentSection('.data')
+                console.log(`[STEP2] new section : ".data" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.BSS' || sectionName === 'BSS') {
-                this.currentSection = '.bss';
-console.log(`[STEP2] new section : ".bss" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //this.currentSectionName = '.bss';
+                this.setCurrentSection('.bss')
+                console.log(`[STEP2] new section : ".bss" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
                 this.advance()
                 return;
 
             } else {
-                this.currentSection = '.text';
-console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //this.currentSectionName = '.text';
+                this.setCurrentSection('.text')
+                console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
             }
 
-            const section = this.sections.get(this.currentSection);
+            const section = this.sections.get(this.currentSectionName);
 
             if (section) {
                 //this.currentAddress = section.startAddress + section.data.length;
 
                 // Set data/bss section start address to current position
 
-                if (section.type !== 'code') {
+                if (section.data.length === 0) {
                     //console.log(`[pass2] start of ${this.currentSection} : ${this.currentAddress}`)
+
+                    section.startAddress = this.currentAddress;
 
 //                    if (this.currentAddress !== section.startAddress) {
 //                        const token = this.peek();
@@ -714,7 +889,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                 }
 
             } else {
-                throw new Error(`Unknown section "${this.currentSection}"`);
+                throw new Error(`Unknown section "${this.currentSectionName}"`);
             }
 
             return;
@@ -740,6 +915,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
         // Handle bare data directives (DB/DW/DD/DQ without preceding identifier)
         if (['DB', 'DW', 'DD', 'DQ'].includes(directive)) {
+            throw new Error('code utile ?')
             this.generateData(undefined, directive, directiveToken);
             return;
         }
@@ -806,7 +982,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                     // Add to unresolved references
                     this.unresolvedRefs.push({
                         address: this.currentAddress,
-                        section: this.currentSection,
+                        section: this.currentSectionName,
                         label: token.value,
                         size: itemSize,
                     });
@@ -831,9 +1007,12 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                 const value = this.parseNumber(token.value);
 
                 for (let i = 0; i < itemSize; i++) {
-                    const defaultComment = i === 0
-                        ? `low  byte of number ${varName} = ${toHex(value)} (${value})`
-                        : `high byte of number ${varName} = ${toHex(value)} (${value})`
+                    const defaultComment = (itemSize <= 1)
+                        ? `number ${varName} = ${toHex(value)} (${value})`
+                        : (i === 0)
+                            ? ` low byte of number ${varName} = ${toHex(value)} (${value})`
+                            : `high byte of number ${varName} = ${toHex(value)} (${value})`
+
 
                     const byte = (value >> (i * 8)) & 0xFF;
                     this.emitByte(byte, comment || defaultComment || (i === 0 ? token.value : undefined), refInstrToken);
@@ -899,7 +1078,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
         // Emit opcode byte
         const comment = this.comments.get(this.currentAddress);
-        this.emitByte(variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), instrToken);
+        this.emitByte(variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), instrToken, true);
 
         // Emit operand bytes
         this.emitOperands(operands, variant, instrToken);
@@ -948,7 +1127,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                     } else {
                         this.unresolvedRefs.push({
                             address: this.currentAddress,
-                            section: this.currentSection,
+                            section: this.currentSectionName,
                             label: op.value,
                             size: 2,
                         });
@@ -1075,7 +1254,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
                     this.unresolvedRefs.push({
                         address: this.currentAddress,
-                        section: this.currentSection,
+                        section: this.currentSectionName,
                         label: token.value,
                         size: 2,
                     });
@@ -1192,7 +1371,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
                 this.unresolvedRefs.push({
                     address: this.currentAddress,
-                    section: this.currentSection,
+                    section: this.currentSectionName,
                     label: token.value,
                     size: 2,
                 });
@@ -1307,7 +1486,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
             const section = this.sections.get(ref.section);
             if (!section) continue;
 
-            const offset = ref.address - (section.startAddress ?? 0);
+            if (!section.startAddress) throw new Error("Missing startAddress (resolveReferences)")
+            const offset = ref.address - section.startAddress;
 
             // Patch bytes with correct endianness
             if (ref.size === 2) {
@@ -1328,13 +1508,13 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
 
     // Emit a single byte to current section
-    private emitByte(value: number, comment?: string, instrToken?: Token): void {
+    private emitByte(value: number, comment?: string, opcodeToken?: Token, isOpcode=false): void {
         // used at several places (step2)
 
-        const section = this.sections.get(this.currentSection);
+        const section = this.sections.get(this.currentSectionName);
         if (!section) return;
 
-        if (instrToken) {
+        if (opcodeToken) {
             // Debug
             //console.log(`[STEP2] emitByte "${toHex(value)}" at address ${toHex(this.currentAddress, 4)} for token ${instrToken.type} (${instrToken.value.trim()}) => ${instrToken.file}:${instrToken.line}:${instrToken.column}`)
         }
@@ -1344,7 +1524,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
             value: value & 0xFF,
             //section: this.currentSection,
             comment,
-            isOpcode: !!instrToken,
+            isOpcode,
+            opcodeToken,
         });
     }
 

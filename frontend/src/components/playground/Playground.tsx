@@ -164,8 +164,9 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         if (!emulator.wasmExports || !emulator.computerPointer || !emulator.devicesManager.devicesRef.current) return;
 
         const sourceCode = await loadSourceCodeFromFile(bootloaderFileUrl);
-        const compiled = await compileCode(sourceCode, CUSTOM_CPU);
-        //const compiled = await compileCodeV2(sourceCode, bootloaderFileUrl, { startAddress: 0 });
+
+        const compiled = await compileCode(sourceCode, { startAddress: MEMORY_MAP.ROM_START, architecture: CUSTOM_CPU });
+        //const compiled = await compileCodeV2(sourceCode, bootloaderFileUrl, { startAddress: MEMORY_MAP.ROM_START });
 
         if (compiled.errors.length > 0) {
             const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');
@@ -208,9 +209,13 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // Compile OS Code
     const compileAndLoadOsCode = async () => {
+        const sourceFilepath = 'os/os_v3.asm';
+
         const startAddress = MEMORY_MAP.OS_START;
-        const sourceCode = await loadSourceCodeFromFile('os/os_v3.asm');
-        const compiled = await compileCode(sourceCode, CUSTOM_CPU, { startAddress });
+        const sourceCode = await loadSourceCodeFromFile(sourceFilepath);
+
+        const compiled = await compileCode(sourceCode, { startAddress, architecture: CUSTOM_CPU });
+        //const compiled = await compileCodeV2(sourceCode, sourceFilepath, { startAddress, architecture: CUSTOM_CPU });
 
         if (compiled.errors.length > 0) {
             const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');

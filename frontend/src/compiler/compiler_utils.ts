@@ -6,6 +6,7 @@ import { CUSTOM_CPU } from "./arch_custom";
 import type { CompiledProgram, CompilerOptions, CPUArchitecture } from "@/types/compiler.types";
 import type { u16, u8 } from "@/types/computer.types";
 import { assembleSourceCode, parseSourceCode, parseSourceCodeFile, type ParsedFile } from "./precompiler";
+import { CompilerV2 } from "./compiler.v2";
 
 
 export let compilationAsmBaseUrl = '';
@@ -24,15 +25,15 @@ export async function loadSourceCodeFromFile(filePath: string): Promise<string> 
 }
 
 
-export async function compileFile(filePath: string, architecture: CPUArchitecture = CUSTOM_CPU, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
+export async function compileFile(filePath: string, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
     const source = await loadSourceCodeFromFile(filePath);
 
-    const result = await compileCode(source, architecture, options);
+    const result = await compileCode(source, options);
     return result;
 }
 
 
-export async function compileCode(source: string, architecture: CPUArchitecture = CUSTOM_CPU, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
+export async function compileCode(source: string, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
     const { source: resolvedSource, stats } = await resolveIncludes(source);
 
     // Log des stats si besoin
@@ -42,6 +43,8 @@ export async function compileCode(source: string, architecture: CPUArchitecture 
             console.log(`  ${stat.file}: ${stat.references} references from [${stat.includedBy.join(', ')}]`);
         });
     }
+
+    const architecture = options.architecture || CUSTOM_CPU;
 
     const compiler = new Compiler({
         architecture,
@@ -79,28 +82,16 @@ export async function compileCodeV2(sourceCode: string, filepath="main.asm", opt
     const architecture = options.architecture || CUSTOM_CPU;
 
     // parse code files recursive (handle "include" directive)
-    //const parsedFiles = await parseSourceCodeFile(architecture, filepath, undefined, undefined, caseSensitive);
     const parsedFiles = await parseSourceCode(architecture, sourceCode, filepath, undefined, undefined, caseSensitive);
-    //console.log('parsedFiles:', parsedFiles)
 
     // assemble files
-    const filesEntries = Array.from(parsedFiles.files.values()).map(v => [v.fileIdx, v] as [number, ParsedFile])
+    const filesEntries: [number, ParsedFile][] = Array.from(parsedFiles.files.values()).map(v => [v.fileIdx, v] as [number, ParsedFile])
     filesEntries.sort(([a], [b]) => a - b)
     const files: ParsedFile[] = filesEntries.map(([idx, file]) => file);
-    //console.log('files:', files)
-
     const { assembledSourcesCode, allTokens } = assembleSourceCode(files);
 
-    //const filesSeparator = "\n".repeat(3) + ("#".repeat(50) + "\n").repeat(3) + "\n".repeat(3);
-    //const assembledSourceCode: string = assembledSourcesCode.join(filesSeparator);
-
-    //console.log('assembledSourcesCode:', assembledSourcesCode)
-    //console.log('assembledSourceCode:', assembledSourceCode)
-    //console.log('allTokens:', allTokens)
-
-
     // compile
-    const compiler = new Compiler({
+    const compiler = new CompilerV2({
         architecture,
         startAddress: options.startAddress || 0,
         startLine: options.startLine || 0,

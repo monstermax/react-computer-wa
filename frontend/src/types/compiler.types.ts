@@ -1,4 +1,5 @@
 
+import type { Token } from "@/compiler/compiler_lexer";
 import type { u16 } from "./computer.types";
 
 
@@ -80,17 +81,30 @@ export interface CompilerOptions {
 export interface Section {
     name: string;
     type: 'code' | 'data' | 'bss';
-    startAddress: number;
-    data: ByteEntry[];
+    startAddress: number | null;
+    compileInstructions: CompileInstruction[]; // input
+    data: ByteEntry[]; // output
 }
+
+export type CompileInstruction = {
+    section: string;
+    type: 'DIRECTIVE' | 'INSTRUCTION';
+    instruction: string;
+    size: number;
+    startPos: number;
+    endPos: number;
+    tokens: Token[];
+}
+
 
 export interface ByteEntry {
     address: number;
     value: number;
-    section: string;
+    //section: string;
     label?: string;
     comment?: string;
     isOpcode?: boolean;
+    opcodeToken?: Token;
 }
 
 export interface CompiledProgram {
