@@ -29,6 +29,7 @@ export interface Token {
     value: string;
     line: number;
     column: number;
+    file: string;
 }
 
 interface LexerConfig {
@@ -36,6 +37,7 @@ interface LexerConfig {
     registers: Set<string>;
     directives: Set<string>;
     caseSensitive: boolean;
+    fileName: string;
 }
 
 export class Lexer {
@@ -50,7 +52,8 @@ export class Lexer {
         instructions: string[],
         registers: string[],
         directives: string[],
-        caseSensitive = false
+        caseSensitive = false,
+        fileName = 'main.asm'
     ) {
         this.source = source;
 
@@ -62,7 +65,8 @@ export class Lexer {
             instructions: normalize(instructions),
             registers: normalize(registers),
             directives: normalize(directives),
-            caseSensitive
+            caseSensitive,
+            fileName,
         };
     }
 
@@ -74,7 +78,7 @@ export class Lexer {
             if (token) tokens.push(token);
         }
 
-        tokens.push({ type: 'EOF', value: '', line: this.line, column: this.col });
+        tokens.push({ type: 'EOF', value: '', line: this.line, column: this.col, file: this.config.fileName });
         return tokens;
     }
 
@@ -178,7 +182,8 @@ export class Lexer {
             type: 'COMMENT',
             value: this.source.substring(start, this.pos),
             line: this.line,
-            column: startCol
+            column: startCol,
+            file: this.config.fileName,
         };
     }
 
@@ -220,7 +225,7 @@ export class Lexer {
         this.pos++;
         this.col++;
 
-        return { type: 'STRING', value, line: this.line, column: startCol };
+        return { type: 'STRING', value, line: this.line, column: startCol, file: this.config.fileName };
     }
 
     private scanNumber(): Token {
@@ -268,7 +273,8 @@ export class Lexer {
             type: 'NUMBER',
             value: this.source.substring(start, this.pos),
             line: this.line,
-            column: startCol
+            column: startCol,
+            file: this.config.fileName,
         };
     }
 
@@ -299,13 +305,13 @@ export class Lexer {
             type = 'DIRECTIVE';
         }
 
-        return { type, value, line: this.line, column: startCol };
+        return { type, value, line: this.line, column: startCol, file: this.config.fileName };
     }
 
     private makeToken(type: TokenType, value: string, advance?: () => void): Token {
         const startCol = this.col;
         if (advance) advance();
-        return { type, value, line: this.line, column: startCol };
+        return { type, value, line: this.line, column: startCol, file: this.config.fileName };
     }
 
     private peek(offset = 0): string {

@@ -106,24 +106,29 @@ export class Compiler {
 
 
     // Main compilation entry point - performs two-pass compilation
-    public async compile(source: string): Promise<CompiledProgram> {
+    public async compile(source: string, tokens?: Token[]): Promise<CompiledProgram> {
         // should be called externally
 
-        // Define all recognized token types for lexer
-        const instructions = Array.from(this.instructionMap.keys());
-        const registers = Array.from(this.registerMap.keys());
-        const directives = [
-            'DB', 'DW', 'DD', 'DQ',
-            'SECTION', 'GLOBAL', 'EXTERN',
-            '.DATA', '.CODE', '.TEXT', '.BSS', '.ORG', '.INCLUDE',
-            'RESB', 'RESW', 'RESD', 'RESQ',
-            'EQU', 'TIMES',
-        ];
+        if (tokens) {
+            this.tokens = tokens;
 
-        // Tokenize source code
-        const lexer = new Lexer(source, instructions, registers, directives, this.caseSensitive);
-        this.tokens = lexer.tokenize() //.filter(t => t.type !== 'COMMENT' && t.type !== 'NEWLINE');
-        //console.log('lexer tokens:', this.tokens)
+        } else {
+            // Define all recognized token types for lexer
+            const instructions = Array.from(this.instructionMap.keys());
+            const registers = Array.from(this.registerMap.keys());
+            const directives = [
+                'DB', 'DW', 'DD', 'DQ',
+                'SECTION', 'GLOBAL', 'EXTERN',
+                '.DATA', '.CODE', '.TEXT', '.BSS', '.ORG', '.INCLUDE',
+                'RESB', 'RESW', 'RESD', 'RESQ',
+                'EQU', 'TIMES',
+            ];
+
+            // Tokenize source code
+            const lexer = new Lexer(source, instructions, registers, directives, this.caseSensitive);
+            this.tokens = lexer.tokenize() //.filter(t => t.type !== 'COMMENT' && t.type !== 'NEWLINE');
+            //console.log('lexer tokens:', this.tokens)
+        }
 
 
         // Pass 1: collect all symbols and calculate addresses
@@ -340,6 +345,13 @@ export class Compiler {
                 continue;
             }
 
+            if (token.type === 'EOF') {
+                this.advance();
+                lastInstructionOrIdentifierAddress = null;
+                this.currentSection = ".text";
+                continue;
+            }
+
             //console.warn(`unknown token type: ${token.type} (value = "${token.value}", line = ${token.line})`)
             this.error(token, `unknown token type: ${token.type} (value = "${token.value}", line = ${token.line})`)
 
@@ -352,7 +364,8 @@ export class Compiler {
     private handleDirectivePass1(): void {
         // called by pass1CollectSymbols (pass1)
 
-        const directive = this.normalize(this.peek().value);
+        const directiveToken = this.peek();
+        const directive = this.normalize(directiveToken.value);
 
         // Switch to different section (.text, .data, .bss)
         if (directive === 'SECTION' || directive.startsWith('.')) {
@@ -371,12 +384,15 @@ export class Compiler {
 
             if (sectionName === '.DATA' || sectionName === 'DATA') {
                 this.currentSection = '.data';
+console.log(`[STEP1] new section : ".data" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.BSS' || sectionName === 'BSS') {
                 this.currentSection = '.bss';
+console.log(`[STEP1] new section : ".bss" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.TEXT' || sectionName === 'TEXT') {
                 this.currentSection = '.text';
+console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
                 this.skip('STRING')
@@ -505,7 +521,10 @@ export class Compiler {
         const mnemonic = this.normalize(instrToken.value);
         const instrDef = this.instructionMap.get(mnemonic);
 
-        if (!instrDef) return 1;
+        if (!instrDef) {
+            throw new Error(`Undefined instruction "${mnemonic}"`)
+            return 1;
+        }
 
         this.advance();
         const operands = this.parseOperands();
@@ -597,15 +616,16 @@ export class Compiler {
                         const varName = token.value;
                         this.advance();
 
-                        const directiveToken = this.peek();
-                        this.generateData(varName, this.normalize(directiveToken.value));
+                        const directiveToken = next //this.peek();
+                        this.generateData(varName, this.normalize(directiveToken.value), next);
                         continue;
                     }
 
                     if (['RESB', 'RESW', 'RESD', 'RESQ'].includes(directive)) {
+                        const directiveToken = next //this.peek();
                         this.advance();
                         this.advance();
-                        this.reserveSpace();
+                        this.reserveSpace(directiveToken);
                         continue;
                     }
                 }
@@ -639,7 +659,8 @@ export class Compiler {
     private handleDirectivePass2(): void {
         // called by pass2GenerateCode (pass2)
 
-        const directive = this.normalize(this.peek().value);
+        const directiveToken = this.peek();
+        const directive = this.normalize(directiveToken.value);
 
         if (directive === 'SECTION' || directive.startsWith('.')) {
             this.advance();
@@ -656,9 +677,11 @@ export class Compiler {
 
             if (sectionName === '.DATA' || sectionName === 'DATA') {
                 this.currentSection = '.data';
+console.log(`[STEP2] new section : ".data" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.BSS' || sectionName === 'BSS') {
                 this.currentSection = '.bss';
+console.log(`[STEP2] new section : ".bss" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
                 this.advance()
@@ -666,6 +689,7 @@ export class Compiler {
 
             } else {
                 this.currentSection = '.text';
+console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddress)}] => in file ${directiveToken.file}:${directiveToken.line}`)
             }
 
             const section = this.sections.get(this.currentSection);
@@ -678,9 +702,10 @@ export class Compiler {
                 if (section.type !== 'code') {
                     //console.log(`[pass2] start of ${this.currentSection} : ${this.currentAddress}`)
 
-                    if (this.currentAddress !== section.startAddress) {
-                        throw new Error(`address mistmatch : ${this.currentAddress} !== ${section.startAddress}`);
-                    }
+//                    if (this.currentAddress !== section.startAddress) {
+//                        const token = this.peek();
+//                        throw new Error(`address mismatch : ${this.currentAddress} !== ${section.startAddress}`);
+//                    }
                 }
 
             } else {
@@ -710,13 +735,15 @@ export class Compiler {
 
         // Handle bare data directives (DB/DW/DD/DQ without preceding identifier)
         if (['DB', 'DW', 'DD', 'DQ'].includes(directive)) {
-            this.generateData(undefined, directive);
+            this.generateData(undefined, directive, directiveToken);
             return;
         }
 
         this.advance();
     }
-    private generateData(varName: string | undefined, directiveName: string): void {
+
+
+    private generateData(varName: string | undefined, directiveName: string, refInstrToken: Token): void {
         // called by pass2GenerateCode (pass2) (gère les valeurs situées après un couple [IDENTIFIER, DIRECTIVE]. example "my_var db 0x05, 0x06, 0x07")
 
         const directive = this.normalize(directiveName);
@@ -755,7 +782,7 @@ export class Compiler {
                         const resolvedValue = this.resolveEquValue(labelInfo.values[0]);
                         for (let i = 0; i < itemSize; i++) {
                             const defaultComment = `${token.value} = ${toHex(resolvedValue)} (${resolvedValue})`;
-                            this.emitByte((resolvedValue >> (i * 8)) & 0xFF, comment || defaultComment, false);
+                            this.emitByte((resolvedValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
                         }
                     } else {
                         // Regular label: emit its address
@@ -764,7 +791,7 @@ export class Compiler {
                                 ? `low  byte of label ${token.value} = ${labelInfo.address}`
                                 : `high byte of label ${token.value} = ${labelInfo.address}`
 
-                            this.emitByte((labelInfo.address >> (i * 8)) & 0xFF, comment || defaultComment, false);
+                            this.emitByte((labelInfo.address >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
                         }
                     }
 
@@ -780,7 +807,7 @@ export class Compiler {
                     });
 
                     for (let i = 0; i < itemSize; i++) {
-                        this.emitByte(0, comment, false);
+                        this.emitByte(0, comment, refInstrToken);
                     }
                 }
 
@@ -789,7 +816,7 @@ export class Compiler {
             } else if (token.type === 'STRING') {
                 // Emit string as ASCII bytes
                 for (let i = 0; i < token.value.length; i++) {
-                    this.emitByte(token.value.charCodeAt(i), comment || `'${token.value[i]}'`, false);
+                    this.emitByte(token.value.charCodeAt(i), comment || `'${token.value[i]}'`, refInstrToken);
                 }
 
                 this.advance();
@@ -804,7 +831,7 @@ export class Compiler {
                         : `high byte of number ${varName} = ${toHex(value)} (${value})`
 
                     const byte = (value >> (i * 8)) & 0xFF;
-                    this.emitByte(byte, comment || defaultComment || (i === 0 ? token.value : undefined), false);
+                    this.emitByte(byte, comment || defaultComment || (i === 0 ? token.value : undefined), refInstrToken);
                 }
 
                 this.advance();
@@ -820,7 +847,7 @@ export class Compiler {
 
 
     // Reserve uninitialized space (resb, resw, resd, resq)
-    private reserveSpace(): void {
+    private reserveSpace(refInstrToken: Token): void {
         // called by pass2GenerateCode (pass2)
 
         const comment = this.comments.get(this.currentAddress);
@@ -829,7 +856,7 @@ export class Compiler {
             const count = this.parseNumber(this.peek().value);
 
             for (let i = 0; i < count; i++) {
-                this.emitByte(0, comment || 'reserved space', false);
+                this.emitByte(0, comment || 'reserved space', refInstrToken);
             }
 
             this.advance();
@@ -867,15 +894,15 @@ export class Compiler {
 
         // Emit opcode byte
         const comment = this.comments.get(this.currentAddress);
-        this.emitByte(variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), true);
+        this.emitByte(variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), instrToken);
 
         // Emit operand bytes
-        this.emitOperands(operands, variant);
+        this.emitOperands(operands, variant, instrToken);
     }
 
 
     // Emit operand bytes based on instruction variant pattern
-    private emitOperands(operands: ParsedOperand[], variant: InstructionVariant): void {
+    private emitOperands(operands: ParsedOperand[], variant: InstructionVariant, refInstrToken: Token): void {
         // called by generateInstruction (pass2)
 
         const pattern = variant.operands;
@@ -891,7 +918,7 @@ export class Compiler {
             if (part === 'IMM8') {
                 // 8-bit immediate value
                 const value = op.address !== undefined ? op.address : this.parseNumber(op.value);
-                this.emitByte(value & 0xFF, op.value, false);
+                this.emitByte(value & 0xFF, op.value, refInstrToken);
 
             } else if (part === 'IMM16' || part === 'MEM') {
                 // 16-bit immediate or memory address
@@ -908,6 +935,7 @@ export class Compiler {
                     if (labelInfo !== undefined && labelSection !== undefined) {
                         if (labelInfo.dataSize === 0 && labelInfo.values) {
                             value = this.resolveEquValue(labelInfo.values[0]);
+
                         } else {
                             value = labelInfo.address;
                         }
@@ -931,6 +959,7 @@ export class Compiler {
 
                     if (label.dataSize === 0 && label.values) {
                         value = this.resolveEquValue(label.values[0]);
+
                     } else {
                         if (label.address === undefined) throw new Error("missing label address");
                         value = label.address;
@@ -946,11 +975,12 @@ export class Compiler {
                 const commentPrefix = `${isNaN(Number(op.value)) ? `${op.value} = ` : ''}${toHex(value)} (${value})`;
 
                 if (this.arch.endianness === 'little') {
-                    this.emitByte(value & 0xFF, `${commentPrefix} (low byte)`, false);
-                    this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte)`, false);
+                    this.emitByte(value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
+                    this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
+
                 } else {
-                    this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte)`, false);
-                    this.emitByte(value & 0xFF, `${commentPrefix} (low byte)`, false);
+                    this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
+                    this.emitByte(value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
                 }
 
             } else if (part === 'REG') {
@@ -987,7 +1017,7 @@ export class Compiler {
 
                 if (value !== 0) {
                     const commentPrefix = `Register ${reg}`;
-                    this.emitByte(value, `${commentPrefix}`, false);
+                    this.emitByte(value, `${commentPrefix}`, refInstrToken);
                 }
 
             } else {
@@ -1293,18 +1323,23 @@ export class Compiler {
 
 
     // Emit a single byte to current section
-    private emitByte(value: number, comment?: string, isOpcode?: boolean): void {
-        // used at several places
+    private emitByte(value: number, comment?: string, instrToken?: Token): void {
+        // used at several places (step2)
 
         const section = this.sections.get(this.currentSection);
         if (!section) return;
+
+        if (instrToken) {
+            // Debug
+            //console.log(`[STEP2] emitByte "${toHex(value)}" at address ${toHex(this.currentAddress, 4)} for token ${instrToken.type} (${instrToken.value.trim()}) => ${instrToken.file}:${instrToken.line}:${instrToken.column}`)
+        }
 
         section.data.push({
             address: this.currentAddress++,
             value: value & 0xFF,
             section: this.currentSection,
             comment,
-            isOpcode,
+            isOpcode: !!instrToken,
         });
     }
 
@@ -1403,7 +1438,7 @@ export class Compiler {
     private isAtEnd(): boolean {
         // used at several places
 
-        return this.peek().type === 'EOF';
+        return this.peek().type === 'EOF' && this.pos >= this.tokens.length - 1;
     }
 
 

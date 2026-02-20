@@ -60,7 +60,7 @@ export class DiskDevice extends IoDevice {
 
 
     saveToLocalStorageDelayed() {
-        console.log('saveToLocalStorageDelayed:', this.persistent)
+        //console.log('saveToLocalStorageDelayed:', this.persistent)
         if (!this.persistent) return;
         delayer(`disk-${this.name}`, this.saveToLocalStorage.bind(this), 500, 2000, []);
     }

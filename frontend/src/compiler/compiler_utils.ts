@@ -5,6 +5,7 @@ import { CUSTOM_CPU } from "./arch_custom";
 
 import type { CompiledProgram, CompilerOptions, CPUArchitecture } from "@/types/compiler.types";
 import type { u16, u8 } from "@/types/computer.types";
+import { assembleSourceCode, parseSourceCode, parseSourceCodeFile, type ParsedFile } from "./precompiler";
 
 
 export let compilationAsmBaseUrl = '';
@@ -60,6 +61,58 @@ export async function compileCode(source: string, architecture: CPUArchitecture 
 
     return compiled
 }
+
+
+
+
+export async function compileFileV2(filePath: string, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
+    const source = await loadSourceCodeFromFile(filePath);
+
+    const result = await compileCodeV2(source, filePath, options);
+    return result;
+}
+
+
+export async function compileCodeV2(sourceCode: string, filepath="main.asm", options: Partial<CompilerOptions> = {}) {
+    //const bootloaderFilepath = "bootloader/bootloader_v2.asm";
+    const caseSensitive = options.caseSensitive || false;
+    const architecture = options.architecture || CUSTOM_CPU;
+
+    // parse code files recursive (handle "include" directive)
+    //const parsedFiles = await parseSourceCodeFile(architecture, filepath, undefined, undefined, caseSensitive);
+    const parsedFiles = await parseSourceCode(architecture, sourceCode, filepath, undefined, undefined, caseSensitive);
+    //console.log('parsedFiles:', parsedFiles)
+
+    // assemble files
+    const filesEntries = Array.from(parsedFiles.files.values()).map(v => [v.fileIdx, v] as [number, ParsedFile])
+    filesEntries.sort(([a], [b]) => a - b)
+    const files: ParsedFile[] = filesEntries.map(([idx, file]) => file);
+    //console.log('files:', files)
+
+    const { assembledSourcesCode, allTokens } = assembleSourceCode(files);
+
+    //const filesSeparator = "\n".repeat(3) + ("#".repeat(50) + "\n").repeat(3) + "\n".repeat(3);
+    //const assembledSourceCode: string = assembledSourcesCode.join(filesSeparator);
+
+    //console.log('assembledSourcesCode:', assembledSourcesCode)
+    //console.log('assembledSourceCode:', assembledSourceCode)
+    //console.log('allTokens:', allTokens)
+
+
+    // compile
+    const compiler = new Compiler({
+        architecture,
+        startAddress: options.startAddress || 0,
+        startLine: options.startLine || 0,
+        caseSensitive,
+    });
+
+    const compiled = await compiler.compile('', allTokens);
+    //console.log('compiled:', compiled)
+
+    return compiled;
+}
+
 
 
 export function formatBytecode(program: CompiledProgram): string {

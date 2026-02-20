@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
-import { compileCode, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
+import { compileCode, compileCodeV2, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
 
 import { useEmulator, type EmulatorHook } from "@/hooks/useEmulator";
@@ -165,6 +165,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
         const sourceCode = await loadSourceCodeFromFile(bootloaderFileUrl);
         const compiled = await compileCode(sourceCode, CUSTOM_CPU);
+        //const compiled = await compileCodeV2(sourceCode, bootloaderFileUrl, { startAddress: 0 });
 
         if (compiled.errors.length > 0) {
             const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');
