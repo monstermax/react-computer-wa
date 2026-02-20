@@ -1,11 +1,15 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { compileCodeV2, compileFileV2 } from "@/compiler/compiler_utils";
+import { compileCodeV2, compileFileV2, formatBytecode } from "@/compiler/compiler_utils";
+import { toHex } from "@/lib/lib_numbers";
 
 
 
 export const CompilerPage: React.FC = () => {
+    //const [logs, setLogs] = useState('')
+    const [machineCodeLabels, setMachineCodeLabels] = useState('')
+    const [machineCode, setMachineCode] = useState<string | null>(null);
 
     useEffect(() => {
         const timer = setTimeout(compile, 100);
@@ -14,18 +18,51 @@ export const CompilerPage: React.FC = () => {
 
 
     const compile = async () => {
-        const bootloaderFilepath = "bootloader/bootloader_v2.asm";
+        //const bootloaderFilepath = "bootloader/bootloader_v2.asm";
+        const bootloaderFilepath = "user/tests/lcd_test.asm";
+
         const startAddress = 0x0000;
         const compiled = await compileFileV2(bootloaderFilepath, { startAddress })
 
         console.log("labels:", compiled.labels)
         console.log("sections:", compiled.sections)
+
+        const machineCodeRaw: string = formatBytecode(compiled);
+        const _machineCode = `// === MACHINE CODE ===\n\n[\n${machineCodeRaw.trim()}\n]`;
+        setMachineCode(_machineCode)
+
+        let _machineCodeLabels = "";
+        compiled.labels.forEach((labelInfo, name) => {
+            const labelAddress = labelInfo.address ?? 0xFFFF;
+            _machineCodeLabels += `  ${name.padEnd(20)} : ${toHex(labelAddress, 4)} (line ${labelAddress} - section ${labelInfo.section})\n`;
+        });
+        _machineCodeLabels += "\n";
+        setMachineCodeLabels(_machineCodeLabels)
     }
 
 
     return (
         <div className="bg-background text-foreground">
             compiler
+            <hr />
+
+            <div className="flex gap-8">
+                <div className="flex flex-col gap-4">
+
+                    <div>
+                        <h2>=== LABELS ===</h2>
+
+                        <pre className="text-xs">{machineCodeLabels}</pre>
+                    </div>
+                </div>
+
+
+                <div className="flex flex-col gap-4">
+                    <h2>=== MACHINE CODE ===</h2>
+
+                    <pre className="text-xs">{machineCode}</pre>
+                </div>
+            </div>
         </div>
     );
 }

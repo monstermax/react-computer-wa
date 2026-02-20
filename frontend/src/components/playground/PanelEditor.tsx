@@ -19,8 +19,8 @@ import "prism-react-editor/themes/github-dark.css";
 
 const defaultLoadAddress = '0xA000';
 
-//const defaultCodeUrl = "/asm/user/examples/draw_fractal_on_screen.asm";
-const defaultCodeUrl = "/asm/user/tests/lcd_test.asm";
+//const defaultCodeFilepath = "user/examples/draw_fractal_on_screen.asm";
+const defaultCodeFilepath = "user/tests/lcd_test.asm";
 
 const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 ; Type "custom" in the shell to run it.
@@ -76,7 +76,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     useEffect(() => {
 
         const _fetch = async () => {
-            const response = await fetch(defaultCodeUrl);
+            const codeUrl = `/asm/${defaultCodeFilepath}`;
+            const response = await fetch(codeUrl);
             const content = await response.text();
             setEditorInitialContent(defaultCodePrefix + content)
         }
@@ -100,8 +101,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         try {
             addLog(`Compiling user code... (target @ ${toHex(addr, 4)})`);
 
-            //const compiled = await compileCode(editorContent, { startAddress: addr, architecture: CUSTOM_CPU });
-            const compiled = await compileCodeV2(editorContent, undefined, { startAddress: addr, architecture: CUSTOM_CPU });
+            const compiled = await compileCode(editorContent, { startAddress: addr, architecture: CUSTOM_CPU });
+            //const compiled = await compileCodeV2(editorContent, undefined, { startAddress: addr, architecture: CUSTOM_CPU });
 
             if (compiled.errors.length > 0) {
                 //const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');
@@ -123,7 +124,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             let _machineCodeLabels = "";
             _machineCodeLabels += "=== LABELS ===\n";
             compiled.labels.forEach((labelInfo, name) => {
-                const labelAddress = labelInfo.address;
+                const labelAddress = labelInfo.address ?? 0xFFFF;
                 _machineCodeLabels += `  ${name.padEnd(20)} : ${toHex(labelAddress, 4)} (line ${labelAddress} - section ${labelInfo.section})\n`;
             });
             _machineCodeLabels += "\n";

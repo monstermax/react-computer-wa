@@ -109,6 +109,9 @@ export async function compileCodeV2(sourceCode: string, filepath="main.asm", opt
 export function formatBytecode(program: CompiledProgram): string {
     const lines: string[] = [];
 
+    const compilerVersion = program.compilerVersion;
+    lines.push(`\n// Compiler version: ${compilerVersion}`);
+
     for (const section of program.sections) {
         if (section.data.length === 0) continue;
 

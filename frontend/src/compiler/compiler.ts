@@ -2,8 +2,11 @@ import { Lexer, type Token } from './compiler_lexer';
 
 import { toHex } from '@/lib/lib_numbers';
 
-import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant } from '@/types/compiler.types';
+import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant, Label } from '@/types/compiler.types';
 import type { u16 } from '@/types/computer.types';
+
+
+const compilerVersion = '0.1';
 
 
 export class Compiler {
@@ -15,7 +18,7 @@ export class Compiler {
     private currentSection: string = '.text'; // Currently active section
     private currentAddress = 0; // Current memory address being written
 
-    private labels: Map<string, { section: string, address: u16, values?: any[] | null, dataSize: number | null }> = new Map(); // Label definitions with their addresses and optional data values
+    private labels: Map<string, Label> = new Map(); // Label definitions with their addresses and optional data values
     private symbols: Map<string, SymbolInfo> = new Map(); // Symbol table for labels and variables
     private comments: Map<number, string> = new Map(); // Comments associated with specific addresses
     private debugAddresses: Map<number, number> = new Map();
@@ -171,6 +174,7 @@ export class Compiler {
             symbols: this.symbols,
             entryPoint: this.entryPoint,
             errors: this.errors,
+            compilerVersion,
         };
     }
 
@@ -225,6 +229,7 @@ export class Compiler {
                 this.labels.set(labelName, {
                     section: this.currentSection,
                     address: this.currentAddress as u16,
+                    addressStep1: this.currentAddress as u16,
                     values: null,
                     dataSize: null,
                 });
@@ -275,6 +280,7 @@ export class Compiler {
                         this.labels.set(varName, {
                             section: this.currentSection,
                             address: valueStartAddress,
+                            addressStep1: valueStartAddress,
                             values: null,
                             dataSize: itemSize,
                         });
@@ -785,12 +791,16 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                     // EQU constant: resolve the value (possibly chained)
                     if (labelInfo.dataSize === 0 && labelInfo.values && labelInfo.values.length > 0) {
                         const resolvedValue = this.resolveEquValue(labelInfo.values[0]);
+
                         for (let i = 0; i < itemSize; i++) {
                             const defaultComment = `${token.value} = ${toHex(resolvedValue)} (${resolvedValue})`;
                             this.emitByte((resolvedValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
                         }
                     } else {
                         // Regular label: emit its address
+
+                        if (labelInfo.address === null) throw new Error("edit me");
+
                         for (let i = 0; i < itemSize; i++) {
                             const defaultComment = i === 0
                                 ? `low  byte of label ${token.value} = ${labelInfo.address}`
@@ -922,7 +932,11 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
             if (part === 'IMM8') {
                 // 8-bit immediate value
-                const value = op.address !== undefined ? op.address : this.parseNumber(op.value);
+                const value = (op.address !== undefined)
+                    ? op.address
+                    : this.parseNumber(op.value);
+
+                if (value === null) throw new Error("edit me");
                 this.emitByte(value & 0xFF, op.value, refInstrToken);
 
             } else if (part === 'IMM16' || part === 'MEM') {
@@ -931,6 +945,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
                 if (op.type === 'MEMORY' && op.address !== undefined) {
                     // Address already resolved by parseMemoryOperand (handles expressions like [label + 1])
+                    if (op.address === null) throw new Error("edit me");
                     value = op.address;
 
                 } else if (op.type === 'LABEL') {
@@ -942,6 +957,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                             value = this.resolveEquValue(labelInfo.values[0]);
 
                         } else {
+                            if (labelInfo.address === null) throw new Error("edit me");
                             value = labelInfo.address;
                         }
 
@@ -967,10 +983,12 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
                     } else {
                         if (label.address === undefined) throw new Error("missing label address");
+                        if (label.address === null) throw new Error("edit me");
                         value = label.address;
                     }
 
                 } else if (op.address !== undefined) {
+                    if (op.address === null) throw new Error("edit me");
                     value = op.address;
 
                 } else {
@@ -1095,7 +1113,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                     operands.push({
                         type: 'LABEL',
                         value: label?.values ? label.values[0] : token.value,
-                        address: label?.address,
+                        address: label?.address ?? undefined,
                         //size: 2,
                     });
                 }
@@ -1214,6 +1232,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                 throw new Error(`Label "${token.value}" has no address`);
             }
 
+            if (label.address === null) throw new Error("edit me");
+
             return {
                 value: label.address,
                 name: token.value,
@@ -1309,6 +1329,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
             const offset = ref.address - (section.startAddress ?? 0);
 
+            if (labelInfo.address === null) throw new Error("edit me");
+
             // Patch bytes with correct endianness
             if (ref.size === 2) {
                 if (this.arch.endianness === 'little') {
@@ -1386,6 +1408,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
             // If it's a known label (not EQU), return its address
             if (label) {
+                if (label.address === null) throw new Error("edit me");
+
                 return label.address;
             }
 

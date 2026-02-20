@@ -1,9 +1,12 @@
-import { Lexer, type Token } from './compiler_lexer';
+import { Lexer, type Token, type TokenType } from './compiler_lexer';
 
 import { toHex } from '@/lib/lib_numbers';
 
-import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant, CompileInstruction } from '@/types/compiler.types';
+import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant, CompileInstruction, Label } from '@/types/compiler.types';
 import type { u16 } from '@/types/computer.types';
+
+
+const compilerVersion = '0.2';
 
 
 export class CompilerV2 {
@@ -15,8 +18,9 @@ export class CompilerV2 {
     private currentSection: Section | null = null; // Currently active section
     private currentSectionName: string = ''; // Currently active section
     private currentAddress = 0; // Current memory address being written
+    private step = 0;
 
-    private labels: Map<string, { section: string, address: u16, values?: any[] | null, dataSize: number | null }> = new Map(); // Label definitions with their addresses and optional data values
+    private labels: Map<string, Label> = new Map(); // Label definitions with their addresses and optional data values
     private symbols: Map<string, SymbolInfo> = new Map(); // Symbol table for labels and variables
     private comments: Map<number, string> = new Map(); // Comments associated with specific addresses
     private debugAddresses: Map<number, number> = new Map();
@@ -148,6 +152,8 @@ export class CompilerV2 {
 
         // Pass 1: collect all symbols and calculate addresses
         this.pass1CollectSymbols();
+        const currentAddressAfterPass1 = this.currentAddress;
+        //console.log('currentAddress after pass1:', currentAddressAfterPass1)
 
 
 //console.log('tokens:', this.tokens)
@@ -155,19 +161,25 @@ export class CompilerV2 {
         // Reset for pass 2
         this.dispatchTokens();
 
-//console.log('.data', this.sections.get('.data'))
-//console.log('.text', this.sections.get('.text'))
-//console.log('tokens:', this.tokens)
+console.log('.data', this.sections.get('.data'))
+console.log('.text', this.sections.get('.text'))
+console.log('tokens:', this.tokens)
 //throw new Error('DEBUG')
 
         // Pass 2: generate actual machine code
         this.pass2GenerateCode();
+        const currentAddressAfterPass2 = this.currentAddress;
+        //console.log('currentAddress after pass2:', currentAddressAfterPass2)
+
+        if (currentAddressAfterPass1 !== currentAddressAfterPass2) {
+            throw new Error(`addresses count mismatch (step1=${currentAddressAfterPass1} vs step2=${currentAddressAfterPass2}).`);
+        }
 
         // Resolve forward references
         this.resolveReferences();
 
         // Sync line numbers with expected offset
-        const syncLines: boolean = false; // synchronise les numéros de ligne avec les offset et non avec les addresses
+        const syncLines: boolean = true; // synchronise les numéros de ligne avec les offset et non avec les addresses
 
         if (syncLines && this.startLine !== this.startAddress) {
             const offset = this.startAddress - this.startLine
@@ -194,6 +206,7 @@ export class CompilerV2 {
             symbols: this.symbols,
             entryPoint: this.entryPoint,
             errors: this.errors,
+            compilerVersion,
         };
     }
 
@@ -225,6 +238,7 @@ export class CompilerV2 {
     private pass1CollectSymbols(): void {
         // called by compile (pass1)
 
+        this.step = 1;
         this.setCurrentSection('')
         this.pos = 0;
         this.currentAddress = this.startAddress;
@@ -252,8 +266,10 @@ export class CompilerV2 {
 
                 this.labels.set(labelName, {
                     section: this.currentSectionName,
-                    address: this.currentAddress as u16,
-                    values: null,
+                    addressStep1: this.currentAddress as u16,
+                    address: null,
+                    //values: null,
+                    immValue: undefined,
                     dataSize: null,
                 });
 
@@ -287,13 +303,14 @@ export class CompilerV2 {
                     section: this.currentSectionName,
                     type: token.type, // INSTRUCTION
                     instruction: token.value,
+                    step1Address: this.currentAddress,
                     size,
                     startPos: lastInstructionOrIdentifierPos,
                     endPos: this.pos,
                     tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
                 };
 
-                //if (this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1)[0].line > 65) debugger;
+                //if (this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1)[0].line === 66) debugger;
 
                 //console.log("New Instruction:", instructionData);
                 if (!this.currentSection) throw new Error(`Missing currentSection`);
@@ -323,15 +340,18 @@ export class CompilerV2 {
 
                         this.labels.set(varName, {
                             section: this.currentSectionName,
-                            address: valueStartAddress,
-                            values: null,
+                            addressStep1: valueStartAddress,
+                            address: null,
+                            //values: null,
+                            immValue: undefined,
                             dataSize: itemSize,
                         });
 
                         this.symbols.set(varName, {
+                            //address: valueStartAddress,
                             address: valueStartAddress,
                             section: this.currentSectionName,
-                            type: 'variable'
+                            type: 'variable',
                         });
 
                         this.advance(); // passe l'IDENTIFIER... pour arriver sur la DIRECTIVE
@@ -349,7 +369,7 @@ export class CompilerV2 {
                         }
 
 
-                        // Parcourt les données
+                        // Parcourt les données de la directive (EQU/DB/DW/DD/DQ/RESB/RESW/RESD/RESQ)
                         while (!this.isAtEnd()) {
                             const t = this.peek();
 
@@ -359,19 +379,20 @@ export class CompilerV2 {
                             } else if (['STRING', 'NUMBER'].includes(t.type)) {
                                 this.advance();
 
-                                if (!label.values) label.values = [];
-                                label.values.push(t.value)
+                                //label.immValue = t.value
 
                             } else if (t.type === 'IDENTIFIER') {
                                 // Reference to another identifier (e.g., _R equ COL_RED)
                                 const nextAfter = this.peek(1);
+
                                 // Stop if this identifier starts a new declaration (e.g., "other_var db ...")
-                                if (nextAfter.type === 'DIRECTIVE') break;
+                                if (nextAfter.type === 'DIRECTIVE') break; // TODO: a verifier. est-ce que qui empecher les directive multilignes (ex sprite_mario) de fonctionner sans patch dédié ?
 
                                 this.advance();
 
-                                if (!label.values) label.values = [];
-                                label.values.push(t.value)
+                                //if (!label.values) label.values = [];
+                                //label.values.push(t.value)
+                                label.immValue = t.value;
 
                             } else {
                                 break;
@@ -386,6 +407,7 @@ export class CompilerV2 {
                             section: this.currentSectionName,
                             type: next.type, // DIRECTIVE ("my_var db 0x12")
                             instruction: token.value,
+                            step1Address: this.currentAddress,
                             size,
                             startPos: lastInstructionOrIdentifierPos,
                             endPos: this.pos,
@@ -511,6 +533,7 @@ export class CompilerV2 {
                 section: this.currentSectionName,
                 type: directiveToken.type as 'DIRECTIVE', // DIRECTIVE (section)
                 instruction: directiveToken.value,
+                step1Address: this.currentAddress,
                 size: 0,
                 startPos: lastInstructionOrIdentifierPos,
                 endPos: this.pos,
@@ -530,6 +553,7 @@ export class CompilerV2 {
             this.advance();
 
             if (this.peek().type === 'NUMBER') {
+                throw new Error('EDIT ME handleDirectivePass1')
                 this.currentAddress = this.parseNumber(this.peek().value);
                 this.advance();
 
@@ -602,6 +626,7 @@ export class CompilerV2 {
                 section: this.currentSectionName,
                 type: token.type as 'DIRECTIVE', // DIRECTIVE (DB/DW/DD/DQ without preceding identifier => "db 0x12")
                 instruction: token.value,
+                step1Address: this.currentAddress,
                 size,
                 startPos: lastInstructionOrIdentifierPos,
                 endPos: this.pos,
@@ -737,12 +762,14 @@ export class CompilerV2 {
     private pass2GenerateCode(): void {
         // called by compile
 
+        this.step = 2;
         this.setCurrentSection('')
         this.pos = 0;
         this.currentAddress = this.startAddress;
 
         while (!this.isAtEnd()) {
             const token = this.peek();
+            //if (this.peek(1).value === 'lcd_clear') debugger;
 
             // DIRECTIVE: Process section switches and directives
             if (token.type === 'DIRECTIVE') {
@@ -754,6 +781,7 @@ export class CompilerV2 {
             // LABEL: Skip labels (already processed in pass1)
             if (token.type === 'LABEL') {
                 // example => "main:"
+                throw new Error("edit it ?");
                 this.advance();
                 this.skip('COLON');
                 continue;
@@ -773,16 +801,22 @@ export class CompilerV2 {
 
                         const directiveToken = next //this.peek();
                         this.generateData(varName, this.normalize(directiveToken.value), next);
-                        continue;
-                    }
 
-                    if (['RESB', 'RESW', 'RESD', 'RESQ'].includes(directive)) {
+                    } else if (['RESB', 'RESW', 'RESD', 'RESQ'].includes(directive)) {
                         const directiveToken = next //this.peek();
                         this.advance();
                         this.advance();
+
                         this.reserveSpace(directiveToken);
-                        continue;
+
+                    } else {
+                        throw new Error("unknown identifier+directive case")
                     }
+
+                    this.skip('COMMENT')
+                    this.skip('NEWLINE')
+                    this.skip('EOF')
+                    continue;
                 }
 
             }
@@ -807,6 +841,11 @@ export class CompilerV2 {
                     //console.log('currentLineTokens:', currentLineTokens)
                     //throw new Error(`Emitted size mismatch (${expectedSize} vs ${size}) at address ${addressBefore} (instruction "${token.value}")`);
                 }
+
+                this.skip('COMMENT')
+                this.skip('NEWLINE')
+                this.skip('EOF')
+
                 continue;
             }
 
@@ -960,11 +999,18 @@ export class CompilerV2 {
                 if (labelInfo !== undefined) {
                     // EQU constant: resolve the value (possibly chained)
                     if (labelInfo.dataSize === 0 && labelInfo.values && labelInfo.values.length > 0) {
-                        const resolvedValue = this.resolveEquValue(labelInfo.values[0]);
+                        debugger
+                        const resolvedEquValue = this.resolveEquValue(labelInfo.values[0]);
+
                         for (let i = 0; i < itemSize; i++) {
-                            const defaultComment = `${token.value} = ${toHex(resolvedValue)} (${resolvedValue})`;
-                            this.emitByte((resolvedValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
+                            //const defaultComment = `${token.value} = ${toHex(resolvedEquValue)} (${resolvedEquValue})`;
+                            //this.emitByte((resolvedEquValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
+
+                            const defaultComment = `${token.value} = ${token.value})`;
+                            this.emitByte((resolvedLabels: number) => (resolvedEquValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken, false, token.value);
+                            //this.emitByte((resolvedLabels: Map<string, number>) => (resolvedEquValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken, false, token.value);
                         }
+
                     } else {
                         // Regular label: emit its address
                         for (let i = 0; i < itemSize; i++) {
@@ -972,7 +1018,8 @@ export class CompilerV2 {
                                 ? `low  byte of label ${token.value} = ${labelInfo.address}`
                                 : `high byte of label ${token.value} = ${labelInfo.address}`
 
-                            this.emitByte((labelInfo.address >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
+                            //this.emitByte((labelInfo.addressStep2 >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
+                            this.emitByte((resolvedValue: number) => (resolvedValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken, false, token.value);
                         }
                     }
 
@@ -988,7 +1035,7 @@ export class CompilerV2 {
                     });
 
                     for (let i = 0; i < itemSize; i++) {
-                        this.emitByte(0, comment, refInstrToken);
+                        this.emitByte((resolvedValue: number) => 0, comment, refInstrToken, false, token.value);
                     }
                 }
 
@@ -997,7 +1044,7 @@ export class CompilerV2 {
             } else if (token.type === 'STRING') {
                 // Emit string as ASCII bytes
                 for (let i = 0; i < token.value.length; i++) {
-                    this.emitByte(token.value.charCodeAt(i), comment || `'${token.value[i]}'`, refInstrToken);
+                    this.emitByte((resolvedValue: number) => token.value.charCodeAt(i), comment || `'${token.value[i]}'`, refInstrToken, false);
                 }
 
                 this.advance();
@@ -1015,7 +1062,7 @@ export class CompilerV2 {
 
 
                     const byte = (value >> (i * 8)) & 0xFF;
-                    this.emitByte(byte, comment || defaultComment || (i === 0 ? token.value : undefined), refInstrToken);
+                    this.emitByte((resolvedValue: number) => byte, comment || defaultComment || (i === 0 ? token.value : undefined), refInstrToken, false);
                 }
 
                 this.advance();
@@ -1040,7 +1087,7 @@ export class CompilerV2 {
             const count = this.parseNumber(this.peek().value);
 
             for (let i = 0; i < count; i++) {
-                this.emitByte(0, comment || 'reserved space', refInstrToken);
+                this.emitByte((resolvedValue: number) => 0, comment || 'reserved space', refInstrToken);
             }
 
             this.advance();
@@ -1078,7 +1125,7 @@ export class CompilerV2 {
 
         // Emit opcode byte
         const comment = this.comments.get(this.currentAddress);
-        this.emitByte(variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), instrToken, true);
+        this.emitByte((resolvedValue: number) => variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), instrToken, true);
 
         // Emit operand bytes
         this.emitOperands(operands, variant, instrToken);
@@ -1101,15 +1148,25 @@ export class CompilerV2 {
 
             if (part === 'IMM8') {
                 // 8-bit immediate value
-                const value = op.address !== undefined ? op.address : this.parseNumber(op.value);
-                this.emitByte(value & 0xFF, op.value, refInstrToken);
+                const value = op.address !== undefined
+                    ? op.address
+                    : this.parseNumber(op.value);
+
+                if (value === null) {
+                    throw new Error("edit me emitOperands (1)");
+                }
+
+                this.emitByte((resolvedValue: number) => value & 0xFF, op.value, refInstrToken, false);
 
             } else if (part === 'IMM16' || part === 'MEM') {
                 // 16-bit immediate or memory address
-                let value = 0;
+                let value: number = 0;
 
                 if (op.type === 'MEMORY' && op.address !== undefined) {
                     // Address already resolved by parseMemoryOperand (handles expressions like [label + 1])
+                    if (op.address === null) {
+                        throw new Error("edit me emitOperands (2)");
+                    }
                     value = op.address;
 
                 } else if (op.type === 'LABEL') {
@@ -1117,11 +1174,15 @@ export class CompilerV2 {
                     const labelSection = this.sections.get(labelInfo?.section || '.none')
 
                     if (labelInfo !== undefined && labelSection !== undefined) {
-                        if (labelInfo.dataSize === 0 && labelInfo.values) {
-                            value = this.resolveEquValue(labelInfo.values[0]);
+                        if (labelInfo.dataSize === 0 /* && labelInfo.values */) {
+                            //value = this.resolveEquValue(labelInfo.values[0]);
+                            debugger;
+                            throw new Error("edit me emitOperands (3)");
 
                         } else {
-                            value = labelInfo.address;
+                            debugger;
+                            throw new Error("edit me emitOperands (3)");
+                            //value = labelInfo.addressStep2;
                         }
 
                     } else {
@@ -1141,15 +1202,20 @@ export class CompilerV2 {
                         throw new Error(`Missing label "${op.value}"`);
                     }
 
-                    if (label.dataSize === 0 && label.values) {
-                        value = this.resolveEquValue(label.values[0]);
+                    if (label.dataSize === 0 && label.immValue !== undefined) {
+                        value = this.resolveEquValue(label.immValue);
 
                     } else {
                         if (label.address === undefined) throw new Error("missing label address");
+                        if (label.address === null) throw new Error("missing label address");
                         value = label.address;
                     }
 
                 } else if (op.address !== undefined) {
+                    if (op.address === null) {
+                        throw new Error("edit me emitOperands (4)");
+                    }
+
                     value = op.address;
 
                 } else {
@@ -1159,12 +1225,12 @@ export class CompilerV2 {
                 const commentPrefix = `${isNaN(Number(op.value)) ? `${op.value} = ` : ''}${toHex(value)} (${value})`;
 
                 if (this.arch.endianness === 'little') {
-                    this.emitByte(value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
-                    this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
+                    this.emitByte((resolvedValue: number) => value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
+                    this.emitByte((resolvedValue: number) => (value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
 
                 } else {
-                    this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
-                    this.emitByte(value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
+                    this.emitByte((resolvedValue: number) => (value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
+                    this.emitByte((resolvedValue: number) => value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
                 }
 
             } else if (part === 'REG') {
@@ -1195,13 +1261,13 @@ export class CompilerV2 {
                     value = 6;
                 }
                 if (op.register === 'SP') {
-                    reg = ''
-                    value = 0;
+                    reg = '';
+                    value = 0; // on n'emet pas de byte pour le registre SP car il possede une instruction dédiée
                 }
 
                 if (value !== 0) {
                     const commentPrefix = `Register ${reg}`;
-                    this.emitByte(value, `${commentPrefix}`, refInstrToken);
+                    this.emitByte((resolvedValue: number) => value, `${commentPrefix}`, refInstrToken);
                 }
 
             } else {
@@ -1260,21 +1326,29 @@ export class CompilerV2 {
                     });
                 }
 
-                // EQU constants become immediate values
+                // EQU constants become immediate value
                 if (label && label.dataSize === 0) {
-                    const resolvedValue = label?.values ? this.resolveEquValue(label.values[0]) : 0;
+                    const resolvedEquValue = label?.immValue !== undefined
+                        ? this.resolveEquValue(label.immValue)
+                        : 0;
+
                     operands.push({
                         type: 'IMMEDIATE',
-                        value: label?.values ? label.values[0] : token.value,
-                        address: resolvedValue,
+                        value: label?.immValue !== undefined ? label.immValue : token.value,
+                        address: resolvedEquValue,
                     });
 
                 } else {
                     // Label reference
+                    const labelValue = label?.immValue !== undefined
+                        ? label.immValue
+                        : token.value;
+
                     operands.push({
                         type: 'LABEL',
-                        value: label?.values ? label.values[0] : token.value,
-                        address: label?.address,
+                        value: labelValue,
+                        address: label?.address ?? null,
+                        //address: () => labelValue,
                         //size: 2,
                     });
                 }
@@ -1313,7 +1387,7 @@ export class CompilerV2 {
             return operand;
         }
 
-        // Parse expression: terme (op terme)*
+        // Parse expression: terme (op terme)
         const firstValue = this.parseMemoryTerm();
         operand.value = firstValue.name;
         operand.address = firstValue.value;
@@ -1369,6 +1443,10 @@ export class CompilerV2 {
                 // Label pas encore connu (forward reference) — valeur temporaire
                 //console.warn(`Unknown label:`, label, token);
 
+                if (this.step === 2) {
+                    throw new Error("edit me parseMemoryTerm")
+                }
+
                 this.unresolvedRefs.push({
                     address: this.currentAddress,
                     section: this.currentSectionName,
@@ -1382,14 +1460,15 @@ export class CompilerV2 {
                 };
             }
 
-            if (label.dataSize === 0 && label.values) {
+            if (label.dataSize === 0 && label.immValue !== undefined) {
                 return {
-                    value: this.parseNumber(label.values[0]),
+                    value: this.parseNumber(label.immValue),
                     name: token.value,
                 };
             }
 
-            if (label.address === undefined) {
+            if (label.address === null && this.step === 2) {
+                debugger
                 throw new Error(`Label "${token.value}" has no address`);
             }
 
@@ -1481,6 +1560,7 @@ export class CompilerV2 {
                 continue;
             }
 
+            /*
             if (1) continue;
 
             const section = this.sections.get(ref.section);
@@ -1492,23 +1572,24 @@ export class CompilerV2 {
             // Patch bytes with correct endianness
             if (ref.size === 2) {
                 if (this.arch.endianness === 'little') {
-                    section.data[offset].value = labelInfo.address & 0xFF;
-                    section.data[offset + 1].value = (labelInfo.address >> 8) & 0xFF;
+                    section.data[offset].value = labelInfo.addressStep2 & 0xFF;
+                    section.data[offset + 1].value = (labelInfo.addressStep2 >> 8) & 0xFF;
 
                 } else {
-                    section.data[offset].value = (labelInfo.address >> 8) & 0xFF;
-                    section.data[offset + 1].value = labelInfo.address & 0xFF;
+                    section.data[offset].value = (labelInfo.addressStep2 >> 8) & 0xFF;
+                    section.data[offset + 1].value = labelInfo.addressStep2 & 0xFF;
                 }
 
             } else {
-                section.data[offset].value = labelInfo.address & 0xFF;
+                section.data[offset].value = labelInfo.addressStep2 & 0xFF;
             }
+            */
         }
     }
 
 
     // Emit a single byte to current section
-    private emitByte(value: number, comment?: string, opcodeToken?: Token, isOpcode=false): void {
+    private emitByte(valueResolver: (offset: number) => number, comment?: string, opcodeToken?: Token, isOpcode=false, labelRef?: string): void {
         // used at several places (step2)
 
         const section = this.sections.get(this.currentSectionName);
@@ -1521,11 +1602,13 @@ export class CompilerV2 {
 
         section.data.push({
             address: this.currentAddress++,
-            value: value & 0xFF,
+            //value: value & 0xFF,
+            valueResolver,
             //section: this.currentSection,
             comment,
             isOpcode,
             opcodeToken,
+            labelRef,
         });
     }
 
@@ -1560,13 +1643,14 @@ export class CompilerV2 {
 
             // Look up as a label/identifier
             const label = this.labels.get(current);
-            if (label && label.dataSize === 0 && label.values && label.values.length > 0) {
-                current = label.values[0];
+            if (label && label.dataSize === 0 && label.immValue !== undefined) {
+                current = label.immValue;
                 continue;
             }
 
             // If it's a known label (not EQU), return its address
             if (label) {
+                if (label.address === null) throw new Error("edit me resolveEquValue")
                 return label.address;
             }
 
@@ -1611,7 +1695,7 @@ export class CompilerV2 {
 
 
     // Skip token if it matches expected type
-    private skip(type: string): void {
+    private skip(type: TokenType): void {
         // used at several places
 
         if (this.peek().type === type) {
@@ -1646,6 +1730,7 @@ export class CompilerV2 {
         const current = this.peek(offset);
         const tokens: Token[] = current.type === 'NEWLINE' ? [] : [current];
 
+        // parse vers l'arriere
         let currentPosMinus = offset - 1
         while (true) {
             const prev = this.peek(currentPosMinus);
@@ -1655,6 +1740,7 @@ export class CompilerV2 {
             currentPosMinus--;
         }
 
+        // parse vers l'avant (sauf si le currentToken est une nouvelle ligne)
         if (current.type !== 'NEWLINE') {
             let currentPosPlus = offset + 1
             while (true) {

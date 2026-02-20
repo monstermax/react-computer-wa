@@ -51,6 +51,15 @@ export interface RegisterDef {
     size: number;
 }
 
+export type Label = {
+    section: string,
+    addressStep1: u16 | null,
+    address: u16 | null,
+    //values?: any[] | null,
+    immValue?: string;
+    dataSize: number | null,
+}
+
 export interface CPUArchitecture {
     name: string;
     addressSize: number;
@@ -64,7 +73,7 @@ export interface ParsedOperand {
     value: string;
     register?: string;
     size?: number;
-    address?: number;
+    address?: number | null;
     base?: string;
     index?: string;
     scale?: number;
@@ -90,6 +99,7 @@ export type CompileInstruction = {
     section: string;
     type: 'DIRECTIVE' | 'INSTRUCTION';
     instruction: string;
+    step1Address: number;
     size: number;
     startPos: number;
     endPos: number;
@@ -99,20 +109,23 @@ export type CompileInstruction = {
 
 export interface ByteEntry {
     address: number;
-    value: number;
+    //value: number;
+    valueResolver: (offset: number) => number;
     //section: string;
     label?: string;
     comment?: string;
     isOpcode?: boolean;
     opcodeToken?: Token;
+    labelRef?: string;
 }
 
 export interface CompiledProgram {
     sections: Section[];
-    labels: Map<string, { section: string, address: u16 }>;
+    labels: Map<string, Label>;
     symbols: Map<string, SymbolInfo>;
     entryPoint?: number;
     errors: CompilerError[];
+    compilerVersion: string;
 }
 
 export interface SymbolInfo {
