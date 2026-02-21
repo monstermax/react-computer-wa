@@ -179,7 +179,7 @@ export const Screen: React.FC<ScreenProps> = (props) => {
 
                 <div
                     className="bg-black border-4 border-slate-600 rounded-lg p-2 mx-auto"
-                    style={{ imageRendering: 'pixelated', width: 'fit-content' }}
+                    //style={{ imageRendering: 'pixelated', width: 'fit-content' }}
                 >
                     <div className="grid gap-0" style={{
                         gridTemplateColumns: `repeat(${width}, 1fr)`,

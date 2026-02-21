@@ -27,6 +27,12 @@ export const Registers: React.FC<RegistersProps> = (props) => {
         setCurrentCodeMapped(_currentCodeMapped)
     }, [registers16, codeMapping])
 
+    const basename = (filepath: string) => {
+        const parts = filepath.split('/');
+        const filename = parts.at(-1);
+        return filename;
+    }
+
     return (
         <>
             <h2>CPU State</h2>
@@ -43,8 +49,12 @@ export const Registers: React.FC<RegistersProps> = (props) => {
                 </div>
                 <div className="text-xs">
                     {currentCodeMapped && (
-                        <div className="cursor-pointer" onClick={() => openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)}>
-                            {currentCodeMapped.file}:{currentCodeMapped.line}
+                        <div
+                            className="cursor-pointer"
+                            onClick={() => openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)}
+                            title={currentCodeMapped.file}
+                        >
+                            {basename(currentCodeMapped.file)}:{currentCodeMapped.line}
                         </div>
                     )}
                 </div>

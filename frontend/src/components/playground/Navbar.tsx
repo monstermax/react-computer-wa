@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = (props) => {
                         <button
                             disabled={emulator.clockStatus || emulator.cpuHalted}
                             onClick={() => runCpuStep()}
-                            className="px-3 py-1.5 text-xs rounded bg-blue-700 hover:bg-blue-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer"
+                            className="px-3 py-1.5 text-xs rounded bg-blue-700 hover:bg-blue-600 disabled:bg-zinc-700 text-zinc-200 transition-colors cursor-pointer hidden sm:block"
                         >
                             Step
                         </button>
