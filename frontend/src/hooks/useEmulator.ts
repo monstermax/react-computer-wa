@@ -29,7 +29,7 @@ export type WasmExports = typeof releaseModule.__AdaptedExports;
 export type useEmulatorParams = {
     clockFrequency: u32;
     speedMultiplier: u32;
-    dumpRegisters: () => Promise<RegistersDump>
+    dumpRegisters: () => Promise<RegistersDump | null>
     addLog: (msg: string) => void;
 }
 
