@@ -283,7 +283,7 @@ display_devices:
     mov bl, [DEVICE_TABLE_COUNT] ; nb de devices restantes à parcourir = nb de devices
 
     mov al, [DEVICE_TABLE_COUNT]
-    add al, 48 ; conversion number en ASCII
+    add al, 48 ; conversion number en ASCII => TODO: utiliser fonction int_to_str (pour gérer les chiffres >= 10)
     call console_print_char ; affiche le nombre de device trouvées
 
     lea cl, dl, [STR_DEVICES_COUNT]
