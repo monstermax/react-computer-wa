@@ -387,11 +387,12 @@ export class CompilerV2 {
                             section: this.currentSectionName,
                             type: 'variable',
                         });
-                        if (directive === 'RESB') debugger
 
                         this.advance(); // passe l'IDENTIFIER... pour arriver sur la DIRECTIVE
 
-                        const size = this.calculateDataSize(itemSize);
+                        const isSpaceReserve = ['RESB', 'RESW', 'RESD', 'RESQ'].includes(directive)
+
+                        const size = this.calculateDataSize(itemSize, isSpaceReserve);
                         this.currentAddress += size;
 
                         this.debugAddresses.set(`${directiveToken.file}:${directiveToken.line}:${directiveToken.column}`, size)
@@ -669,7 +670,7 @@ export class CompilerV2 {
 
             const token = directiveToken;
             const itemSize = getDirectiveDataSize(directive);
-            const size = this.calculateDataSize(itemSize)
+            const size = this.calculateDataSize(itemSize, false)
             this.currentAddress += size;
 
             this.debugAddresses.set(`${token.file}:${token.line}:${token.column}`, size)
@@ -779,7 +780,7 @@ export class CompilerV2 {
 
 
     // Calculate data declaration size in bytes (db, dw, dd, dq with values)
-    private calculateDataSize(itemSize: number): number {
+    private calculateDataSize(itemSize: number, isSpaceReserve: boolean): number {
         // called by pass1CollectSymbols (pass1)
 
         let size = 0;
@@ -793,14 +794,18 @@ export class CompilerV2 {
 
             if (token.type === 'STRING') {
                 // Each character is one byte
+                if (isSpaceReserve) throw new Error(`unexpected string`)
                 size += token.value.length;
                 offset++;
 
             } else if (token.type === 'NUMBER') {
-                size += itemSize;
+                size += isSpaceReserve
+                    ? (itemSize * Number(token.value))
+                    : itemSize;
                 offset++;
 
             } else if (token.type === 'IDENTIFIER') {
+                if (isSpaceReserve) throw new Error(`unexpected identifier`)
                 const next = this.peek(offset + 1);
                 if (next.type === 'DIRECTIVE') break
 
@@ -808,6 +813,7 @@ export class CompilerV2 {
                 offset++;
 
             } else if (token.type === 'COMMA') {
+                if (isSpaceReserve) throw new Error(`unexpected comma`)
                 offset++;
 
             } else {

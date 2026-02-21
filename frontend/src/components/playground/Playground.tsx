@@ -214,8 +214,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const startAddress = MEMORY_MAP.OS_START;
         const sourceCode = await loadSourceCodeFromFile(sourceFilepath);
 
-        const compiled = await compileCode(sourceCode, { startAddress, architecture: CUSTOM_CPU });
-        //const compiled = await compileCodeV2(sourceCode, sourceFilepath, { startAddress, architecture: CUSTOM_CPU });
+        //const compiled = await compileCode(sourceCode, { startAddress, architecture: CUSTOM_CPU });
+        const compiled = await compileCodeV2(sourceCode, sourceFilepath, { startAddress, architecture: CUSTOM_CPU });
 
         if (compiled.errors.length > 0) {
             const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');
