@@ -44,22 +44,14 @@ export const Registers: React.FC<RegistersProps> = (props) => {
                 <div className="text-xs">
                     {currentCodeMapped && (
                         <div className="cursor-pointer" onClick={() => openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)}>
-                            {currentCodeMapped.file}:{currentCodeMapped.line}
+                            {currentCodeMapped.file}:{currentCodeMapped.line} [{currentCodeMapped.value}]
                         </div>
                     )}
                 </div>
                 <div>
                     SP: {toHex(Number(registers16.SP))} ({Number(registers16.SP)})
                 </div>
-                <div className="flex justify-between">
-                    <div>IR: {toHex(Number(registers16.IR))} ({Number(registers16.IR)})</div>
-
-                    {currentCodeMapped && (
-                        <div className="mx-2">
-                            next: {currentCodeMapped.value}
-                        </div>
-                    )}
-                </div>
+                <div>IR: {toHex(Number(registers16.IR))} ({Number(registers16.IR)})</div>
             </div>
 
             <div className="grid grid-cols-2 border-t pt-1 mt-1">

@@ -1,5 +1,5 @@
 
-- compiler: mapping entre addresses finales et numero de ligne et nom de fichier source
+- editor: files tabs
 - os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - os: parser les arguments de la commande shell
 + os: gestion des io devices (recuperer ce que le bootloader a initialisé)

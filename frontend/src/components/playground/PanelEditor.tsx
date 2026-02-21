@@ -21,9 +21,9 @@ import type { Token } from "@/compiler/compiler_lexer";
 const defaultLoadAddress = '0xA000';
 
 //const defaultCodeFilepath = "user/examples/draw_fractal_on_screen.asm";
-//const defaultCodeFilepath = "user/tests/lcd_test.asm";
+const defaultCodeFilepath = "user/tests/lcd_test.asm";
 //const defaultCodeFilepath = "bootloader/bootloader_v2.asm";
-const defaultCodeFilepath = "os/os_v3.asm";
+//const defaultCodeFilepath = "os/os_v3.asm";
 
 const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 ; Type "custom" in the shell to run it.
