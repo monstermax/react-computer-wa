@@ -268,7 +268,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 {/* Button "togglePanelEmulator" for Mobile-only */}
                 <button
                     onClick={() => togglePanelEmulator()}
-                    className={`md:hidden ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                    className={`xl:hidden ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
                         ${!panelEmulatorHidden
                             ? 'text-zinc-200 border-b-2 border-b-emerald-800'
                             : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
@@ -280,7 +280,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 {/* Button "togglePanelEmulator" for Desktop-only */}
                 <button
                     onClick={() => togglePanelEmulator()}
-                    className={`hidden md:block ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                    className={`hidden xl:block ms-auto tracking-wider px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
                         ${!panelEmulatorHidden
                             ? 'text-zinc-200 border-b-2 border-b-emerald-800'
                             : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'

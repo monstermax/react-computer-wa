@@ -64,7 +64,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
             <div className="flex border-b border-zinc-800/50 bg-[#0c0c13] shrink-0 px-4 h-12">
                 <button
                     onClick={() => setEmulatorTab('devices')}
-                    className={`px-2 md:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
+                    className={`px-2 xl:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
                         ${emulatorTab === 'devices'
                             ? 'text-zinc-200 border-b-2 border-emerald-500'
                             : 'text-zinc-500 hover:text-zinc-400'
@@ -74,7 +74,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
 
                 <button
                     onClick={() => setEmulatorTab('memory')}
-                    className={`px-2 md:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
+                    className={`px-2 xl:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
                         ${emulatorTab === 'memory'
                             ? 'text-zinc-200 border-b-2 border-emerald-500'
                             : 'text-zinc-500 hover:text-zinc-400'
@@ -84,7 +84,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
 
                 <button
                     onClick={() => setEmulatorTab('docs')}
-                    className={`px-2 md:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
+                    className={`px-2 xl:px-4 py-1 text-[11px] tracking-wider uppercase transition-colors cursor-pointer 
                         ${emulatorTab === 'docs'
                             ? 'text-zinc-200 border-b-2 border-emerald-500'
                             : 'text-zinc-500 hover:text-zinc-400'
@@ -100,7 +100,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                     {/* Button "togglePanelEmulator" for Mobile-only */}
                     <button 
                         onClick={() => togglePanelEmulator()}
-                        className={`md:hidden px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                        className={`xl:hidden px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
                             ${!panelEditorHidden
                                 ? 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
                                 : 'text-zinc-200 border-b-2 border-b-emerald-800'
@@ -112,7 +112,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                     {/* Button "togglePanelEmulator" for Desktop-only */}
                     <button 
                         onClick={() => togglePanelEditor()}
-                        className={`hidden md:block px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
+                        className={`hidden xl:block px-3 py-1 text-sm uppercase transition-colors text-zinc-500 hover:text-zinc-400 cursor-pointer
                             ${!panelEditorHidden
                                 ? 'text-zinc-200 border-b-2 border-b-emerald-800'
                                 : 'text-zinc-500 hover:text-zinc-400 border-b-2 border-b-orange-800'
@@ -128,7 +128,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                 {/* ── Row 1: Console + Screen ── */}
                 <div className="flex flex-wrap gap-3 mb-3">
 
-                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] md:w-auto min-w-96 flex justify-center ">
+                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] xl:w-auto min-w-96 flex justify-center ">
                         <Console deviceInstance={consoleDevice} />
                     </div>
 
@@ -142,12 +142,12 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                             <div className={preferHdScreen ? "" : "line-through"}>HD</div>
                         </button>
 
-                        <div className={`md:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`xl:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen */}
                             <Screen deviceInstance={screenDevice} />
                         </div>
 
-                        <div className={`md:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`xl:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen HD */}
                             <ScreenCanvas deviceInstance={screenHdDevice} />
                         </div>

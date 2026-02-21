@@ -414,7 +414,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 </div>
 
                 {/* ══════ Assembly Editor Panel ══════ */}
-                <div className={`flex-col w-full md:min-w-[600px] h-full flex-1 border-r border-zinc-800/60 ${(panelEmulatorHidden) ? "flex" : "hidden"} ${panelEditorHidden ? "hidden" : "md:flex"}`}>
+                <div className={`flex-col w-full xl:min-w-[600px] h-full flex-1 border-r border-zinc-800/60 ${(panelEmulatorHidden) ? "flex" : "hidden"} ${panelEditorHidden ? "hidden" : "xl:flex"}`}>
                     <PanelEditor
                         emulator={emulator}
                         logs={logs}
