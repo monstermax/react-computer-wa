@@ -845,19 +845,7 @@ export class CompilerV2 {
             // DIRECTIVE: Process section switches and directives
             if (token.type === 'DIRECTIVE') {
                 // example => "section .text"
-                const addressBefore = this.currentAddress;
-                this.handleDirectivePass2();
-
-                const size = this.currentAddress - addressBefore; // TODO: comparer avec la size du step1
-                const debugAddress = this.debugAddresses.get(`${token.file}:${token.line}:${token.column}`)
-
-                if (debugAddress === undefined) {
-                    //throw new Error("debugAddress not found");
-                }
-
-                if (debugAddress !== size) {
-                    //throw new Error(`debugAddress size mismatch : debugAddress=${debugAddress} VS size=${size}`);
-                }
+                this.handleDirectivePass2(); // size=0
                 continue;
             }
 
@@ -915,7 +903,7 @@ export class CompilerV2 {
                         throw new Error("unknown identifier+directive case")
                     }
 
-                    const size = this.currentAddress - addressBefore; // TODO: comparer avec la size du step1
+                    const size = this.currentAddress - addressBefore;
 
                     const debugAddress = this.debugAddresses.get(`${next.file}:${next.line}:${next.column}`)
 
@@ -942,7 +930,7 @@ export class CompilerV2 {
                 const addressBefore = this.currentAddress;
                 this.generateInstruction();
 
-                const size = this.currentAddress - addressBefore; // TODO: comparer avec la size du step1
+                const size = this.currentAddress - addressBefore;
 
                 const debugAddress = this.debugAddresses.get(`${token.file}:${token.line}:${token.column}`)
 
@@ -1357,33 +1345,6 @@ export class CompilerV2 {
                         throw new Error()
                     }
 
-                    //console.log('labelRef (mem):', labelRef, value)
-
-                    /*
-                    // Address already resolved by parseMemoryOperand (handles expressions like [label + 1])
-                    if (op.address === null) {
-                        throw new Error("edit me emitOperands (2)");
-                    }
-                    //value = op.address;
-
-                    console.log('labelRef (mem):', op.value)
-                    const opValue = op.value;
-                    labelRef = op.value;
-
-                    const resolver = () => {
-                        if (!labelRef) throw new Error(`missing label "${labelRef}"`)
-                        const label = this.labels.get(opValue)
-                        if (!label) throw new Error(`missing label "${labelRef}"`)
-                        if (!label.address) throw new Error(`missing label "${labelRef}" address`)
-
-                        return label.address
-                    }
-
-                    value = resolver
-
-                    // TODO: probleme ici: il faut pouvoir parser les expressions, comme dans parseMemoryTerm
-                    */
-
                 } else if (op.type === 'LABEL') {
                     // example: "call print_something"
                     const labelInfo = this.labels.get(op.value);
@@ -1395,10 +1356,6 @@ export class CompilerV2 {
                             throw new Error("edit me emitOperands (3)");
 
                         } else {
-                            //debugger;
-                            //throw new Error("edit me emitOperands (3b)");
-                            //value = labelInfo.addressStep2;
-                            //console.log('labelRef (label):', labelRef)
                             const opValue = op.value;
                             labelRef = op.value;
 
@@ -1410,20 +1367,15 @@ export class CompilerV2 {
                                 return label.address
                             }
 
-                            //valueLow  = () => (resolver() & 0xFF);
-                            //valueHigh = () => ((resolver() >> 8) & 0xFF);
-
                             valueLow  = () => {
                                 const resolved = resolver();
                                 const value = (resolved) & 0xFF
-                                //console.log(`low value of ${resolved} => ${value}`)
                                 return value
                             };
 
                             valueHigh = () => {
                                 const resolved = resolver();
                                 const value = (resolved >> 8) & 0xFF
-                                //console.log(`high value of ${resolved} => ${value}`)
                                 return value
                             };
                         }
@@ -1888,12 +1840,14 @@ export class CompilerV2 {
             // Look up as a label/identifier
             const label = this.labels.get(current);
             if (label && label.dataSize === 0 && label.immValue !== undefined) {
+                // EQU
                 current = label.immValue;
                 continue;
             }
 
             // If it's a known label (not EQU), return its address
             if (label) {
+                throw new Error("edit me: resolveEquValue")
                 //if (label.address === null) throw new Error("edit me resolveEquValue")
                 //return label.address; // TODO
                 return 0 // TODO: resolver
