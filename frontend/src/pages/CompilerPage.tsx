@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 
-import { compileCodeV2, compileFileV2, formatBytecode } from "@/compiler/compiler_utils";
+import { compileCodeV2, compileFileV2, formatBytecode, getAssemblyCodeMapping } from "@/compiler/compiler_utils";
 import { toHex } from "@/lib/lib_numbers";
 
 
@@ -32,6 +32,11 @@ export const CompilerPage: React.FC = () => {
         const machineCodeRaw: string = formatBytecode(compiled);
         const _machineCode = `// === MACHINE CODE ===\n\n[\n${machineCodeRaw.trim()}\n]`;
         setMachineCode(_machineCode)
+
+        const codeMapping = getAssemblyCodeMapping(compiled);
+        const codeMappingFormattedList = Object.entries(codeMapping)
+        codeMappingFormattedList.sort(([a], [b]) => Number(a) - Number(b))
+        console.log('codeMapping:', Object.keys(codeMapping).length, codeMappingFormattedList)
 
         let _machineCodeLabels = "";
         compiled.labels.forEach((labelInfo, name) => {

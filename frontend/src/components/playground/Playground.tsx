@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
-import { compileCode, compileCodeV2, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
+import { compileCode, compileCodeV2, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
 
 import { useEmulator, type EmulatorHook } from "@/hooks/useEmulator";
@@ -30,6 +30,7 @@ import { DmaDevice } from "@/components/devices/dma";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
 import { Navbar } from "./Navbar";
+import type { Token } from "@/compiler/compiler_lexer";
 
 
 
@@ -114,6 +115,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const speakerDeviceHook = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
     const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
 
+    const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
+
 
     // Prevent GUI Tab key
     useEffect(() => {
@@ -174,6 +177,9 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             throw new Error();
         }
 
+        const newCodeMapping = getAssemblyCodeMapping(compiled);
+        updateCodeMapping(newCodeMapping)
+
         const size = emulator.loadBootloader(compiled)
         setBootloaderLoaded(true);
         addLog(`Bootloader loaded (${size} bytes)`);
@@ -223,12 +229,32 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             throw new Error();
         }
 
+        const newCodeMapping = getAssemblyCodeMapping(compiled);
+        updateCodeMapping(newCodeMapping)
+
         const byteCodeMap: MapIterator<[u16, u8]> = getBytecodeArray(compiled).entries();
         const byteCodeArr = Array.from(byteCodeMap);
         const data = byteCodeArr ?? [];
 
         return data;
     }
+
+
+    const updateCodeMapping = (newCodeMapping: Record<string, Token | undefined>) => {
+        setCodeMapping(old => ({ ...old, ...newCodeMapping }));
+    }
+
+
+    useEffect(() => {
+        const _debug = () => {
+            const codeMappingFormattedList = Object.entries(codeMapping)
+            codeMappingFormattedList.sort(([a], [b]) => Number(a) - Number(b))
+            console.log('codeMapping:', Object.keys(codeMapping).length, codeMappingFormattedList)
+        }
+
+        const timer = setTimeout(_debug, 100);
+        return () => clearTimeout(timer);
+    }, [codeMapping])
 
 
     //  Load devices when computer is instanciated
@@ -367,6 +393,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         memory={memory}
                         panelEmulatorHidden={panelEmulatorHidden}
                         panelEditorHidden={panelEditorHidden}
+                        codeMapping={codeMapping}
                         dumpMemory={dumpMemory}
                         dumpRam={dumpRam}
                         dumpDisk={dumpDisk}

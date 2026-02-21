@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { toHex } from "@/lib/lib_numbers";
 
 import type { u16, u8 } from "@/types/computer.types";
+import type { Token } from "@/compiler/compiler_lexer";
 
 
 export type RegistersProps = {
@@ -10,10 +11,20 @@ export type RegistersProps = {
     registers8: Record<string, u8>;
     registers16: Record<string, u8 | u16 | bigint>;
     modifiedRegisters: string[];
+    codeMapping: Record<string, Token | undefined>;
 };
 
 export const Registers: React.FC<RegistersProps> = (props) => {
-    const { cyclesCount, registers8, registers16, modifiedRegisters } = props;
+    const { cyclesCount, registers8, registers16, modifiedRegisters, codeMapping } = props;
+
+    const [currentCodeMapped, setCurrentCodeMapped] = useState<Token | undefined>(undefined)
+
+    useEffect(() => {
+        const PC = toHex(Number(registers16.PC), 4);
+        const _currentCodeMapped = codeMapping[PC]
+        //console.log('currentCodeMapped:', _currentCodeMapped)
+        setCurrentCodeMapped(_currentCodeMapped)
+    }, [registers16, codeMapping])
 
     return (
         <>
@@ -26,11 +37,28 @@ export const Registers: React.FC<RegistersProps> = (props) => {
             </div>
 
             <div className="grid grid-cols-2 border-t pt-1 mt-1">
-                {Object.entries(registers16).map(([name, value]) => (
-                    <div key={name}>
-                        {name}: {toHex(Number(value))} ({Number(value)})
-                    </div>
-                ))}
+                <div>
+                    PC: {toHex(Number(registers16.PC))} ({Number(registers16.PC)})
+                </div>
+                <div className="text-xs">
+                    {currentCodeMapped && (
+                        <>
+                            {currentCodeMapped.file}:{currentCodeMapped.line}
+                        </>
+                    )}
+                </div>
+                <div>
+                    SP: {toHex(Number(registers16.SP))} ({Number(registers16.SP)})
+                </div>
+                <div className="flex justify-between">
+                    <div>IR: {toHex(Number(registers16.IR))} ({Number(registers16.IR)})</div>
+
+                    {currentCodeMapped && (
+                        <div className="mx-2">
+                            {currentCodeMapped.value}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="grid grid-cols-2 border-t pt-1 mt-1">

@@ -215,6 +215,7 @@ export class CompilerV2 {
             labels: this.labels,
             symbols: this.symbols,
             entryPoint: this.entryPoint,
+            startAddress: this.startAddress,
             errors: this.errors,
             compilerVersion,
         };

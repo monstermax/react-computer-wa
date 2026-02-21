@@ -130,6 +130,7 @@ export interface CompiledProgram {
     labels: Map<string, Label>;
     symbols: Map<string, SymbolInfo>;
     entryPoint?: number;
+    startAddress: number;
     errors: CompilerError[];
     compilerVersion: string;
 }

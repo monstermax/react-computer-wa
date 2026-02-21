@@ -172,6 +172,7 @@ export class Compiler {
             sections: Array.from(this.sections.values()),
             labels: this.labels,
             symbols: this.symbols,
+            startAddress: this.startAddress,
             entryPoint: this.entryPoint,
             errors: this.errors,
             compilerVersion,

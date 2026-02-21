@@ -8,6 +8,7 @@ import type { u16, u8 } from "@/types/computer.types";
 import { assembleSourceCode, parseSourceCode, parseSourceCodeFile, type ParsedFile } from "./precompiler";
 import { CompilerV2 } from "./compiler.v2";
 import { toHex } from "@/lib/lib_numbers";
+import type { Token } from "./compiler_lexer";
 
 
 export let compilationAsmBaseUrl = '';
@@ -120,12 +121,12 @@ export function formatBytecode(program: CompiledProgram): string {
 
         for (const entry of section.data) {
             const hexAddr = toHex(entry.address, 4);
-            const hexValue = entry.value === null ? null : toHex(entry.value); // note: ne devrait pas etre null (sauf pour des cas de debug temporaires)
+            const hexValue = entry.value === null ? null : toHex(entry.value as number); // note: ne devrait pas etre null (sauf pour des cas de debug temporaires)
 
             let line = `    [${hexAddr}, ${hexValue}],`;
 
             if (entry.comment) {
-                line += ` // ${entry.comment}`;
+                line += ` // ${entry.comment} ${entry.opcodeToken ? `// ${entry.opcodeToken.file}:${entry.opcodeToken.line}` : ``}`;
             }
 
             lines.push(line);
@@ -134,6 +135,24 @@ export function formatBytecode(program: CompiledProgram): string {
 
     return lines.join('\n');
 }
+
+
+export function getAssemblyCodeMapping(program: CompiledProgram): Record<string, Token | undefined> {
+    const mapping: Record<string, Token | undefined> = {}
+
+    for (const section of program.sections) {
+        if (section.data.length === 0) continue;
+
+
+        for (const entry of section.data) {
+            const hexAddr = toHex(entry.address + program.startAddress, 4);
+            mapping[hexAddr] = entry.opcodeToken;
+        }
+    }
+
+    return mapping;
+}
+
 
 
 export function getBytecodeArray(program: CompiledProgram, sectionName?: string): Map<u16, u8> {
