@@ -12,10 +12,11 @@ export type RegistersProps = {
     registers16: Record<string, u8 | u16 | bigint>;
     modifiedRegisters: string[];
     codeMapping: Record<string, Token | undefined>;
+    openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>
 };
 
 export const Registers: React.FC<RegistersProps> = (props) => {
-    const { cyclesCount, registers8, registers16, modifiedRegisters, codeMapping } = props;
+    const { cyclesCount, registers8, registers16, modifiedRegisters, codeMapping, openAssemblyFileInEditor } = props;
 
     const [currentCodeMapped, setCurrentCodeMapped] = useState<Token | undefined>(undefined)
 
@@ -42,9 +43,9 @@ export const Registers: React.FC<RegistersProps> = (props) => {
                 </div>
                 <div className="text-xs">
                     {currentCodeMapped && (
-                        <>
+                        <div className="cursor-pointer" onClick={() => openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)}>
                             {currentCodeMapped.file}:{currentCodeMapped.line}
-                        </>
+                        </div>
                     )}
                 </div>
                 <div>
@@ -55,7 +56,7 @@ export const Registers: React.FC<RegistersProps> = (props) => {
 
                     {currentCodeMapped && (
                         <div className="mx-2">
-                            {currentCodeMapped.value}
+                            next: {currentCodeMapped.value}
                         </div>
                     )}
                 </div>

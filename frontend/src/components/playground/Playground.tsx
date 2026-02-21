@@ -115,6 +115,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const speakerDeviceHook = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
     const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
 
+    const [editorInitialContent, setEditorInitialContent] = useState("");
+    const [editorHightLine, setEditorHightLine] = useState<number | null>(null);
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 
 
@@ -245,16 +247,16 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }
 
 
-    useEffect(() => {
-        const _debug = () => {
-            const codeMappingFormattedList = Object.entries(codeMapping)
-            codeMappingFormattedList.sort(([a], [b]) => Number(a) - Number(b))
-            console.log('codeMapping:', Object.keys(codeMapping).length, codeMappingFormattedList)
-        }
-
-        const timer = setTimeout(_debug, 100);
-        return () => clearTimeout(timer);
-    }, [codeMapping])
+//    useEffect(() => {
+//        const _debug = () => {
+//            const codeMappingFormattedList = Object.entries(codeMapping)
+//            codeMappingFormattedList.sort(([a], [b]) => Number(a) - Number(b))
+//            console.log('codeMapping:', Object.keys(codeMapping).length, codeMappingFormattedList)
+//        }
+//
+//        const timer = setTimeout(_debug, 100);
+//        return () => clearTimeout(timer);
+//    }, [codeMapping])
 
 
     //  Load devices when computer is instanciated
@@ -362,6 +364,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }
 
 
+    const openAssemblyFileInEditor = async (filePath: string, selectedLine?: number) => {
+        const response = await fetch(`/asm/${filePath}`);
+        const value = await response.text();
+        setEditorInitialContent(value)
+        setEditorHightLine(selectedLine ?? null)
+    }
+
+
     return (
         <div
             className="h-screen flex flex-col bg-[#0a0a0f] text-zinc-200"
@@ -399,6 +409,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         dumpDisk={dumpDisk}
                         togglePanelEmulator={togglePanelEmulator}
                         togglePanelEditor={togglePanelEditor}
+                        openAssemblyFileInEditor={openAssemblyFileInEditor}
                         />
                 </div>
 
@@ -408,8 +419,13 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         emulator={emulator}
                         logs={logs}
                         panelEmulatorHidden={panelEmulatorHidden}
+                        editorHightLine={editorHightLine}
                         addLog={addLog}
                         togglePanelEmulator={togglePanelEmulator}
+                        editorInitialContent={editorInitialContent}
+                        setEditorInitialContent={setEditorInitialContent}
+                        setEditorHightLine={setEditorHightLine}
+                        openAssemblyFileInEditor={openAssemblyFileInEditor}
                         />
                 </div>
 

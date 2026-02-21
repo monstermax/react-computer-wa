@@ -35,19 +35,23 @@ const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 export type PanelEditorProps = {
     emulator: EmulatorHook;
     logs: string[];
+    editorHightLine: number | null;
+    editorInitialContent: string;
     panelEmulatorHidden: boolean;
     addLog: (msg: string) => void;
     togglePanelEmulator: () => void;
+    setEditorInitialContent: React.Dispatch<React.SetStateAction<string>>;
+    setEditorHightLine: React.Dispatch<React.SetStateAction<number | null>>;
+    openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>
 }
 
 
 export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
-    const { emulator, logs, panelEmulatorHidden } = props;
-    const { addLog, togglePanelEmulator } = props;
+    const { emulator, logs, panelEmulatorHidden, editorInitialContent, editorHightLine } = props;
+    const { addLog, togglePanelEmulator, setEditorInitialContent, setEditorHightLine, openAssemblyFileInEditor } = props;
 
     // ── Editor ──
     const editorRef = useRef<PrismEditor>(null);
-    const [editorInitialContent, setEditorInitialContent] = useState("");
     const [machineCode, setMachineCode] = useState<string | null>(null);
     const [machineCodeLabels, setMachineCodeLabels] = useState<string | null>(null);
     const [bytecode, setBytecode] = useState<Map<u16, u8> | null>(null);
@@ -78,6 +82,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     useEffect(() => {
 
         const _fetch = async () => {
+            openAssemblyFileInEditor(defaultCodeFilepath)
+            return
             const codeUrl = `/asm/${defaultCodeFilepath}`;
             const response = await fetch(codeUrl);
             const content = await response.text();
@@ -87,6 +93,15 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         const timer = setTimeout(_fetch, 100);
         return () => clearTimeout(timer);
     }, []);
+
+
+    useEffect(() => {
+        if (editorInitialContent && editorHightLine !== null) {
+            //console.log('editorHightLine:', editorHightLine)
+            highlightLine(editorHightLine)
+        }
+    }, [editorInitialContent, editorHightLine])
+
 
     const handleCompileEditorCode = async () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
@@ -179,13 +194,6 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     }
 
 
-    const openAssemblyFileInEditor = async (filePath: string) => {
-        const response = await fetch(`/asm/${filePath}`);
-        const value = await response.text();
-        setEditorInitialContent(value)
-    }
-
-
     const handleEditorUpdate = (value: string, editor: PrismEditor) => {
         setEditorContent(value);
         setBytecode(null)
@@ -198,6 +206,18 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         setIsFileModalOpen(true)
     }
 
+
+    const highlightLine = (lineNumber: number) => {
+        const textarea = editorRef.current?.textarea;
+        if (!textarea) return;
+
+        const lines = editorContent.split('\n');
+        const start = lines.slice(0, lineNumber - 1).reduce((acc, l) => acc + l.length + 1, 0);
+        const end = start + lines[lineNumber - 1].length;
+
+        textarea.focus();
+        textarea.setSelectionRange(start, end);
+    }
 
 
     return (

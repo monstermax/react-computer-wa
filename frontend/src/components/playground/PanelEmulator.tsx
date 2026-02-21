@@ -34,12 +34,13 @@ export type PanelEmulatorProps = {
     dumpDisk: (diskDevice: DiskDevice | null) => void;
     togglePanelEmulator: () => void;
     togglePanelEditor: () => void;
+    openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>
 }
 
 
 export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
     const { emulator, cyclesCount, registers8, registers16, modifiedRegisters, memory, panelEmulatorHidden, panelEditorHidden, codeMapping } = props;
-    const { dumpRam, dumpMemory, dumpDisk, togglePanelEmulator, togglePanelEditor } = props;
+    const { dumpRam, dumpMemory, dumpDisk, togglePanelEmulator, togglePanelEditor, openAssemblyFileInEditor } = props;
 
     const [preferHdScreen, setPreferHdScreen] = useState(false);
     const [selectedDisk, setselectedDisk] = useState('os_disk');
@@ -178,6 +179,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                                 registers16={registers16}
                                 modifiedRegisters={modifiedRegisters}
                                 codeMapping={codeMapping}
+                                openAssemblyFileInEditor={openAssemblyFileInEditor}
                             />
                         </div>
 
