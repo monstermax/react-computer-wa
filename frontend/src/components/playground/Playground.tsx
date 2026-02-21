@@ -31,6 +31,7 @@ import { DmaDevice } from "@/components/devices/dma";
 import type { u16, u8, u32 } from "@/types/computer.types";
 import { Navbar } from "./Navbar";
 import type { Token } from "@/compiler/compiler_lexer";
+import { toHex } from "@/lib/lib_numbers";
 
 
 
@@ -70,7 +71,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const [panelEditorHidden, setPanelEditorHidden] = useState(false);
 
     const dumpRegisters = async () => {
-        if (!emulator.wasmExports || emulator.computerPointer === null) return;
+        if (!emulator.wasmExports || emulator.computerPointer === null) return null;
 
         const registers8_new = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
         const registers16_new = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
@@ -91,6 +92,12 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         setRegisters8(registers8_new);
         setRegisters16(registers16_new);
         setCyclesCount(cyclesCount_new);
+
+        return {
+            registers8: registers8_new,
+            registers16: registers16_new,
+            cyclesCount: cyclesCount_new,
+        }
     };
 
 
@@ -117,6 +124,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     const [editorInitialContent, setEditorInitialContent] = useState("");
     const [editorHightLine, setEditorHightLine] = useState<number | null>(null);
+    const [editorCurrentFilepath, setEditorCurrentFilepath] = useState<string | null>(null);
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 
 
@@ -352,6 +360,17 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         console.log('AFTER', controlAfter, dataAfter);
 
         dumpRegisters()
+            .then(registers => {
+                if (!registers) return;
+                const { registers16 } = registers;
+                const PC = toHex(Number(registers16.PC), 4);
+                const currentCodeMapped = codeMapping[PC]
+
+                if (currentCodeMapped) {
+                    openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)
+                }
+            })
+
     };
 
 
@@ -365,11 +384,17 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     const openAssemblyFileInEditor = async (filePath: string, selectedLine?: number) => {
-        if (filePath.startsWith('main.asm')) return;
-        const response = await fetch(`/asm/${filePath}`);
-        const value = await response.text();
-        setEditorInitialContent(value)
-        setEditorHightLine(selectedLine ?? null)
+        if (filePath !== editorCurrentFilepath) {
+            if (filePath.startsWith('main.asm')) return;
+            const response = await fetch(`/asm/${filePath}`);
+            const value = await response.text();
+            setEditorCurrentFilepath(filePath)
+            setEditorInitialContent(value)
+        }
+
+        if (selectedLine) {
+            setEditorHightLine(selectedLine)
+        }
     }
 
 

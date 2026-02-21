@@ -1,6 +1,9 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import { Editor, type PrismEditor } from "prism-react-editor";
+import Editor, { useMonaco, type Monaco } from '@monaco-editor/react';
+import { shikiToMonaco } from '@shikijs/monaco'
+import { createHighlighter } from 'shiki'
+
 
 import { toHex } from "@/lib/lib_numbers";
 import { compileCode, compileCodeV2, formatBytecode, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
@@ -10,11 +13,6 @@ import { FileModal } from "./FileModal";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
 import type { EmulatorHook } from "@/hooks/useEmulator";
-
-import "prism-react-editor/prism/languages/nasm";
-import "prism-react-editor/languages/asm";
-import "prism-react-editor/layout.css";
-import "prism-react-editor/themes/github-dark.css";
 import type { Token } from "@/compiler/compiler_lexer";
 
 
@@ -30,7 +28,6 @@ const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 ; IMPORTANT: end with "ret" !
 ; ==                                ==
 `;
-
 
 
 export type PanelEditorProps = {
@@ -53,8 +50,13 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     const { emulator, logs, panelEmulatorHidden, editorInitialContent, editorHightLine, codeMapping } = props;
     const { addLog, togglePanelEmulator, setEditorInitialContent, setEditorHightLine, openAssemblyFileInEditor, updateCodeMapping } = props;
 
+    const monaco = useMonaco();
+
     // ── Editor ──
-    const editorRef = useRef<PrismEditor>(null);
+    const editorRef = useRef<any>(null); // Monaco Editor
+    const monacoRef = useRef<Monaco>(null);
+    const [currentHighlight, setCurrentHighlight] = useState<any[]>([]);
+
     const [machineCode, setMachineCode] = useState<string | null>(null);
     const [machineCodeLabels, setMachineCodeLabels] = useState<string | null>(null);
     const [bytecode, setBytecode] = useState<Map<u16, u8> | null>(null);
@@ -75,6 +77,54 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         //logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); // TODO: a revoir: ca scroll la page entiere, à chaque nouveau caractere
     }, [logs]);
 
+
+    const handleEditorDidMount = async (editor: any, monaco: Monaco) => {
+        editorRef.current = editor;
+        monacoRef.current = monaco;
+
+        const highlighter = await createHighlighter({
+            themes: ['vitesse-dark'],
+            langs: ['asm'],
+        });
+
+        monaco.languages.register({ id: 'asm' });
+        shikiToMonaco(highlighter, monaco);
+    };
+
+
+    const handleEditorWillMount = (monaco: Monaco) => {
+        // Enregistrer un nouveau langage
+        monaco.languages.register({ id: 'asm' });
+
+        // Définir les règles de tokens (c'est un exemple très basique pour illustration)
+        monaco.languages.setMonarchTokensProvider('asm', {
+            keywords: [
+                'section',
+                'mov', 'add', 'sub', 'jmp', 'int', 'push', 'pop', 'call', 'ret',
+                'cmp', 'je', 'jne', 'jg', 'jl', 'jge', 'jle', 'lea'
+            ],
+            registers: /%?[a-z]+/,
+            directives: /^\s*[a-z]+\s/,
+
+            tokenizer: {
+                root: [
+                    [/;.*$/, 'comment'],
+                    [/[a-z_]+(?=\s*:)/, 'tag'],
+                    [/[a-z]+/, { cases: { '@keywords': 'keyword', '@default': 'identifier' } }],
+                    [/\$?[0-9]+/, 'number'],
+                    [/%?[a-z]+/, 'register'],
+                    [/[{}()\[\]]/, '@brackets'],
+                ]
+            },
+        });
+
+        // Définir la configuration (commentaires, brackets, etc.)
+        monaco.languages.setLanguageConfiguration('asm', {
+            comments: { lineComment: ';' },
+            brackets: [['{', '}'], ['[', ']'], ['(', ')']],
+        });
+
+    };
 
 
     // ═══════════════════════════════════════════
@@ -101,7 +151,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     useEffect(() => {
         if (editorInitialContent && editorHightLine !== null) {
             //console.log('editorHightLine:', editorHightLine)
-            highlightLine(editorHightLine)
+            highlightLine(editorHightLine);
         }
     }, [editorInitialContent, editorHightLine])
 
@@ -200,8 +250,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     }
 
 
-    const handleEditorUpdate = (value: string, editor: PrismEditor) => {
-        setEditorContent(value);
+    const handleEditorUpdate = (value: string | undefined, event: any) => {
+        setEditorContent(value ?? '');
         setBytecode(null)
         setCodeLoaded(false)
         setMachineCode(null)
@@ -214,18 +264,26 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
 
     const highlightLine = (lineNumber: number) => {
-        const textarea = editorRef.current?.textarea;
-        if (!textarea) return;
+        const editor = editorRef.current;
+        const monaco = monacoRef.current;
+        if (!monaco) return;
 
-        const lines = editorContent.split('\n');
-        const start = lines.slice(0, lineNumber - 1).reduce((acc, l) => acc + l.length + 1, 0);
-        const lastLine = lines[lineNumber - 1];
-        if (!lastLine) return;
-        const end = start + lastLine.length;
+        // Créer la nouvelle décoration
+        const decorations = [{
+            range: new monaco.Range(lineNumber, 1, lineNumber, 1),
+            options: {
+                isWholeLine: true,
+                className: 'border-l-4 border-blue-500 bg-blue-50/30',
+                //className: 'bg-yellow-500/30',
+            }
+        }];
 
-        textarea.focus();
-        textarea.setSelectionRange(start, end);
-    }
+        const newDecorationIds = editor.deltaDecorations(currentHighlight, decorations);
+        setCurrentHighlight(newDecorationIds);
+
+        //editor.revealLine(lines[0], monaco.editor.ScrollType.Smooth);
+        editor.revealLineInCenter(lineNumber, monaco.editor.ScrollType.Smooth);
+    };
 
 
     return (
@@ -342,13 +400,13 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                 </div>
 
                 <Editor
-                    ref={editorRef}
-                    className=""
-                    language="nasm"
+                    //ref={editorRef}
+                    theme="vs-dark"
+                    defaultLanguage="asm"
                     value={editorInitialContent}
-                    onUpdate={handleEditorUpdate}
-                    tabSize={4}
-                    insertSpaces={true}
+                    onChange={handleEditorUpdate}
+                    beforeMount={handleEditorWillMount}
+                    onMount={handleEditorDidMount}
                 >
                 </Editor>
             </div>
@@ -358,9 +416,9 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                     className="h-full"
                     language="nasm"
                     value={machineCode ?? ''}
-                    tabSize={4}
-                    insertSpaces={true}
-                    readOnly
+                //tabSize={4}
+                //insertSpaces={true}
+                //readOnly
                 >
                 </Editor>
             </div>
@@ -370,9 +428,9 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                     className="h-full"
                     language="nasm"
                     value={machineCodeLabels ?? ''}
-                    tabSize={4}
-                    insertSpaces={true}
-                    readOnly
+                //tabSize={4}
+                //insertSpaces={true}
+                //readOnly
                 >
                 </Editor>
             </div>

@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { compileCodeV2, compileFileV2, formatBytecode, getAssemblyCodeMapping } from "@/compiler/compiler_utils";
 import { toHex } from "@/lib/lib_numbers";
