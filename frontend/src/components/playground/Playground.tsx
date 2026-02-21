@@ -165,8 +165,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
         const sourceCode = await loadSourceCodeFromFile(bootloaderFileUrl);
 
-        const compiled = await compileCode(sourceCode, { startAddress: MEMORY_MAP.ROM_START, architecture: CUSTOM_CPU });
-        //const compiled = await compileCodeV2(sourceCode, bootloaderFileUrl, { startAddress: MEMORY_MAP.ROM_START });
+        //const compiled = await compileCode(sourceCode, { startAddress: MEMORY_MAP.ROM_START, architecture: CUSTOM_CPU });
+        const compiled = await compileCodeV2(sourceCode, bootloaderFileUrl, { startAddress: MEMORY_MAP.ROM_START });
 
         if (compiled.errors.length > 0) {
             const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');

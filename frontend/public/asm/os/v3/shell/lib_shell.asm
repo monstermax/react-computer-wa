@@ -27,7 +27,7 @@ section .data
     STR_RUN_COMMAND       db "Running command...", 13, 0
     STR_COMMAND_NOT_FOUND db "Command not found", 13, 0
     STR_COMMAND_HELP_TEST db "Commands:", 13
-                          db " - help (0) : Print help message (this message)", 13
+                          db " - help (0) : Print help message (this message)", 13 ; test
                           db " - halt (7) : Halt the computer", 13
                           db " - reboot : Reboot the computer ( /!\ buggy )", 13
                           db " - leds (4) : Toggle LEDs", 13

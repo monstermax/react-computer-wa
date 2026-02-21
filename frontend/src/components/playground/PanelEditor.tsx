@@ -20,7 +20,9 @@ import "prism-react-editor/themes/github-dark.css";
 const defaultLoadAddress = '0xA000';
 
 //const defaultCodeFilepath = "user/examples/draw_fractal_on_screen.asm";
-const defaultCodeFilepath = "user/tests/lcd_test.asm";
+//const defaultCodeFilepath = "user/tests/lcd_test.asm";
+//const defaultCodeFilepath = "bootloader/bootloader_v2.asm";
+const defaultCodeFilepath = "os/os_v3.asm";
 
 const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 ; Type "custom" in the shell to run it.
@@ -101,8 +103,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         try {
             addLog(`Compiling user code... (target @ ${toHex(addr, 4)})`);
 
-            const compiled = await compileCode(editorContent, { startAddress: addr, architecture: CUSTOM_CPU });
-            //const compiled = await compileCodeV2(editorContent, undefined, { startAddress: addr, architecture: CUSTOM_CPU });
+            //const compiled = await compileCode(editorContent, { startAddress: addr, architecture: CUSTOM_CPU });
+            const compiled = await compileCodeV2(editorContent, undefined, { startAddress: addr, architecture: CUSTOM_CPU });
 
             if (compiled.errors.length > 0) {
                 //const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');

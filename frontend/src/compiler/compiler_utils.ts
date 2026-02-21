@@ -7,6 +7,7 @@ import type { CompiledProgram, CompilerOptions, CPUArchitecture } from "@/types/
 import type { u16, u8 } from "@/types/computer.types";
 import { assembleSourceCode, parseSourceCode, parseSourceCodeFile, type ParsedFile } from "./precompiler";
 import { CompilerV2 } from "./compiler.v2";
+import { toHex } from "@/lib/lib_numbers";
 
 
 export let compilationAsmBaseUrl = '';
@@ -118,8 +119,8 @@ export function formatBytecode(program: CompiledProgram): string {
         lines.push(`\n// Section: ${section.name}`);
 
         for (const entry of section.data) {
-            const hexAddr = `0x${entry.address.toString(16).padStart(4, '0').toUpperCase()}`;
-            const hexValue = `0x${entry.value.toString(16).padStart(2, '0').toUpperCase()}`;
+            const hexAddr = toHex(entry.address, 4);
+            const hexValue = entry.value === null ? null : toHex(entry.value); // note: ne devrait pas etre null (sauf pour des cas de debug temporaires)
 
             let line = `    [${hexAddr}, ${hexValue}],`;
 

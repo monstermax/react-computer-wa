@@ -2,7 +2,7 @@ import { Lexer, type Token, type TokenType } from './compiler_lexer';
 
 import { toHex } from '@/lib/lib_numbers';
 
-import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant, CompileInstruction, Label } from '@/types/compiler.types';
+import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEntry, SymbolInfo, CompilerError, ParsedOperand, InstructionDef, InstructionVariant, CompileInstruction, Label, MemoryExprTerm } from '@/types/compiler.types';
 import type { u16 } from '@/types/computer.types';
 
 
@@ -23,7 +23,7 @@ export class CompilerV2 {
     private labels: Map<string, Label> = new Map(); // Label definitions with their addresses and optional data values
     private symbols: Map<string, SymbolInfo> = new Map(); // Symbol table for labels and variables
     private comments: Map<number, string> = new Map(); // Comments associated with specific addresses
-    private debugAddresses: Map<number, number> = new Map();
+    private debugAddresses: Map<string, number> = new Map();
 
     // Forward references to resolve after pass1
     private unresolvedRefs: Array<{
@@ -156,24 +156,34 @@ export class CompilerV2 {
         //console.log('currentAddress after pass1:', currentAddressAfterPass1)
 
 
-//console.log('tokens:', this.tokens)
+        //console.log('tokens:', this.tokens)
 
         // Reset for pass 2
         this.dispatchTokens();
 
-console.log('.data', this.sections.get('.data'))
-console.log('.text', this.sections.get('.text'))
-console.log('tokens:', this.tokens)
-//throw new Error('DEBUG')
+        console.log('.NONE', this.sections.get(''))
+        console.log('.data', this.sections.get('.data'))
+        console.log('.text', this.sections.get('.text'))
+        console.log('tokens:', this.tokens)
+        //throw new Error('DEBUG')
 
         // Pass 2: generate actual machine code
         this.pass2GenerateCode();
         const currentAddressAfterPass2 = this.currentAddress;
         //console.log('currentAddress after pass2:', currentAddressAfterPass2)
 
+        console.log('.NONE', this.sections.get(''))
+        console.log('.data', this.sections.get('.data'))
+        console.log('.text', this.sections.get('.text'))
+
         if (currentAddressAfterPass1 !== currentAddressAfterPass2) {
-            throw new Error(`addresses count mismatch (step1=${currentAddressAfterPass1} vs step2=${currentAddressAfterPass2}).`);
+            console.warn(`addresses count mismatch (step1 = ${toHex(currentAddressAfterPass1, 4)} (${currentAddressAfterPass1}) vs step2 = ${toHex(currentAddressAfterPass2, 4)} (${currentAddressAfterPass2})).`);
+            debugger
+            //throw new Error(`addresses count mismatch (step1=${currentAddressAfterPass1} vs step2=${currentAddressAfterPass2}).`);
         }
+
+
+        this.resolveLabels();
 
         // Resolve forward references
         this.resolveReferences();
@@ -216,7 +226,7 @@ console.log('tokens:', this.tokens)
         // called by compile
 
         const tokens: Token[] = [];
-        const sectionsNames = [ '.text', '.data', '.bss'];
+        const sectionsNames = ['.text', '.data', '.bss', ''];
 
         for (const sectionName of sectionsNames) {
             const section = this.sections.get(sectionName);
@@ -263,6 +273,7 @@ console.log('tokens:', this.tokens)
             if (token.type === 'LABEL') {
                 // example => "main:"
                 const labelName = token.value;
+                lastInstructionOrIdentifierPos = this.pos;
 
                 this.labels.set(labelName, {
                     section: this.currentSectionName,
@@ -281,6 +292,26 @@ console.log('tokens:', this.tokens)
 
                 this.advance();
                 this.skip('COLON');
+
+                this.appendInstructionCommentAndNewline()
+
+                const instructionData: CompileInstruction = {
+                    section: this.currentSectionName,
+                    type: token.type as 'LABEL',
+                    instruction: token.value,
+                    step1Address: this.currentAddress,
+                    size: 0,
+                    startPos: lastInstructionOrIdentifierPos,
+                    endPos: this.pos,
+                    tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos + 1),
+                };
+
+                //console.log("New Instruction:", instructionData);
+                if (!this.currentSection) throw new Error(`Missing currentSection`);
+                this.currentSection.compileInstructions.push(instructionData);
+
+                //if (token.value === 'sprite_sonic') debugger;
+
                 continue;
             }
 
@@ -294,8 +325,10 @@ console.log('tokens:', this.tokens)
                 const size = this.calculateInstructionSize();
 
                 //console.log(`[pass1] ${token.value} at ${this.currentAddress}, size=${size}`);
-                this.debugAddresses.set(this.currentAddress, size)
+
                 this.currentAddress += size;
+
+                this.debugAddresses.set(`${token.file}:${token.line}:${token.column}`, size)
 
                 this.appendInstructionCommentAndNewline()
 
@@ -307,7 +340,7 @@ console.log('tokens:', this.tokens)
                     size,
                     startPos: lastInstructionOrIdentifierPos,
                     endPos: this.pos,
-                    tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+                    tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos + 1),
                 };
 
                 //if (this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1)[0].line === 66) debugger;
@@ -324,6 +357,8 @@ console.log('tokens:', this.tokens)
             if (token.type === 'IDENTIFIER') {
                 // example => "my_var db 0x12"
                 const next = this.peek(1);
+
+                //if (token.value === 'STR_COMMAND_HELP_TEST') debugger;
 
                 if (next?.type === 'DIRECTIVE') {
                     const directiveToken = next;
@@ -348,18 +383,20 @@ console.log('tokens:', this.tokens)
                         });
 
                         this.symbols.set(varName, {
-                            //address: valueStartAddress,
                             address: valueStartAddress,
                             section: this.currentSectionName,
                             type: 'variable',
                         });
+                        if (directive === 'RESB') debugger
 
                         this.advance(); // passe l'IDENTIFIER... pour arriver sur la DIRECTIVE
 
                         const size = this.calculateDataSize(itemSize);
                         this.currentAddress += size;
 
-                        this.advance();  // Passe la DIRECTIVE
+                        this.debugAddresses.set(`${directiveToken.file}:${directiveToken.line}:${directiveToken.column}`, size)
+
+                        //this.advance();  // Passe la DIRECTIVE
 
 
                         const label = this.labels.get(varName);
@@ -371,30 +408,45 @@ console.log('tokens:', this.tokens)
 
                         // Parcourt les données de la directive (EQU/DB/DW/DD/DQ/RESB/RESW/RESD/RESQ)
                         while (!this.isAtEnd()) {
-                            const t = this.peek();
+                            //const t = this.peek();
+                            const nextAfter = this.peek(1);
 
-                            if (['COMMA'].includes(t.type)) {
+                            if (['COMMA'].includes(nextAfter.type)) {
                                 this.advance();
 
-                            } else if (['STRING', 'NUMBER'].includes(t.type)) {
+                            } else if (['STRING', 'NUMBER'].includes(nextAfter.type)) {
                                 this.advance();
 
-                                //label.immValue = t.value
+                                label.immValue = nextAfter.value
 
-                            } else if (t.type === 'IDENTIFIER') {
+                            } else if (nextAfter.type === 'IDENTIFIER') {
                                 // Reference to another identifier (e.g., _R equ COL_RED)
-                                const nextAfter = this.peek(1);
+                                const twoAfter = this.peek(2);
 
                                 // Stop if this identifier starts a new declaration (e.g., "other_var db ...")
-                                if (nextAfter.type === 'DIRECTIVE') break; // TODO: a verifier. est-ce que qui empecher les directive multilignes (ex sprite_mario) de fonctionner sans patch dédié ?
+                                if (twoAfter.type === 'DIRECTIVE') {
+                                    //throw new Error("debug me: pass1CollectSymbols (1)")
+                                    break;
+                                }
 
                                 this.advance();
 
                                 //if (!label.values) label.values = [];
                                 //label.values.push(t.value)
-                                label.immValue = t.value;
+                                label.immValue = nextAfter.value;
+
+                            } else if (['COMMENT', 'NEWLINE'].includes(nextAfter.type)) {
+                                this.advance();
+
+                            } else if (['LABEL', 'EOF'].includes(nextAfter.type)) {
+                                break;
+
+                            } else if (['DIRECTIVE'].includes(nextAfter.type)) {
+                                break;
+                                //this.advance();
 
                             } else {
+                                throw new Error(`debug me: pass1CollectSymbols (2) : ${nextAfter.type}`)
                                 break;
                             }
                         }
@@ -411,7 +463,7 @@ console.log('tokens:', this.tokens)
                             size,
                             startPos: lastInstructionOrIdentifierPos,
                             endPos: this.pos,
-                            tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+                            tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos + 1),
                         };
 
                         //if (this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1)[0].line > 40) debugger;
@@ -428,7 +480,7 @@ console.log('tokens:', this.tokens)
 
             if (token.type === 'NEWLINE') {
                 this.advance();
-                lastInstructionOrIdentifierAddress = null;
+                //lastInstructionOrIdentifierAddress = null;
                 continue;
             }
 
@@ -438,7 +490,7 @@ console.log('tokens:', this.tokens)
                     this.comments.set(lastInstructionOrIdentifierAddress, token.value);
                 }
                 this.advance();
-                lastInstructionOrIdentifierAddress = null;
+                //lastInstructionOrIdentifierAddress = null;
                 continue;
             }
 
@@ -503,15 +555,15 @@ console.log('tokens:', this.tokens)
 
             if (sectionName === '.DATA' || sectionName === 'DATA') {
                 this.setCurrentSection(".data")
-                console.log(`[STEP1] new section : ".data" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //console.log(`[STEP1] new section : ".data" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.BSS' || sectionName === 'BSS') {
                 this.setCurrentSection(".bss")
-                console.log(`[STEP1] new section : ".bss" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //console.log(`[STEP1] new section : ".bss" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.TEXT' || sectionName === 'TEXT') {
                 this.setCurrentSection(".text")
-                console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
                 this.skip('STRING')
@@ -537,7 +589,7 @@ console.log('tokens:', this.tokens)
                 size: 0,
                 startPos: lastInstructionOrIdentifierPos,
                 endPos: this.pos,
-                tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+                tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos + 1),
             };
 
             //console.log("New Instruction:", instructionData);
@@ -620,6 +672,35 @@ console.log('tokens:', this.tokens)
             const size = this.calculateDataSize(itemSize)
             this.currentAddress += size;
 
+            this.debugAddresses.set(`${token.file}:${token.line}:${token.column}`, size)
+
+            //this.advance(); // consume the directive
+
+            while (!this.isAtEnd()) {
+                //const t = this.peek();
+                const nextAfter = this.peek(1);
+
+                if (['STRING', 'NUMBER', 'IDENTIFIER', 'COMMA', 'COMMENT', 'NEWLINE'].includes(nextAfter.type)) {
+                    // For IDENTIFIER, stop if it starts a new declaration
+                    if (nextAfter.type === 'IDENTIFIER') {
+                        const twoAfter = this.peek(2);
+                        if (twoAfter.type === 'DIRECTIVE') break;
+                    }
+
+                    this.advance();
+
+                } else if (nextAfter.type === 'DIRECTIVE') {
+                    break;
+
+                } else if (nextAfter.type === 'LABEL') {
+                    break;
+
+                } else {
+                    throw new Error("edit me")
+                    break;
+                }
+            }
+
             this.appendInstructionCommentAndNewline()
 
             const instructionData: CompileInstruction = {
@@ -630,30 +711,13 @@ console.log('tokens:', this.tokens)
                 size,
                 startPos: lastInstructionOrIdentifierPos,
                 endPos: this.pos,
-                tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos+1),
+                tokens: this.tokens.slice(lastInstructionOrIdentifierPos, this.pos + 1),
             };
 
             //console.log("New Instruction:", instructionData);
             if (!this.currentSection) throw new Error(`Missing currentSection`);
             this.currentSection.compileInstructions.push(instructionData);
 
-
-            this.advance(); // consume the directive
-
-            // Skip over the values (they'll be processed in pass2)
-            while (!this.isAtEnd()) {
-                const t = this.peek();
-                if (['STRING', 'NUMBER', 'IDENTIFIER', 'COMMA'].includes(t.type)) {
-                    // For IDENTIFIER, stop if it starts a new declaration
-                    if (t.type === 'IDENTIFIER') {
-                        const nextAfter = this.peek(1);
-                        if (nextAfter.type === 'DIRECTIVE') break;
-                    }
-                    this.advance();
-                } else {
-                    break;
-                }
-            }
             return;
         }
 
@@ -669,7 +733,7 @@ console.log('tokens:', this.tokens)
     private appendInstructionCommentAndNewline() {
         const currentToken = this.peek();
 
-        if (! ['EOF', 'NEWLINE'].includes(currentToken.type)) {
+        if (!['EOF', 'NEWLINE'].includes(currentToken.type)) {
             // on cherche le NEWLINE ou EOF suivant et on l'ajoute
 
             let nextToken = this.peek(1);
@@ -723,7 +787,7 @@ console.log('tokens:', this.tokens)
 
         while (true) {
             const token = this.peek(offset);
-            if (!token || token.type === 'EOF') break;
+            if (!token || ['EOF', 'NEWLINE', 'COMMENT'].includes(token.type)) break;
 
             if (token.type === 'INSTRUCTION' || token.type === 'LABEL') break;
 
@@ -747,6 +811,7 @@ console.log('tokens:', this.tokens)
                 offset++;
 
             } else {
+                throw new Error("edit me: calculateDataSize");
                 break;
             }
         }
@@ -774,14 +839,40 @@ console.log('tokens:', this.tokens)
             // DIRECTIVE: Process section switches and directives
             if (token.type === 'DIRECTIVE') {
                 // example => "section .text"
+                const addressBefore = this.currentAddress;
                 this.handleDirectivePass2();
+
+                const size = this.currentAddress - addressBefore; // TODO: comparer avec la size du step1
+                const debugAddress = this.debugAddresses.get(`${token.file}:${token.line}:${token.column}`)
+
+                if (debugAddress === undefined) {
+                    //throw new Error("debugAddress not found");
+                }
+
+                if (debugAddress !== size) {
+                    //throw new Error(`debugAddress size mismatch : debugAddress=${debugAddress} VS size=${size}`);
+                }
                 continue;
             }
 
             // LABEL: Skip labels (already processed in pass1)
             if (token.type === 'LABEL') {
                 // example => "main:"
-                throw new Error("edit it ?");
+
+                const debugAddress = this.debugAddresses.get(`${token.file}:${token.line}:${token.column}`)
+
+                if (debugAddress === undefined) {
+                    //throw new Error("debugAddress not found");
+                }
+
+                if (debugAddress !== 1) {
+                    //throw new Error(`debugAddress size mismatch : debugAddress=${debugAddress} VS size=${size}`);
+                }
+
+                const label = this.labels.get(token.value)
+                if (!label) throw new Error(`missing label "${token.value}"`)
+                label.address = this.currentAddress as u16;
+
                 this.advance();
                 this.skip('COLON');
                 continue;
@@ -791,6 +882,11 @@ console.log('tokens:', this.tokens)
             if (token.type === 'IDENTIFIER') {
                 // example => "LEDS_BASE db 0x00"
                 const next = this.peek(1);
+
+                const label = this.labels.get(token.value)
+                if (!label) throw new Error(`missing label "${token.value}"`)
+                label.address = this.currentAddress as u16;
+                const addressBefore = this.currentAddress as u16;
 
                 if (next?.type === 'DIRECTIVE') {
                     const directive = this.normalize(next.value);
@@ -813,6 +909,19 @@ console.log('tokens:', this.tokens)
                         throw new Error("unknown identifier+directive case")
                     }
 
+                    const size = this.currentAddress - addressBefore; // TODO: comparer avec la size du step1
+
+                    const debugAddress = this.debugAddresses.get(`${next.file}:${next.line}:${next.column}`)
+
+                    if (debugAddress === undefined) {
+                        throw new Error("debugAddress not found");
+                    }
+
+                    if (debugAddress !== size) {
+                        throw new Error(`debugAddress size mismatch : debugAddress=${debugAddress} VS size=${size}`);
+                    }
+
+
                     this.skip('COMMENT')
                     this.skip('NEWLINE')
                     this.skip('EOF')
@@ -827,20 +936,18 @@ console.log('tokens:', this.tokens)
                 const addressBefore = this.currentAddress;
                 this.generateInstruction();
 
-                const size = this.currentAddress - addressBefore;
+                const size = this.currentAddress - addressBefore; // TODO: comparer avec la size du step1
 
-                // TODO: ce code ne fonctionne plus depuis compiler V2
+                const debugAddress = this.debugAddresses.get(`${token.file}:${token.line}:${token.column}`)
 
-                //console.log(`[pass2] ${token.value} at ${before}, emitted=${size}`);
-                const expectedSize = this.debugAddresses.get(addressBefore)
-
-                if (expectedSize === undefined) {
-
-                } else if (expectedSize !== size) {
-                    //const currentLineTokens = this.extractCurrentLine()
-                    //console.log('currentLineTokens:', currentLineTokens)
-                    //throw new Error(`Emitted size mismatch (${expectedSize} vs ${size}) at address ${addressBefore} (instruction "${token.value}")`);
+                if (debugAddress === undefined) {
+                    throw new Error("debugAddress not found");
                 }
+
+                if (debugAddress !== size) {
+                    throw new Error(`debugAddress size mismatch : debugAddress=${debugAddress} VS size=${size}`);
+                }
+
 
                 this.skip('COMMENT')
                 this.skip('NEWLINE')
@@ -892,12 +999,12 @@ console.log('tokens:', this.tokens)
             if (sectionName === '.DATA' || sectionName === 'DATA') {
                 //this.currentSectionName = '.data';
                 this.setCurrentSection('.data')
-                console.log(`[STEP2] new section : ".data" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //console.log(`[STEP2] new section : ".data" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.BSS' || sectionName === 'BSS') {
                 //this.currentSectionName = '.bss';
                 this.setCurrentSection('.bss')
-                console.log(`[STEP2] new section : ".bss" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //console.log(`[STEP2] new section : ".bss" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
             } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
                 this.advance()
@@ -906,7 +1013,7 @@ console.log('tokens:', this.tokens)
             } else {
                 //this.currentSectionName = '.text';
                 this.setCurrentSection('.text')
-                console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
+                //console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
             }
 
             const section = this.sections.get(this.currentSectionName);
@@ -921,10 +1028,10 @@ console.log('tokens:', this.tokens)
 
                     section.startAddress = this.currentAddress;
 
-//                    if (this.currentAddress !== section.startAddress) {
-//                        const token = this.peek();
-//                        throw new Error(`address mismatch : ${this.currentAddress} !== ${section.startAddress}`);
-//                    }
+                    //                    if (this.currentAddress !== section.startAddress) {
+                    //                        const token = this.peek();
+                    //                        throw new Error(`address mismatch : ${this.currentAddress} !== ${section.startAddress}`);
+                    //                    }
                 }
 
             } else {
@@ -954,10 +1061,12 @@ console.log('tokens:', this.tokens)
 
         // Handle bare data directives (DB/DW/DD/DQ without preceding identifier)
         if (['DB', 'DW', 'DD', 'DQ'].includes(directive)) {
-            throw new Error('code utile ?')
+            //throw new Error('code utile ?') // oui
             this.generateData(undefined, directive, directiveToken);
             return;
         }
+
+        throw new Error(`case not handled. directive ${directiveToken.value}`)
 
         this.advance();
     }
@@ -993,33 +1102,45 @@ console.log('tokens:', this.tokens)
 
                 // Sinon, c'est une référence à un label
 
+                //if (1) throw new Error('utile ?') // oui
+
+                const tokenValue = token.value;
+
                 // Emit label address as data (or EQU value if it's a constant)
                 const labelInfo = this.labels.get(token.value);
 
                 if (labelInfo !== undefined) {
                     // EQU constant: resolve the value (possibly chained)
-                    if (labelInfo.dataSize === 0 && labelInfo.values && labelInfo.values.length > 0) {
-                        debugger
-                        const resolvedEquValue = this.resolveEquValue(labelInfo.values[0]);
+                    if (labelInfo.dataSize === 0 && labelInfo.immValue !== undefined) {
+                        //debugger
+                        const resolvedEquValue = this.resolveEquValue(labelInfo.immValue);
 
                         for (let i = 0; i < itemSize; i++) {
-                            //const defaultComment = `${token.value} = ${toHex(resolvedEquValue)} (${resolvedEquValue})`;
-                            //this.emitByte((resolvedEquValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
-
-                            const defaultComment = `${token.value} = ${token.value})`;
-                            this.emitByte((resolvedLabels: number) => (resolvedEquValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken, false, token.value);
-                            //this.emitByte((resolvedLabels: Map<string, number>) => (resolvedEquValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken, false, token.value);
+                            const defaultComment = `${token.value} = ${toHex(resolvedEquValue)} (${resolvedEquValue})`;
+                            this.emitByte((resolvedEquValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
                         }
 
                     } else {
                         // Regular label: emit its address
+
                         for (let i = 0; i < itemSize; i++) {
                             const defaultComment = i === 0
-                                ? `low  byte of label ${token.value} = ${labelInfo.address}`
-                                : `high byte of label ${token.value} = ${labelInfo.address}`
+                                ? `low  byte of label ${tokenValue} = ${labelInfo.address}`
+                                : `high byte of label ${tokenValue} = ${labelInfo.address}`
 
                             //this.emitByte((labelInfo.addressStep2 >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken);
-                            this.emitByte((resolvedValue: number) => (resolvedValue >> (i * 8)) & 0xFF, comment || defaultComment, refInstrToken, false, token.value);
+
+                            console.log(`defer known label "${token.value}"`)
+
+                            const resolver = () => {
+                                const label = this.labels.get(tokenValue);
+                                console.log(`resolve label ${label}`)
+                                if (!label) throw new Error("missing label");
+                                if (!label.address) throw new Error("missing label address");
+                                return (label.address >> (i * 8)) & 0xFF;
+                            }
+
+                            this.emitByte(resolver, comment || defaultComment, refInstrToken, false);
                         }
                     }
 
@@ -1034,8 +1155,19 @@ console.log('tokens:', this.tokens)
                         size: itemSize,
                     });
 
+                    console.log(`defer unresolved label "${token.value}"`)
+
                     for (let i = 0; i < itemSize; i++) {
-                        this.emitByte((resolvedValue: number) => 0, comment, refInstrToken, false, token.value);
+
+                        const resolver = () => {
+                            const label = this.labels.get(tokenValue);
+                            console.log(`resolve label ${label}`)
+                            if (!label) throw new Error("missing label");
+                            if (!label.address) throw new Error("missing label address");
+                            return (label.address >> (i * 8)) & 0xFF;
+                        }
+
+                        this.emitByte(resolver, comment, refInstrToken, false);
                     }
                 }
 
@@ -1044,7 +1176,7 @@ console.log('tokens:', this.tokens)
             } else if (token.type === 'STRING') {
                 // Emit string as ASCII bytes
                 for (let i = 0; i < token.value.length; i++) {
-                    this.emitByte((resolvedValue: number) => token.value.charCodeAt(i), comment || `'${token.value[i]}'`, refInstrToken, false);
+                    this.emitByte(token.value.charCodeAt(i), comment || `'${token.value[i]}'`, refInstrToken, false);
                 }
 
                 this.advance();
@@ -1062,15 +1194,19 @@ console.log('tokens:', this.tokens)
 
 
                     const byte = (value >> (i * 8)) & 0xFF;
-                    this.emitByte((resolvedValue: number) => byte, comment || defaultComment || (i === 0 ? token.value : undefined), refInstrToken, false);
+                    this.emitByte(byte, comment || defaultComment || (i === 0 ? token.value : undefined), refInstrToken, false);
                 }
 
                 this.advance();
 
-            } else if (token.type === 'COMMA') {
+            } else if (['COMMA', 'COMMENT', 'NEWLINE'].includes(token.type)) {
                 this.advance();
 
+            } else if (['EOF', 'DIRECTIVE', 'LABEL'].includes(token.type)) {
+                break;
+
             } else {
+                throw new Error("debug me: generateData")
                 break;
             }
         }
@@ -1087,7 +1223,7 @@ console.log('tokens:', this.tokens)
             const count = this.parseNumber(this.peek().value);
 
             for (let i = 0; i < count; i++) {
-                this.emitByte((resolvedValue: number) => 0, comment || 'reserved space', refInstrToken);
+                this.emitByte(0, comment || 'reserved space', refInstrToken);
             }
 
             this.advance();
@@ -1125,7 +1261,7 @@ console.log('tokens:', this.tokens)
 
         // Emit opcode byte
         const comment = this.comments.get(this.currentAddress);
-        this.emitByte((resolvedValue: number) => variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), instrToken, true);
+        this.emitByte(variant.opcode, variant.mnemonic + (comment ? ` ${comment}` : ''), instrToken, true);
 
         // Emit operand bytes
         this.emitOperands(operands, variant, instrToken);
@@ -1148,7 +1284,9 @@ console.log('tokens:', this.tokens)
 
             if (part === 'IMM8') {
                 // 8-bit immediate value
-                const value = op.address !== undefined
+                if (op.address === undefined) throw new Error("debug me: emitOperands")
+
+                const value = (op.address !== undefined) // TODO: a préciser
                     ? op.address
                     : this.parseNumber(op.value);
 
@@ -1156,33 +1294,132 @@ console.log('tokens:', this.tokens)
                     throw new Error("edit me emitOperands (1)");
                 }
 
-                this.emitByte((resolvedValue: number) => value & 0xFF, op.value, refInstrToken, false);
+                this.emitByte(value & 0xFF, op.value, refInstrToken, false);
 
             } else if (part === 'IMM16' || part === 'MEM') {
                 // 16-bit immediate or memory address
-                let value: number = 0;
+                let value: number | (() => number) = 0;
+                let labelRef: string | null = null
+                let valueLow: (() => number) = () => 0;
+                let valueHigh: (() => number) = () => 0;
 
                 if (op.type === 'MEMORY' && op.address !== undefined) {
+
+                    if (op.memoryExpr && op.memoryExpr.some(t => t.labelName)) {
+                        // Expression avec au moins un label → resolver lazy
+                        const expr = op.memoryExpr;
+
+                        //console.log('parsing memoryExpr:', op.memoryExpr)
+
+                        const resolver = () => {
+                            if (!labelRef) throw new Error(`missing label "${labelRef}"`)
+
+                            // parse expression
+                            let result = 0;
+                            //console.log(`start parsing expression for operands:`, operands)
+
+                            for (const term of expr) {
+                                let termValue: number;
+
+                                if (term.labelName) {
+                                    const label = this.labels.get(term.labelName);
+                                    if (!label) throw new Error(`Missing label "${term.labelName}"`);
+                                    if (label.address === null) throw new Error(`Label "${term.labelName}" has no address`);
+                                    termValue = label.address;
+
+                                } else {
+                                    termValue = term.offset; // constante numérique ou EQU déjà résolu
+                                }
+
+                                result = (term.op === '+') ? result + termValue : result - termValue;
+                                //console.log('tmp result:', result)
+                            }
+
+                            return result;
+                        }
+
+                        labelRef = op.value; // pour le commentaire
+
+                        valueLow  = () => (resolver() & 0xFF);
+                        valueHigh = () => ((resolver() >> 8) & 0xFF);
+
+                    } else if (op.address) {
+                        // Expression purement numérique (pas de label), déjà résolue
+                        value = op.address;
+
+                    } else {
+                        throw new Error()
+                    }
+
+                    //console.log('labelRef (mem):', labelRef, value)
+
+                    /*
                     // Address already resolved by parseMemoryOperand (handles expressions like [label + 1])
                     if (op.address === null) {
                         throw new Error("edit me emitOperands (2)");
                     }
-                    value = op.address;
+                    //value = op.address;
+
+                    console.log('labelRef (mem):', op.value)
+                    const opValue = op.value;
+                    labelRef = op.value;
+
+                    const resolver = () => {
+                        if (!labelRef) throw new Error(`missing label "${labelRef}"`)
+                        const label = this.labels.get(opValue)
+                        if (!label) throw new Error(`missing label "${labelRef}"`)
+                        if (!label.address) throw new Error(`missing label "${labelRef}" address`)
+
+                        return label.address
+                    }
+
+                    value = resolver
+
+                    // TODO: probleme ici: il faut pouvoir parser les expressions, comme dans parseMemoryTerm
+                    */
 
                 } else if (op.type === 'LABEL') {
+                    // example: "call print_something"
                     const labelInfo = this.labels.get(op.value);
-                    const labelSection = this.sections.get(labelInfo?.section || '.none')
 
-                    if (labelInfo !== undefined && labelSection !== undefined) {
-                        if (labelInfo.dataSize === 0 /* && labelInfo.values */) {
-                            //value = this.resolveEquValue(labelInfo.values[0]);
+                    if (labelInfo !== undefined) {
+                        if (labelInfo.dataSize === 0 && labelInfo.immValue !== undefined) {
+                            value = this.resolveEquValue(labelInfo.immValue);
                             debugger;
                             throw new Error("edit me emitOperands (3)");
 
                         } else {
-                            debugger;
-                            throw new Error("edit me emitOperands (3)");
+                            //debugger;
+                            //throw new Error("edit me emitOperands (3b)");
                             //value = labelInfo.addressStep2;
+                            //console.log('labelRef (label):', labelRef)
+                            const opValue = op.value;
+                            labelRef = op.value;
+
+                            const resolver = () => {
+                                if (!labelRef) throw new Error(`missing label "${labelRef}"`)
+                                const label = this.labels.get(opValue);
+                                if (!label) throw new Error(`missing label "${labelRef}"`)
+                                if (!label.address) throw new Error(`missing label "${labelRef}" address`)
+                                return label.address
+                            }
+
+                            //valueLow  = () => (resolver() & 0xFF);
+                            //valueHigh = () => ((resolver() >> 8) & 0xFF);
+
+                            valueLow  = () => {
+                                const resolved = resolver();
+                                const value = (resolved) & 0xFF
+                                //console.log(`low value of ${resolved} => ${value}`)
+                                return value
+                            };
+
+                            valueHigh = () => {
+                                const resolved = resolver();
+                                const value = (resolved >> 8) & 0xFF
+                                //console.log(`high value of ${resolved} => ${value}`)
+                                return value
+                            };
                         }
 
                     } else {
@@ -1197,6 +1434,7 @@ console.log('tokens:', this.tokens)
                 } else if (op.type === 'MEMORY') {
                     // Fallback: no address resolved yet (shouldn't happen after parseMemoryOperand fix)
                     const label = this.labels.get(op.value);
+                    if (1) throw new Error('utile ?')
 
                     if (!label) {
                         throw new Error(`Missing label "${op.value}"`);
@@ -1222,16 +1460,34 @@ console.log('tokens:', this.tokens)
                     value = this.parseNumber(op.value);
                 }
 
-                const commentPrefix = `${isNaN(Number(op.value)) ? `${op.value} = ` : ''}${toHex(value)} (${value})`;
 
-                if (this.arch.endianness === 'little') {
-                    this.emitByte((resolvedValue: number) => value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
-                    this.emitByte((resolvedValue: number) => (value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
+                if (labelRef || typeof value !== 'number') {
+                    if (!labelRef) throw new Error(`missing label "${labelRef}"`)
+
+                    const commentPrefix = `${isNaN(Number(op.value)) ? `${op.value} = ` : ''}${labelRef}`;
+
+                    if (this.arch.endianness === 'little') {
+                        this.emitByte(valueLow,  `${commentPrefix} (low byte little)  - defer "${labelRef}`, refInstrToken, false);
+                        this.emitByte(valueHigh, `${commentPrefix} (high byte little) - defer "${labelRef}`, refInstrToken, false);
+
+                    } else {
+                        this.emitByte(valueHigh, `${commentPrefix} (high byte big) - defer "${labelRef}`, refInstrToken, false);
+                        this.emitByte(valueLow,  `${commentPrefix} (low byte big)  - defer "${labelRef}`, refInstrToken, false);
+                    }
 
                 } else {
-                    this.emitByte((resolvedValue: number) => (value >> 8) & 0xFF, `${commentPrefix} (high byte)`, refInstrToken);
-                    this.emitByte((resolvedValue: number) => value & 0xFF, `${commentPrefix} (low byte)`, refInstrToken);
+                    const commentPrefix = `${isNaN(Number(op.value)) ? `${op.value} = ` : ''}${toHex(value)} (${value})`;
+
+                    if (this.arch.endianness === 'little') {
+                        this.emitByte(value & 0xFF, `${commentPrefix} (low byte little)`, refInstrToken, false);
+                        this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte little)`, refInstrToken, false);
+                    } else {
+
+                        this.emitByte(value & 0xFF, `${commentPrefix} (low byte big)`, refInstrToken, false);
+                        this.emitByte((value >> 8) & 0xFF, `${commentPrefix} (high byte big)`, refInstrToken, false);
+                    }
                 }
+
 
             } else if (part === 'REG') {
                 let value = 0;
@@ -1267,7 +1523,7 @@ console.log('tokens:', this.tokens)
 
                 if (value !== 0) {
                     const commentPrefix = `Register ${reg}`;
-                    this.emitByte((resolvedValue: number) => value, `${commentPrefix}`, refInstrToken);
+                    this.emitByte(value, `${commentPrefix}`, refInstrToken);
                 }
 
             } else {
@@ -1315,7 +1571,7 @@ console.log('tokens:', this.tokens)
             } else if (token.type === 'IDENTIFIER') {
                 const label = this.labels.get(token.value);
 
-                if (! label) {
+                if (!label) {
                     //console.warn(`Unknown label:`, label, token);
 
                     this.unresolvedRefs.push({
@@ -1370,29 +1626,23 @@ console.log('tokens:', this.tokens)
     // Parse memory addressing operand inside brackets
     // Supports expressions: [label + 1], [0x1234 + 5], [label - 2]
     private parseMemoryOperand(): ParsedOperand {
-        // called by parseOperands (pass1 & pass2)
-
-        const operand: ParsedOperand = {
-            type: 'MEMORY',
-            value: ''
-        };
-
+        const operand: ParsedOperand = { type: 'MEMORY', value: '' };
         const token = this.peek();
 
         if (token.type === 'REGISTER') {
-            // Register indirect [eax]
             operand.base = this.mapRegister(token.value);
             operand.value = token.value;
             this.advance();
             return operand;
         }
 
-        // Parse expression: terme (op terme)
-        const firstValue = this.parseMemoryTerm();
-        operand.value = firstValue.name;
-        operand.address = firstValue.value;
+        const expr: MemoryExprTerm[] = [];
 
-        // Parse optional + / - offset
+        const firstTerm = this.parseMemoryTerm();
+        operand.value = firstTerm.name;
+        operand.address = firstTerm.value;
+        expr.push({ labelName: firstTerm.labelName, offset: firstTerm.value, op: '+' });
+
         while (!this.isAtEnd()) {
             const next = this.peek();
 
@@ -1401,12 +1651,14 @@ console.log('tokens:', this.tokens)
                 const term = this.parseMemoryTerm();
                 operand.address! += term.value;
                 operand.value += ' + ' + term.name;
+                expr.push({ labelName: term.labelName, offset: term.value, op: '+' });
 
             } else if (next.type === 'MINUS') {
                 this.advance();
                 const term = this.parseMemoryTerm();
                 operand.address! -= term.value;
                 operand.value += ' - ' + term.name;
+                expr.push({ labelName: term.labelName, offset: term.value, op: '-' });
 
             } else if (next.type === 'RBRACKET') {
                 break;
@@ -1417,22 +1669,18 @@ console.log('tokens:', this.tokens)
             }
         }
 
+        operand.memoryExpr = expr;
         return operand;
     }
 
 
     // Parse a single term inside a memory expression: NUMBER or IDENTIFIER
-    private parseMemoryTerm(): { value: number, name: string } {
-        // called by parseMemoryOperand (pass1 & pass2)
-
+    private parseMemoryTerm(): { value: number, name: string, labelName?: string } {
         const token = this.peek();
 
         if (token.type === 'NUMBER') {
             this.advance();
-            return {
-                value: this.parseNumber(token.value),
-                name: token.value,
-            };
+            return { value: this.parseNumber(token.value), name: token.value };
         }
 
         if (token.type === 'IDENTIFIER') {
@@ -1440,42 +1688,18 @@ console.log('tokens:', this.tokens)
             this.advance();
 
             if (!label) {
-                // Label pas encore connu (forward reference) — valeur temporaire
-                //console.warn(`Unknown label:`, label, token);
-
-                if (this.step === 2) {
-                    throw new Error("edit me parseMemoryTerm")
-                }
-
-                this.unresolvedRefs.push({
-                    address: this.currentAddress,
-                    section: this.currentSectionName,
-                    label: token.value,
-                    size: 2,
-                });
-
-                return {
-                    value: 0,
-                    name: token.value,
-                };
+                if (this.step === 2) throw new Error(`Unresolved label "${token.value}" in memory expression`);
+                this.unresolvedRefs.push({ address: this.currentAddress, section: this.currentSectionName, label: token.value, size: 2 });
+                return { value: 0, name: token.value, labelName: token.value };
             }
 
             if (label.dataSize === 0 && label.immValue !== undefined) {
-                return {
-                    value: this.parseNumber(label.immValue),
-                    name: token.value,
-                };
+                // EQU constant : résolu à la valeur, pas de labelName (pas de déférence)
+                return { value: this.parseNumber(label.immValue), name: token.value };
             }
 
-            if (label.address === null && this.step === 2) {
-                debugger
-                throw new Error(`Label "${token.value}" has no address`);
-            }
-
-            return {
-                value: label.address,
-                name: token.value,
-            };
+            // Label normal : on retourne labelName pour résolution lazy
+            return { value: label.address ?? 0, name: token.value, labelName: token.value };
         }
 
         throw new Error(`Unexpected token "${token.value}" in memory expression at line ${token.line}`);
@@ -1542,6 +1766,21 @@ console.log('tokens:', this.tokens)
     }
 
 
+    private resolveLabels(): void {
+        for (const section of Array.from(this.sections.values())) {
+            const sectionName = section.name;
+            console.log('resolve labels of section:', sectionName, section)
+
+            section.data.forEach(d => {
+                if (typeof d.value !== 'number') {
+                    const resolver = d.value;
+                    d.value = resolver()
+                }
+            })
+        }
+    }
+
+
     // Resolve forward references after both passes complete
     private resolveReferences(): void {
         // called by compile
@@ -1589,7 +1828,7 @@ console.log('tokens:', this.tokens)
 
 
     // Emit a single byte to current section
-    private emitByte(valueResolver: (offset: number) => number, comment?: string, opcodeToken?: Token, isOpcode=false, labelRef?: string): void {
+    private emitByte(valueResolver: number | (() => number), comment?: string, opcodeToken?: Token, isOpcode = false): void {
         // used at several places (step2)
 
         const section = this.sections.get(this.currentSectionName);
@@ -1603,12 +1842,11 @@ console.log('tokens:', this.tokens)
         section.data.push({
             address: this.currentAddress++,
             //value: value & 0xFF,
-            valueResolver,
+            value: valueResolver,
             //section: this.currentSection,
             comment,
             isOpcode,
             opcodeToken,
-            labelRef,
         });
     }
 
@@ -1650,8 +1888,9 @@ console.log('tokens:', this.tokens)
 
             // If it's a known label (not EQU), return its address
             if (label) {
-                if (label.address === null) throw new Error("edit me resolveEquValue")
-                return label.address;
+                //if (label.address === null) throw new Error("edit me resolveEquValue")
+                //return label.address; // TODO
+                return 0 // TODO: resolver
             }
 
             // Couldn't resolve

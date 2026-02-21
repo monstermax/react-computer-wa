@@ -78,6 +78,7 @@ export interface ParsedOperand {
     index?: string;
     scale?: number;
     displacement?: number;
+    memoryExpr?: MemoryExprTerm[];
 }
 
 export interface CompilerOptions {
@@ -97,7 +98,7 @@ export interface Section {
 
 export type CompileInstruction = {
     section: string;
-    type: 'DIRECTIVE' | 'INSTRUCTION';
+    type: 'DIRECTIVE' | 'INSTRUCTION' | 'LABEL';
     instruction: string;
     step1Address: number;
     size: number;
@@ -107,16 +108,21 @@ export type CompileInstruction = {
 }
 
 
+export type MemoryExprTerm = {
+    labelName?: string;   // si c'est une référence à un label
+    offset: number;       // valeur numérique du terme (ou EQU résolu)
+    op: '+' | '-';        // signe (toujours '+' pour le premier terme)
+}
+
 export interface ByteEntry {
     address: number;
-    //value: number;
-    valueResolver: (offset: number) => number;
+    value: number | (() => number);
+    //valueResolver: (offset: number) => number;
     //section: string;
     label?: string;
     comment?: string;
     isOpcode?: boolean;
     opcodeToken?: Token;
-    labelRef?: string;
 }
 
 export interface CompiledProgram {

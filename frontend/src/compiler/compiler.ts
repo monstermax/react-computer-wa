@@ -230,7 +230,7 @@ export class Compiler {
                     section: this.currentSection,
                     address: this.currentAddress as u16,
                     addressStep1: this.currentAddress as u16,
-                    values: null,
+                    immValue: undefined,
                     dataSize: null,
                 });
 
@@ -281,14 +281,14 @@ export class Compiler {
                             section: this.currentSection,
                             address: valueStartAddress,
                             addressStep1: valueStartAddress,
-                            values: null,
+                            immValue: undefined,
                             dataSize: itemSize,
                         });
 
                         this.symbols.set(varName, {
                             address: valueStartAddress,
                             section: this.currentSection,
-                            type: 'variable'
+                            type: 'variable',
                         });
 
                         this.advance(); // passe l'IDENTIFIER... pour arriver sur la DIRECTIVE
@@ -314,8 +314,7 @@ export class Compiler {
                             } else if (['STRING', 'NUMBER'].includes(t.type)) {
                                 this.advance();
 
-                                if (!label.values) label.values = [];
-                                label.values.push(t.value)
+                                label.immValue = t.value
 
                             } else if (t.type === 'IDENTIFIER') {
                                 // Reference to another identifier (e.g., _R equ COL_RED)
@@ -325,8 +324,7 @@ export class Compiler {
 
                                 this.advance();
 
-                                if (!label.values) label.values = [];
-                                label.values.push(t.value)
+                                label.immValue = t.value
 
                             } else {
                                 break;
@@ -789,8 +787,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
                 if (labelInfo !== undefined) {
                     // EQU constant: resolve the value (possibly chained)
-                    if (labelInfo.dataSize === 0 && labelInfo.values && labelInfo.values.length > 0) {
-                        const resolvedValue = this.resolveEquValue(labelInfo.values[0]);
+                    if (labelInfo.dataSize === 0 && labelInfo.immValue !== undefined) {
+                        const resolvedValue = this.resolveEquValue(labelInfo.immValue);
 
                         for (let i = 0; i < itemSize; i++) {
                             const defaultComment = `${token.value} = ${toHex(resolvedValue)} (${resolvedValue})`;
@@ -953,8 +951,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                     const labelSection = this.sections.get(labelInfo?.section || '.none')
 
                     if (labelInfo !== undefined && labelSection !== undefined) {
-                        if (labelInfo.dataSize === 0 && labelInfo.values) {
-                            value = this.resolveEquValue(labelInfo.values[0]);
+                        if (labelInfo.dataSize === 0 && labelInfo.immValue !== undefined) {
+                            value = this.resolveEquValue(labelInfo.immValue);
 
                         } else {
                             if (labelInfo.address === null) throw new Error("edit me");
@@ -978,8 +976,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                         throw new Error(`Missing label "${op.value}"`);
                     }
 
-                    if (label.dataSize === 0 && label.values) {
-                        value = this.resolveEquValue(label.values[0]);
+                    if (label.dataSize === 0 && label.immValue !== undefined) {
+                        value = this.resolveEquValue(label.immValue);
 
                     } else {
                         if (label.address === undefined) throw new Error("missing label address");
@@ -1101,10 +1099,10 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
                 // EQU constants become immediate values
                 if (label && label.dataSize === 0) {
-                    const resolvedValue = label?.values ? this.resolveEquValue(label.values[0]) : 0;
+                    const resolvedValue = label?.immValue !== undefined ? this.resolveEquValue(label.immValue) : 0;
                     operands.push({
                         type: 'IMMEDIATE',
-                        value: label?.values ? label.values[0] : token.value,
+                        value: label?.immValue !== undefined ? label.immValue : token.value,
                         address: resolvedValue,
                     });
 
@@ -1112,7 +1110,7 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                     // Label reference
                     operands.push({
                         type: 'LABEL',
-                        value: label?.values ? label.values[0] : token.value,
+                        value: label?.immValue !== undefined ? label.immValue : token.value,
                         address: label?.address ?? undefined,
                         //size: 2,
                     });
@@ -1221,9 +1219,9 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
                 };
             }
 
-            if (label.dataSize === 0 && label.values) {
+            if (label.dataSize === 0 && label.immValue !== undefined) {
                 return {
-                    value: this.parseNumber(label.values[0]),
+                    value: this.parseNumber(label.immValue),
                     name: token.value,
                 };
             }
@@ -1401,8 +1399,8 @@ console.log(`[STEP2] new section : ".text" at address [${toHex(this.currentAddre
 
             // Look up as a label/identifier
             const label = this.labels.get(current);
-            if (label && label.dataSize === 0 && label.values && label.values.length > 0) {
-                current = label.values[0];
+            if (label && label.dataSize === 0 && label.immValue !== undefined) {
+                current = label.immValue;
                 continue;
             }
 
