@@ -21,14 +21,14 @@ export type ConsoleDeviceParams = {
     type: string;
     vendor?: string;
     model?: string;
-    width?: number;
+    //width?: number;
     height?: number;
     maxLines?: number;
 }
 
 export class ConsoleDevice extends IoDevice {
     static type = 'output';
-    width = 30;
+    //width = 30;
     height = 15;
     lines = [] as string[];
     maxLines = 100;
@@ -41,7 +41,7 @@ export class ConsoleDevice extends IoDevice {
     constructor(idx: u8, name: string, params: ConsoleDeviceParams) {
         super(idx, name, params);
 
-        this.width = params.width ?? this.width;
+        //this.width = params.width ?? this.width;
         this.height = params.height ?? this.height;
         this.maxLines = params.maxLines ?? this.maxLines;
     }
@@ -209,7 +209,7 @@ export type ConsoleProps = {
 export const Console: React.FC<ConsoleProps> = (props) => {
     const { deviceInstance } = props;
 
-    const [width, setWidth] = useState(0);
+    //const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [lines, setLines] = useState<string[]>([])
     const [currentLine, setCurrentLine] = useState<string>("")
@@ -247,7 +247,7 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
         deviceInstance.on('state', stateHandler)
 
-        setWidth(deviceInstance.width)
+        //setWidth(deviceInstance.width)
         setHeight(deviceInstance.height)
 
         setLines(deviceInstance.lines.slice())
@@ -305,8 +305,11 @@ export const Console: React.FC<ConsoleProps> = (props) => {
 
     return (
         <div
-            className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-xl font-mono text-sm relative group"
-            style={{ height: `${deviceInstance.height * 1.15}em`, width: `${deviceInstance.width * 1.1}ch` }}
+            className="bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-700 shadow-xl font-mono text-sm relative group size-full"
+            style={{
+                height: `${deviceInstance.height * 1.15}em`,
+                //width: `${deviceInstance.width * 1.0}ch`,
+            }}
         >
             {/* Terminal Header */}
             <div className="bg-[#2d2d2d] px-4 py-2 flex items-center border-b border-gray-700">

@@ -128,7 +128,7 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                 {/* ── Row 1: Console + Screen ── */}
                 <div className="flex flex-wrap gap-3 mb-3">
 
-                    <div className="flex-1 border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] xl:w-auto min-w-96 flex justify-center ">
+                    <div className="flex-1 min-w-[350px] w-full border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] xl:w-auto flex justify-center ">
                         <Console deviceInstance={consoleDevice} />
                     </div>
 
@@ -142,12 +142,12 @@ export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
                             <div className={preferHdScreen ? "" : "line-through"}>HD</div>
                         </button>
 
-                        <div className={`xl:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`xl:min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${!preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen */}
                             <Screen deviceInstance={screenDevice} />
                         </div>
 
-                        <div className={`xl:min-w-[500px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
+                        <div className={`xl:min-w-[350px] border border-zinc-800/50 rounded-lg p-2 bg-[#0c0c14] shrink-0 ${preferHdScreen ? "" : "hidden"}`}>
                             {/* Screen HD */}
                             <ScreenCanvas deviceInstance={screenHdDevice} />
                         </div>

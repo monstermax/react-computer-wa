@@ -202,7 +202,7 @@ export const Switchs: React.FC<SwitchsProps> = (props) => {
                             <div
                                 key={i}
                                 className={`
-                                    w-8 h-8 cursor-pointer rounded transition-all flex items-center justify-center
+                                    px-2 py-1 cursor-pointer rounded transition-all flex items-center justify-center
                                     ${isPending(i)
                                         ? 'bg-gray-500 animate-pulse ring-2 ring-yellow-400'
                                         : on
