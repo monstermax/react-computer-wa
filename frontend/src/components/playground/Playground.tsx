@@ -420,12 +420,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         logs={logs}
                         panelEmulatorHidden={panelEmulatorHidden}
                         editorHightLine={editorHightLine}
+                        codeMapping={codeMapping}
                         addLog={addLog}
                         togglePanelEmulator={togglePanelEmulator}
                         editorInitialContent={editorInitialContent}
                         setEditorInitialContent={setEditorInitialContent}
                         setEditorHightLine={setEditorHightLine}
                         openAssemblyFileInEditor={openAssemblyFileInEditor}
+                        updateCodeMapping={updateCodeMapping}
                         />
                 </div>
 

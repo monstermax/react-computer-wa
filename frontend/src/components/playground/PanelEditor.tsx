@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Editor, type PrismEditor } from "prism-react-editor";
 
 import { toHex } from "@/lib/lib_numbers";
-import { compileCode, compileCodeV2, formatBytecode, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
+import { compileCode, compileCodeV2, formatBytecode, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
 
 import { FileModal } from "./FileModal";
@@ -15,6 +15,7 @@ import "prism-react-editor/prism/languages/nasm";
 import "prism-react-editor/languages/asm";
 import "prism-react-editor/layout.css";
 import "prism-react-editor/themes/github-dark.css";
+import type { Token } from "@/compiler/compiler_lexer";
 
 
 const defaultLoadAddress = '0xA000';
@@ -38,17 +39,19 @@ export type PanelEditorProps = {
     editorHightLine: number | null;
     editorInitialContent: string;
     panelEmulatorHidden: boolean;
+    codeMapping: Record<string, Token | undefined>;
     addLog: (msg: string) => void;
     togglePanelEmulator: () => void;
     setEditorInitialContent: React.Dispatch<React.SetStateAction<string>>;
     setEditorHightLine: React.Dispatch<React.SetStateAction<number | null>>;
     openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>
+    updateCodeMapping: (newCodeMapping: Record<string, Token | undefined>) => void
 }
 
 
 export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
-    const { emulator, logs, panelEmulatorHidden, editorInitialContent, editorHightLine } = props;
-    const { addLog, togglePanelEmulator, setEditorInitialContent, setEditorHightLine, openAssemblyFileInEditor } = props;
+    const { emulator, logs, panelEmulatorHidden, editorInitialContent, editorHightLine, codeMapping } = props;
+    const { addLog, togglePanelEmulator, setEditorInitialContent, setEditorHightLine, openAssemblyFileInEditor, updateCodeMapping } = props;
 
     // ── Editor ──
     const editorRef = useRef<PrismEditor>(null);
@@ -138,6 +141,9 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             const _machineCode = `// === MACHINE CODE ===\n\n[\n${machineCodeRaw.trim()}\n]`;
             setMachineCode(_machineCode)
 
+            const newCodeMapping = getAssemblyCodeMapping(compiled);
+            updateCodeMapping(newCodeMapping)
+
             let _machineCodeLabels = "";
             _machineCodeLabels += "=== LABELS ===\n";
             compiled.labels.forEach((labelInfo, name) => {
@@ -213,7 +219,9 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
         const lines = editorContent.split('\n');
         const start = lines.slice(0, lineNumber - 1).reduce((acc, l) => acc + l.length + 1, 0);
-        const end = start + lines[lineNumber - 1].length;
+        const lastLine = lines[lineNumber - 1];
+        if (!lastLine) return;
+        const end = start + lastLine.length;
 
         textarea.focus();
         textarea.setSelectionRange(start, end);
