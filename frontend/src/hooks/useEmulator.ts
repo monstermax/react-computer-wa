@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { getBytecodeArray } from "@/compiler/compiler_utils";
 import { deviceTypeFromString, useDevicesManager, type DeviceHook, type DevicesManagerHook } from "./useDevice";
 import { Clock } from "@/components/devices/clock";
+import { delayer } from "@/lib/lib_delayer";
 
 import * as releaseModule from "@/../public/web_assembly/release";
 
@@ -11,7 +12,7 @@ import type { u32, u8, u16 } from "@/types/computer.types";
 import type { CompiledProgram } from "@/types/compiler.types";
 import type { IoDevice } from "@/components/devices/IoDevice";
 import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer";
-import { delayer } from "@/lib/lib_delayer";
+import type { RegistersDump } from "@/components/playground/Playground";
 
 
 declare global {
@@ -28,7 +29,7 @@ export type WasmExports = typeof releaseModule.__AdaptedExports;
 export type useEmulatorParams = {
     clockFrequency: u32;
     speedMultiplier: u32;
-    dumpRegisters: () => Promise<void>
+    dumpRegisters: () => Promise<RegistersDump>
     addLog: (msg: string) => void;
 }
 

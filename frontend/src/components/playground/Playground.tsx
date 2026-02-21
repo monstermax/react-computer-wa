@@ -35,6 +35,23 @@ import { toHex } from "@/lib/lib_numbers";
 
 
 
+export type RegistersDump = {
+    registers8: {
+        A: u8;
+        B: u8;
+        C: u8;
+        D: u8;
+        E: u8;
+        F: u8;
+    };
+    registers16: {
+        PC: u16;
+        SP: u16;
+        IR: u8;
+    };
+    cyclesCount: number;
+}
+
 
 // ─────────────────────────────────────────────
 //  Playground Component
@@ -70,7 +87,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const [panelEmulatorHidden, setPanelEmulatorHidden] = useState(false);
     const [panelEditorHidden, setPanelEditorHidden] = useState(false);
 
-    const dumpRegisters = async () => {
+    const dumpRegisters = async (): Promise<RegistersDump | null> => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return null;
 
         const registers8_new = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
