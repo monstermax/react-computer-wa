@@ -238,6 +238,10 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
 
                 {/* Memory view responsive */}
                 <div className="divide-y divide-zinc-800/20 overflow-x-auto">
+                    {data.length === 0 && (
+                        <div className="p-4">Empty memory</div>
+                    )}
+
                     {Array.from({ length: linesPerPage }).map((_, i) => {
                         const addr = startOffset + i * bytesPerLine;
                         if (addr >= data.length) return null;
@@ -304,7 +308,7 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                         <div className="space-y-1">
                             <div className="text-[10px] text-emerald-400/60 uppercase">RAM</div>
                             <div className="flex flex-wrap gap-1">
-                                {[0x0500, 0x0700, 0x1000, 0xA000, 0xC000, 0xF000].map(addr => (
+                                {[0x0500, 0x0700, 0x1000, 0xA000, 0xC000].map(addr => (
                                     <button
                                         key={addr}
                                         onClick={() => {
