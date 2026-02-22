@@ -1,17 +1,27 @@
 # DEC_MEM
 
+## Mnemonic
+
+- `DEC_MEM`
+
 ## Opcode
 
-- Value: `0x33`
+- `0x33`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Decrement operand by 1.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+DEC [0xA000]
+```

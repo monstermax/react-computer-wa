@@ -1,13 +1,23 @@
 # JB
 
-## Type
+## Mnemonic
 
-Alias opcode.
+- `JB`
 
-## Mapping
+## Opcode
 
-- Alias of: `JL`
+- Alias of `JL` (same opcode value)
 
-## Runtime status
+## Description
 
-- Uses the behavior of `JL`.
+Alias mnemonic for `JL`.
+
+## Operands
+
+Same as `JL`.
+
+## Assembly example
+
+```asm
+JL lower
+```

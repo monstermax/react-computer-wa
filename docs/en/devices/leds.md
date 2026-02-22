@@ -1,19 +1,23 @@
 # Leds
 
-## Role
+## Description
 
-8-bit LEDs output device.
+8-bit LED output register.
 
-## Addressing model
+Each bit controls one LED in the UI.
 
-- Devices are memory-mapped through `0xF000-0xFFFF`.
-- Device base address is assigned by index: `0xF000 + index * 0x10`.
-- Each device exposes 16 ports (`0x10`).
+## Main features
 
-## Host bridge
-
-Runtime I/O calls are forwarded through `jsIo.read(device, port)` and `jsIo.write(device, port, value)`.
+- single 8-bit state register
+- readback support
+- reset to `0x00`
 
 ## Ports
 
-TBD (to document exact per-port semantics for this device).
+### Read
+
+- `0x00`: current LED register value (8 bits)
+
+### Write
+
+- `0x00`: set LED register value

@@ -1,13 +1,23 @@
 # JAE
 
-## Type
+## Mnemonic
 
-Alias opcode.
+- `JAE`
 
-## Mapping
+## Opcode
 
-- Alias of: `JGE`
+- Alias of `JGE` (same opcode value)
 
-## Runtime status
+## Description
 
-- Uses the behavior of `JGE`.
+Alias mnemonic for `JGE`.
+
+## Operands
+
+Same as `JGE`.
+
+## Assembly example
+
+```asm
+JGE greater_or_eq
+```

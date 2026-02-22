@@ -1,17 +1,28 @@
 # SHL_MEM_IMM
 
+## Mnemonic
+
+- `SHL_MEM_IMM`
+
 ## Opcode
 
-- Value: `0x77`
+- `0x77`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Logical shift left.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SHL [0xA000], 1
+```

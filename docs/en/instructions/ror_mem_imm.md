@@ -1,17 +1,28 @@
 # ROR_MEM_IMM
 
+## Mnemonic
+
+- `ROR_MEM_IMM`
+
 ## Opcode
 
-- Value: `0x68`
+- `0x68`
 
-## Runtime status
+## Description
 
-- Not connected in the current `Cpu.ts` instruction switch.
+Rotate right.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Defined in enum but not connected in the current execution switch.
+
+## Assembly example
+
+```asm
+ROR MEM IMM
+```

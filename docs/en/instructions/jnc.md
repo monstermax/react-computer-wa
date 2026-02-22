@@ -1,17 +1,27 @@
 # JNC
 
+## Mnemonic
+
+- `JNC`
+
 ## Opcode
 
-- Value: `0x14`
+- `0x14`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Jump if carry flag is clear.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+JNC 0x1100
+```

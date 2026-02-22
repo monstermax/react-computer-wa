@@ -1,17 +1,28 @@
 # SHR_MEM_IMM
 
+## Mnemonic
+
+- `SHR_MEM_IMM`
+
 ## Opcode
 
-- Value: `0x7C`
+- `0x7C`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Logical shift right.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SHR [0xA000], 1
+```

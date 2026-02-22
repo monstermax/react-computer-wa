@@ -1,17 +1,28 @@
 # SUB_MEM_IMM
 
+## Mnemonic
+
+- `SUB_MEM_IMM`
+
 ## Opcode
 
-- Value: `0x3E`
+- `0x3E`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Subtract source from destination.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SUB [0xA000], 0x01
+```

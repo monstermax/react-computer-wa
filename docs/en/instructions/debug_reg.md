@@ -1,17 +1,28 @@
 # DEBUG_REG
 
+## Mnemonic
+
+- `DEBUG_REG`
+
 ## Opcode
 
-- Value: `0x05`
+- `0x05`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Debug helper instruction.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `debug_id`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+DEBUG_REG 1, A
+```

@@ -1,17 +1,27 @@
 # PUSH_REG
 
+## Mnemonic
+
+- `PUSH_REG`
+
 ## Opcode
 
-- Value: `0x26`
+- `0x26`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Push register value on stack.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+PUSH A
+```

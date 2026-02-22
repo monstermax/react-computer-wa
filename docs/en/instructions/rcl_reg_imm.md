@@ -1,17 +1,28 @@
 # RCL_REG_IMM
 
+## Mnemonic
+
+- `RCL_REG_IMM`
+
 ## Opcode
 
-- Value: `0x6A`
+- `0x6A`
 
-## Runtime status
+## Description
 
-- Not connected in the current `Cpu.ts` instruction switch.
+Rotate left through carry.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Defined in enum but not connected in the current execution switch.
+
+## Assembly example
+
+```asm
+RCL REG IMM
+```

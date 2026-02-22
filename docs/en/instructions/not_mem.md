@@ -1,17 +1,27 @@
 # NOT_MEM
 
+## Mnemonic
+
+- `NOT_MEM`
+
 ## Opcode
 
-- Value: `0x35`
+- `0x35`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise NOT.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+NOT [0xA000]
+```

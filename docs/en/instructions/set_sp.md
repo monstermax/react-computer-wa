@@ -1,17 +1,27 @@
 # SET_SP
 
+## Mnemonic
+
+- `SET_SP`
+
 ## Opcode
 
-- Value: `0x28`
+- `0x28`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Set special register value.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `imm16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SET_SP 0xEFFF
+```

@@ -1,17 +1,28 @@
 # RCR_REG_REG
 
+## Mnemonic
+
+- `RCR_REG_REG`
+
 ## Opcode
 
-- Value: `0x70`
+- `0x70`
 
-## Runtime status
+## Description
 
-- Not connected in the current `Cpu.ts` instruction switch.
+Rotate right through carry.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Defined in enum but not connected in the current execution switch.
+
+## Assembly example
+
+```asm
+RCR REG REG
+```

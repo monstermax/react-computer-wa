@@ -1,17 +1,28 @@
 # ROR_REG_MEM
 
+## Mnemonic
+
+- `ROR_REG_MEM`
+
 ## Opcode
 
-- Value: `0x67`
+- `0x67`
 
-## Runtime status
+## Description
 
-- Not connected in the current `Cpu.ts` instruction switch.
+Rotate right.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Defined in enum but not connected in the current execution switch.
+
+## Assembly example
+
+```asm
+ROR REG MEM
+```

@@ -1,17 +1,27 @@
 # NOT_REG
 
+## Mnemonic
+
+- `NOT_REG`
+
 ## Opcode
 
-- Value: `0x34`
+- `0x34`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise NOT.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+NOT A
+```

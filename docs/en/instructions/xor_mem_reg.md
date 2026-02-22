@@ -1,17 +1,28 @@
 # XOR_MEM_REG
 
+## Mnemonic
+
+- `XOR_MEM_REG`
+
 ## Opcode
 
-- Value: `0x4E`
+- `0x4E`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise XOR.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+XOR [0xA000], A
+```

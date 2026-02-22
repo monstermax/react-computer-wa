@@ -1,17 +1,27 @@
 # RET
 
+## Mnemonic
+
+- `RET`
+
 ## Opcode
 
-- Value: `0x03`
+- `0x03`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Return from subroutine using stack return address.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
 
-## Behavior
 
-TBD (to be documented instruction-by-instruction).
+## Runtime status
+
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+RET
+```

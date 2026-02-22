@@ -1,19 +1,28 @@
 # Screen
 
-## Role
+## Description
 
-32x32 display output device.
+Pixel output device with a 2D framebuffer.
 
-## Addressing model
+Default geometry is `32x32`. Drawing uses a cursor model (`currentX`, `currentY`) plus a color byte write.
 
-- Devices are memory-mapped through `0xF000-0xFFFF`.
-- Device base address is assigned by index: `0xF000 + index * 0x10`.
-- Each device exposes 16 ports (`0x10`).
+## Main features
 
-## Host bridge
-
-Runtime I/O calls are forwarded through `jsIo.read(device, port)` and `jsIo.write(device, port, value)`.
+- read/write pixel at current cursor
+- cursor X/Y selection via ports
+- color byte storage per pixel
+- clear/reset support
 
 ## Ports
 
-TBD (to document exact per-port semantics for this device).
+### Read
+
+- `0x00` (`PIXEL_X`): current X cursor
+- `0x01` (`PIXEL_Y`): current Y cursor
+- `0x02` (`PIXEL_COLOR`): color byte at current `(X,Y)`
+
+### Write
+
+- `0x00` (`PIXEL_X`): set X cursor (`value % width`)
+- `0x01` (`PIXEL_Y`): set Y cursor (`value % height`)
+- `0x02` (`PIXEL_COLOR`): write color at current `(X,Y)`

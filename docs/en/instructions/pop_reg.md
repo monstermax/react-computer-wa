@@ -1,17 +1,27 @@
 # POP_REG
 
+## Mnemonic
+
+- `POP_REG`
+
 ## Opcode
 
-- Value: `0x27`
+- `0x27`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Pop value from stack into register.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+POP A
+```

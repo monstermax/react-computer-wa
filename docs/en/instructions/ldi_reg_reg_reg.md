@@ -1,17 +1,29 @@
 # LDI_REG_REG_REG
 
+## Mnemonic
+
+- `LDI_REG_REG_REG`
+
 ## Opcode
 
-- Value: `0x82`
+- `0x82`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Load indirect via register pair address.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg_dst`
+- `reg_low`
+- `reg_high`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+LDI C, A, B
+```

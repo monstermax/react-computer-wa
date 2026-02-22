@@ -1,17 +1,28 @@
 # XCHG
 
+## Mnemonic
+
+- `XCHG`
+
 ## Opcode
 
-- Value: `0x25`
+- `0x25`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Exchange two register values.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg_dst`
+- `reg_src`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+XCHG A, B
+```

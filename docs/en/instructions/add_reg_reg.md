@@ -1,17 +1,28 @@
 # ADD_REG_REG
 
+## Mnemonic
+
+- `ADD_REG_REG`
+
 ## Opcode
 
-- Value: `0x37`
+- `0x37`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Add source to destination.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+ADD A, B
+```

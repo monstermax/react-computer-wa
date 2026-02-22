@@ -1,17 +1,28 @@
 # XOR_REG_IMM
 
+## Mnemonic
+
+- `XOR_REG_IMM`
+
 ## Opcode
 
-- Value: `0x4A`
+- `0x4A`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise XOR.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+XOR A, 0xFF
+```

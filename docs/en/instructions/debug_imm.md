@@ -1,17 +1,28 @@
 # DEBUG_IMM
 
+## Mnemonic
+
+- `DEBUG_IMM`
+
 ## Opcode
 
-- Value: `0x04`
+- `0x04`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Debug helper instruction.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `debug_id`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+DEBUG_IMM 1, 0x2A
+```

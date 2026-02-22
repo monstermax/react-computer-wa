@@ -1,13 +1,23 @@
 # JE
 
-## Type
+## Mnemonic
 
-Alias opcode.
+- `JE`
 
-## Mapping
+## Opcode
 
-- Alias of: `JZ`
+- Alias of `JZ` (same opcode value)
 
-## Runtime status
+## Description
 
-- Uses the behavior of `JZ`.
+Alias mnemonic for `JZ`.
+
+## Operands
+
+Same as `JZ`.
+
+## Assembly example
+
+```asm
+JZ done
+```

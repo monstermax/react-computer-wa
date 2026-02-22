@@ -1,17 +1,28 @@
 # ADD_REG_IMM
 
+## Mnemonic
+
+- `ADD_REG_IMM`
+
 ## Opcode
 
-- Value: `0x36`
+- `0x36`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Add source to destination.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+ADD A, 0x01
+```

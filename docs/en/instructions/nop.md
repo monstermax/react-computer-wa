@@ -1,17 +1,27 @@
 # NOP
 
+## Mnemonic
+
+- `NOP`
+
 ## Opcode
 
-- Value: `0x00`
+- `0x00`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+No operation.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
 
-## Behavior
 
-TBD (to be documented instruction-by-instruction).
+## Runtime status
+
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+NOP
+```

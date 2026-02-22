@@ -1,17 +1,27 @@
 # JMP
 
+## Mnemonic
+
+- `JMP`
+
 ## Opcode
 
-- Value: `0x10`
+- `0x10`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Unconditional jump.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+JMP 0x1000
+```

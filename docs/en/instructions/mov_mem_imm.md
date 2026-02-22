@@ -1,17 +1,28 @@
 # MOV_MEM_IMM
 
+## Mnemonic
+
+- `MOV_MEM_IMM`
+
 ## Opcode
 
-- Value: `0x24`
+- `0x24`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Move data between registers/memory/immediate.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+MOV [0xA000], 0x2A
+```

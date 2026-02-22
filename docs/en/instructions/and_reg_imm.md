@@ -1,17 +1,28 @@
 # AND_REG_IMM
 
+## Mnemonic
+
+- `AND_REG_IMM`
+
 ## Opcode
 
-- Value: `0x40`
+- `0x40`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise AND.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+AND A, 0x0F
+```

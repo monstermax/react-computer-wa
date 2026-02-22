@@ -1,17 +1,27 @@
 # DEC_REG
 
+## Mnemonic
+
+- `DEC_REG`
+
 ## Opcode
 
-- Value: `0x32`
+- `0x32`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Decrement operand by 1.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+DEC A
+```

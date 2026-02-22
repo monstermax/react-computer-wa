@@ -1,17 +1,28 @@
 # SHL_REG_IMM
 
+## Mnemonic
+
+- `SHL_REG_IMM`
+
 ## Opcode
 
-- Value: `0x74`
+- `0x74`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Logical shift left.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SHL A, 1
+```

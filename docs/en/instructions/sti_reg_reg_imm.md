@@ -1,17 +1,29 @@
 # STI_REG_REG_IMM
 
+## Mnemonic
+
+- `STI_REG_REG_IMM`
+
 ## Opcode
 
-- Value: `0x84`
+- `0x84`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Store indirect via register pair address.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg_low`
+- `reg_high`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+STI A, B, 0x2A
+```

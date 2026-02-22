@@ -1,17 +1,27 @@
 # JL
 
+## Mnemonic
+
+- `JL`
+
 ## Opcode
 
-- Value: `0x15`
+- `0x15`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Jump if lower (carry=1 and zero=0).
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+JL lower
+```

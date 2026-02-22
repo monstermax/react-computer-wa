@@ -1,19 +1,29 @@
 # Console
 
-## Role
+## Description
 
-Console output device.
+Output text console device.
 
-## Addressing model
+It accumulates characters into `currentLine`, pushes lines on CR/LF, supports backspace handling, and can clear screen state.
 
-- Devices are memory-mapped through `0xF000-0xFFFF`.
-- Device base address is assigned by index: `0xF000 + index * 0x10`.
-- Each device exposes 16 ports (`0x10`).
+## Main features
 
-## Host bridge
-
-Runtime I/O calls are forwarded through `jsIo.read(device, port)` and `jsIo.write(device, port, value)`.
+- line buffer + scrollback (`lines`)
+- max line retention (`maxLines`)
+- control-character handling
+- ESC sequence handling for arrow-key related cursor position updates
 
 ## Ports
 
-TBD (to document exact per-port semantics for this device).
+### Read
+
+- none (returns `0`, write-oriented device)
+
+### Write
+
+- `0x00` (`CONSOLE_CHAR`): write one character/control byte
+  - printable ASCII: append to current line
+  - CR/LF: commit current line
+  - backspace: delete one character
+  - ESC sequences: parse and update cursor position handling
+- `0x01` (`CONSOLE_CLEAR`): reset/clear console state

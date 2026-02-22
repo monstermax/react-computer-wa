@@ -1,17 +1,28 @@
 # RCR_MEM_REG
 
+## Mnemonic
+
+- `RCR_MEM_REG`
+
 ## Opcode
 
-- Value: `0x73`
+- `0x73`
 
-## Runtime status
+## Description
 
-- Not connected in the current `Cpu.ts` instruction switch.
+Rotate right through carry.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Defined in enum but not connected in the current execution switch.
+
+## Assembly example
+
+```asm
+RCR MEM REG
+```

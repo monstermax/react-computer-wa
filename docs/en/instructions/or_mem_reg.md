@@ -1,17 +1,28 @@
 # OR_MEM_REG
 
+## Mnemonic
+
+- `OR_MEM_REG`
+
 ## Opcode
 
-- Value: `0x49`
+- `0x49`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise OR.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+OR [0xA000], A
+```

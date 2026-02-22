@@ -1,17 +1,28 @@
 # ADD_MEM_REG
 
+## Mnemonic
+
+- `ADD_MEM_REG`
+
 ## Opcode
 
-- Value: `0x3A`
+- `0x3A`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Add source to destination.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+ADD [0xA000], A
+```

@@ -1,17 +1,28 @@
 # TEST_REG_MEM
 
+## Mnemonic
+
+- `TEST_REG_MEM`
+
 ## Opcode
 
-- Value: `0x55`
+- `0x55`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise test (AND) and update flags.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+TEST A, [0xA000]
+```

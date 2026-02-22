@@ -1,17 +1,27 @@
 # HALT
 
+## Mnemonic
+
+- `HALT`
+
 ## Opcode
 
-- Value: `0x01`
+- `0x01`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Stop CPU execution.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
 
-## Behavior
 
-TBD (to be documented instruction-by-instruction).
+## Runtime status
+
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+HALT
+```

@@ -1,17 +1,28 @@
 # SHL_REG_REG
 
+## Mnemonic
+
+- `SHL_REG_REG`
+
 ## Opcode
 
-- Value: `0x75`
+- `0x75`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Logical shift left.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SHL A, B
+```

@@ -1,17 +1,28 @@
 # SUB_MEM_REG
 
+## Mnemonic
+
+- `SUB_MEM_REG`
+
 ## Opcode
 
-- Value: `0x3F`
+- `0x3F`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Subtract source from destination.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SUB [0xA000], A
+```

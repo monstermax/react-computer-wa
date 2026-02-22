@@ -1,17 +1,27 @@
 # JLE
 
+## Mnemonic
+
+- `JLE`
+
 ## Opcode
 
-- Value: `0x16`
+- `0x16`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Jump if lower or equal.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+JLE lower_or_eq
+```

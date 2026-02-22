@@ -1,17 +1,27 @@
 # JG
 
+## Mnemonic
+
+- `JG`
+
 ## Opcode
 
-- Value: `0x17`
+- `0x17`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Jump if greater.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+JG greater
+```

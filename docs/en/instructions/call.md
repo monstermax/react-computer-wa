@@ -1,17 +1,27 @@
 # CALL
 
+## Mnemonic
+
+- `CALL`
+
 ## Opcode
 
-- Value: `0x02`
+- `0x02`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Call subroutine: push return address, then jump.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+CALL 0x1200
+```

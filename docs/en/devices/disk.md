@@ -1,19 +1,30 @@
 # Disk
 
-## Role
+## Description
 
-Storage device used by boot sequence.
+Byte-addressable storage device with an internal address pointer.
 
-## Addressing model
+Supports raw byte read/write through data and address ports. Optional persistence is available through browser localStorage.
 
-- Devices are memory-mapped through `0xF000-0xFFFF`.
-- Device base address is assigned by index: `0xF000 + index * 0x10`.
-- Each device exposes 16 ports (`0x10`).
+## Main features
 
-## Host bridge
-
-Runtime I/O calls are forwarded through `jsIo.read(device, port)` and `jsIo.write(device, port, value)`.
+- sparse storage (`Map<u16,u8>`)
+- current address pointer (`currentAddress`)
+- max-size guard (`maxSize`)
+- optional persistence (`persistent`)
 
 ## Ports
 
-TBD (to document exact per-port semantics for this device).
+### Read
+
+- `0x00` (`DISK_DATA`): read byte at `currentAddress`
+- `0x01` (`DISK_SIZE_LOW`): low byte of current stored size
+- `0x02` (`DISK_SIZE_HIGH`): high byte of current stored size
+- `0x03` (`DISK_ADDR_LOW`): low byte of current address pointer
+- `0x04` (`DISK_ADDR_HIGH`): high byte of current address pointer
+
+### Write
+
+- `0x00` (`DISK_DATA`): write byte at `currentAddress`, then auto-increment pointer
+- `0x03` (`DISK_ADDR_LOW`): set low byte of current address pointer
+- `0x04` (`DISK_ADDR_HIGH`): set high byte of current address pointer

@@ -1,17 +1,27 @@
 # JZ
 
+## Mnemonic
+
+- `JZ`
+
 ## Opcode
 
-- Value: `0x11`
+- `0x11`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Jump if zero flag is set.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+JZ done
+```

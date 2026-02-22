@@ -1,13 +1,23 @@
 # JNE
 
-## Type
+## Mnemonic
 
-Alias opcode.
+- `JNE`
 
-## Mapping
+## Opcode
 
-- Alias of: `JNZ`
+- Alias of `JNZ` (same opcode value)
 
-## Runtime status
+## Description
 
-- Uses the behavior of `JNZ`.
+Alias mnemonic for `JNZ`.
+
+## Operands
+
+Same as `JNZ`.
+
+## Assembly example
+
+```asm
+JNZ loop
+```

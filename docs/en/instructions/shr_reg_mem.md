@@ -1,17 +1,28 @@
 # SHR_REG_MEM
 
+## Mnemonic
+
+- `SHR_REG_MEM`
+
 ## Opcode
 
-- Value: `0x7B`
+- `0x7B`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Logical shift right.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SHR A, [0xA000]
+```

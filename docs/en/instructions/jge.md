@@ -1,17 +1,27 @@
 # JGE
 
+## Mnemonic
+
+- `JGE`
+
 ## Opcode
 
-- Value: `0x18`
+- `0x18`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Jump if greater or equal.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+JGE greater_or_eq
+```

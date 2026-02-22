@@ -1,13 +1,23 @@
 # JA
 
-## Type
+## Mnemonic
 
-Alias opcode.
+- `JA`
 
-## Mapping
+## Opcode
 
-- Alias of: `JG`
+- Alias of `JG` (same opcode value)
 
-## Runtime status
+## Description
 
-- Uses the behavior of `JG`.
+Alias mnemonic for `JG`.
+
+## Operands
+
+Same as `JG`.
+
+## Assembly example
+
+```asm
+JG greater
+```

@@ -1,17 +1,27 @@
 # INT3
 
+## Mnemonic
+
+- `INT3`
+
 ## Opcode
 
-- Value: `0x09`
+- `0x09`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Breakpoint trap.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
 
-## Behavior
 
-TBD (to be documented instruction-by-instruction).
+## Runtime status
+
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+INT3
+```

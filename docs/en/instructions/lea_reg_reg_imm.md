@@ -1,17 +1,29 @@
 # LEA_REG_REG_IMM
 
+## Mnemonic
+
+- `LEA_REG_REG_IMM`
+
 ## Opcode
 
-- Value: `0x80`
+- `0x80`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Load 16-bit value/address into register pair.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg_low`
+- `reg_high`
+- `imm16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+LEA A, B, 0x1234
+```

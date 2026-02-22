@@ -1,17 +1,28 @@
 # OR_REG_IMM
 
+## Mnemonic
+
+- `OR_REG_IMM`
+
 ## Opcode
 
-- Value: `0x45`
+- `0x45`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise OR.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+OR A, 0xF0
+```

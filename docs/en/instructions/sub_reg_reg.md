@@ -1,17 +1,28 @@
 # SUB_REG_REG
 
+## Mnemonic
+
+- `SUB_REG_REG`
+
 ## Opcode
 
-- Value: `0x3C`
+- `0x3C`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Subtract source from destination.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+SUB A, B
+```

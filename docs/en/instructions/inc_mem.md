@@ -1,17 +1,27 @@
 # INC_MEM
 
+## Mnemonic
+
+- `INC_MEM`
+
 ## Opcode
 
-- Value: `0x31`
+- `0x31`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Increment operand by 1.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+INC [0xA000]
+```

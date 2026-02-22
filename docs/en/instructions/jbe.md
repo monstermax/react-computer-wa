@@ -1,13 +1,23 @@
 # JBE
 
-## Type
+## Mnemonic
 
-Alias opcode.
+- `JBE`
 
-## Mapping
+## Opcode
 
-- Alias of: `JLE`
+- Alias of `JLE` (same opcode value)
 
-## Runtime status
+## Description
 
-- Uses the behavior of `JLE`.
+Alias mnemonic for `JLE`.
+
+## Operands
+
+Same as `JLE`.
+
+## Assembly example
+
+```asm
+JLE lower_or_eq
+```

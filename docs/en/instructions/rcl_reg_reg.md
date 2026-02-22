@@ -1,17 +1,28 @@
 # RCL_REG_REG
 
+## Mnemonic
+
+- `RCL_REG_REG`
+
 ## Opcode
 
-- Value: `0x6B`
+- `0x6B`
 
-## Runtime status
+## Description
 
-- Not connected in the current `Cpu.ts` instruction switch.
+Rotate left through carry.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `reg`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Defined in enum but not connected in the current execution switch.
+
+## Assembly example
+
+```asm
+RCL REG REG
+```

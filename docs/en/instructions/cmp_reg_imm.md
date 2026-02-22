@@ -1,17 +1,28 @@
 # CMP_REG_IMM
 
+## Mnemonic
+
+- `CMP_REG_IMM`
+
 ## Opcode
 
-- Value: `0x50`
+- `0x50`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Compare operands and update flags.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+CMP A, 0x00
+```

@@ -1,17 +1,28 @@
 # TEST_REG_IMM
 
+## Mnemonic
+
+- `TEST_REG_IMM`
+
 ## Opcode
 
-- Value: `0x53`
+- `0x53`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Bitwise test (AND) and update flags.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `reg`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+TEST A, 0x01
+```

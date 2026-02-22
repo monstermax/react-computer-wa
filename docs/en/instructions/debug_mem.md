@@ -1,17 +1,28 @@
 # DEBUG_MEM
 
+## Mnemonic
+
+- `DEBUG_MEM`
+
 ## Opcode
 
-- Value: `0x06`
+- `0x06`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Debug helper instruction.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `debug_id`
+- `addr16`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+DEBUG_MEM 1, 0xA000
+```

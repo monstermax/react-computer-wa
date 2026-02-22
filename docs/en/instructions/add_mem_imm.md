@@ -1,17 +1,28 @@
 # ADD_MEM_IMM
 
+## Mnemonic
+
+- `ADD_MEM_IMM`
+
 ## Opcode
 
-- Value: `0x39`
+- `0x39`
 
-## Runtime status
+## Description
 
-- Implemented in `Cpu.ts` instruction switch.
+Add source to destination.
 
 ## Operands
 
-TBD (to be documented with exact binary encoding and examples).
+- `addr16`
+- `imm8`
 
-## Behavior
+## Runtime status
 
-TBD (to be documented instruction-by-instruction).
+- Implemented in `web_assembly/src/Cpu.ts`.
+
+## Assembly example
+
+```asm
+ADD [0xA000], 0x01
+```
