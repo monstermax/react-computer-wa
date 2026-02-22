@@ -1,6 +1,7 @@
 ; Author: Bob + yomax
 ; Name: sokoban_game
 ; Description: Sokoban (8x8 grid, rendered on 32x32 screen)
+; Visual scale: tiles are 3x3, walls are drawn with 2px thickness
 ;
 ; Controls: Z/Q/S/D (or W/A/S/D)
 ; - Z/W: up
@@ -15,6 +16,7 @@
 
 .include "os/v3/drivers/lib_screen.asm"
 .include "os/v3/drivers/lib_keyboard.asm"
+.include "os/v3/drivers/lib_console.asm"
 .include "os/v3/arithmetic/lib_math.asm"
 
 
@@ -78,6 +80,11 @@ section .data
     ; RNG device base (see rng_test.asm)
     rng_io_base         dw 0xF0A0
 
+    msg_help_1          db "SOKOBAN: ZQSD/WASD to move", 0
+    msg_help_2          db "Push orange box onto yellow target", 0
+    msg_level_ok        db "Level solved. New target generated.", 0
+    msg_eol             db 10, 0
+
     ; 8x8 map:
     ; 11111111
     ; 10000001
@@ -106,10 +113,46 @@ section .text
 
 _start:
     call render_map
+    call print_help
 
 .main_loop:
     call handle_input
     jmp .main_loop
+
+
+; =============================================================================
+; Console messages
+; =============================================================================
+print_help:
+    push cl
+    push dl
+
+    lea cl, dl, [msg_help_1]
+    call console_print_string
+    lea cl, dl, [msg_eol]
+    call console_print_string
+
+    lea cl, dl, [msg_help_2]
+    call console_print_string
+    lea cl, dl, [msg_eol]
+    call console_print_string
+
+    pop dl
+    pop cl
+    ret
+
+print_level_ok:
+    push cl
+    push dl
+
+    lea cl, dl, [msg_level_ok]
+    call console_print_string
+    lea cl, dl, [msg_eol]
+    call console_print_string
+
+    pop dl
+    pop cl
+    ret
 
 
 ; =============================================================================
@@ -438,6 +481,7 @@ check_win:
     jne .check_win_exit
 
     call relocate_target
+    call print_level_ok
 
     ; keep playing (no permanent win state)
     mov al, 0
@@ -579,10 +623,20 @@ render_map:
     je .next_render_y
 
     call get_tile
+    mov bl, al
     call tile_to_color
 
-    ; draw 4x4 cell at tile (F,E)
-    call draw_cell4
+    ; walls with thinner border (2x2), other tiles in 3x3
+    cmp bl, TILE_WALL
+    je .draw_wall
+
+    call draw_cell3
+    jmp .after_draw_cell
+
+.draw_wall:
+    call draw_cell2
+
+.after_draw_cell:
 
     inc fl
     jmp .render_x
@@ -669,10 +723,10 @@ tile_to_color:
 
 
 ; =============================================================================
-; draw_cell4
+; draw_cell3
 ; in:  F=tile_x, E=tile_y, AL=color
 ; =============================================================================
-draw_cell4:
+draw_cell3:
     push al
     push bl
     push cl
@@ -682,34 +736,97 @@ draw_cell4:
 
     mov bl, al
 
-    ; tile coords -> pixel coords
-    shl fl, 2
-    shl el, 2
+    ; tile coords -> pixel coords (x3)
+    ; fl = fl * 3 => fl*2 + fl
+    mov dl, fl
+    shl fl, 1
+    add fl, dl
+
+    ; el = el * 3 => el*2 + el
+    mov dl, el
+    shl el, 1
+    add el, dl
 
     mov cl, 0 ; dy
-.row_loop:
-    cmp cl, 4
-    je .draw_done
+.draw3_row_loop:
+    cmp cl, 3
+    je .draw3_done
 
     mov dl, 0 ; dx
-.col_loop:
-    cmp dl, 4
-    je .next_row
+.draw3_col_loop:
+    cmp dl, 3
+    je .draw3_next_row
 
     mov al, bl
     call screen_set_pixel
 
     inc fl
     inc dl
-    jmp .col_loop
+    jmp .draw3_col_loop
 
-.next_row:
-    sub fl, 4
+.draw3_next_row:
+    sub fl, 3
     inc el
     inc cl
-    jmp .row_loop
+    jmp .draw3_row_loop
 
-.draw_done:
+.draw3_done:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
+; draw_cell2 (used for wall thickness)
+; in:  F=tile_x, E=tile_y, AL=color
+; =============================================================================
+draw_cell2:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    mov bl, al
+
+    ; tile coords -> pixel coords (x3) to stay aligned with grid
+    mov dl, fl
+    shl fl, 1
+    add fl, dl
+
+    mov dl, el
+    shl el, 1
+    add el, dl
+
+    mov cl, 0 ; dy
+.draw2_row_loop:
+    cmp cl, 2
+    je .draw2_done
+
+    mov dl, 0 ; dx
+.draw2_col_loop:
+    cmp dl, 2
+    je .draw2_next_row
+
+    mov al, bl
+    call screen_set_pixel
+
+    inc fl
+    inc dl
+    jmp .draw2_col_loop
+
+.draw2_next_row:
+    sub fl, 2
+    inc el
+    inc cl
+    jmp .draw2_row_loop
+
+.draw2_done:
     pop fl
     pop el
     pop dl
