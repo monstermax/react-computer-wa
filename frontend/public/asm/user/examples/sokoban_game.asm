@@ -26,6 +26,8 @@ section .data
     ; ------------------------------------------------------------------------
     MAP_W               equ 8
     MAP_H               equ 8
+    MAP_W_MAX           equ 7
+    MAP_H_MAX           equ 7
 
     TILE_FLOOR          equ 0
     TILE_WALL           equ 1
@@ -282,7 +284,7 @@ try_move:
     je .try_move_wrap_next_x_pos
     jmp .try_move_wrap_next_x_done
 .try_move_wrap_next_x_neg:
-    mov al, MAP_W - 1
+    mov al, MAP_W_MAX
     jmp .try_move_wrap_next_x_done
 .try_move_wrap_next_x_pos:
     mov al, 0
@@ -299,7 +301,7 @@ try_move:
     je .try_move_wrap_next_y_pos
     jmp .try_move_wrap_next_y_done
 .try_move_wrap_next_y_neg:
-    mov al, MAP_H - 1
+    mov al, MAP_H_MAX
     jmp .try_move_wrap_next_y_done
 .try_move_wrap_next_y_pos:
     mov al, 0
@@ -340,7 +342,7 @@ try_move:
     je .try_move_wrap_next2_x_pos
     jmp .try_move_wrap_next2_x_done
 .try_move_wrap_next2_x_neg:
-    mov al, MAP_W - 1
+    mov al, MAP_W_MAX
     jmp .try_move_wrap_next2_x_done
 .try_move_wrap_next2_x_pos:
     mov al, 0
@@ -356,7 +358,7 @@ try_move:
     je .try_move_wrap_next2_y_pos
     jmp .try_move_wrap_next2_y_done
 .try_move_wrap_next2_y_neg:
-    mov al, MAP_H - 1
+    mov al, MAP_H_MAX
     jmp .try_move_wrap_next2_y_done
 .try_move_wrap_next2_y_pos:
     mov al, 0
