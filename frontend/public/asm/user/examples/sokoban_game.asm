@@ -1,0 +1,649 @@
+; Author: Bob + yomax
+; Name: sokoban_game
+; Description: Sokoban (8x8 grid, rendered on 32x32 screen)
+;
+; Controls: Z/Q/S/D (or W/A/S/D)
+; - Z/W: up
+; - S: down
+; - Q/A: left
+; - D: right
+;
+; Notes:
+; - Turn-based (no timer dependency)
+; - Full redraw only after valid moves
+
+
+.include "os/v3/drivers/lib_screen.asm"
+.include "os/v3/drivers/lib_keyboard.asm"
+.include "os/v3/arithmetic/lib_math.asm"
+
+
+section .data
+    ; ------------------------------------------------------------------------
+    ; Constants
+    ; ------------------------------------------------------------------------
+    MAP_W               equ 8
+    MAP_H               equ 8
+
+    TILE_FLOOR          equ 0
+    TILE_WALL           equ 1
+    TILE_TARGET         equ 2
+    TILE_BOX            equ 3
+    TILE_PLAYER         equ 4
+    TILE_BOX_ON_TARGET  equ 5
+    TILE_PLAYER_ON_TGT  equ 6
+
+    COL_FLOOR           equ 0x00
+    COL_WALL            equ 0x96
+    COL_TARGET          equ 0x2A
+    COL_BOX             equ 0x15
+    COL_PLAYER          equ 0xE0
+    COL_BOX_ON_TARGET   equ 0xF0
+    COL_PLAYER_ON_TGT   equ 0xFF
+
+    ; Tiny win marker color (top-left 2x2)
+    COL_WIN             equ 0x55
+
+    ; Keyboard (ASCII)
+    KEY_Z               equ 122
+    KEY_W               equ 119
+    KEY_S               equ 115
+    KEY_Q               equ 113
+    KEY_A               equ 97
+    KEY_D               equ 100
+
+    KEY_Z_UPPER         equ 90
+    KEY_W_UPPER         equ 87
+    KEY_S_UPPER         equ 83
+    KEY_Q_UPPER         equ 81
+    KEY_A_UPPER         equ 65
+    KEY_D_UPPER         equ 68
+
+    ; ------------------------------------------------------------------------
+    ; Game state
+    ; ------------------------------------------------------------------------
+    player_x            db 4
+    player_y            db 2
+
+    move_dx             db 0
+    move_dy             db 0
+
+    next_x              db 0
+    next_y              db 0
+    next2_x             db 0
+    next2_y             db 0
+
+    game_won            db 0
+
+    ; 8x8 map:
+    ; 11111111
+    ; 10000001
+    ; 10234001
+    ; 10000001
+    ; 10000001
+    ; 10000001
+    ; 10000001
+    ; 11111111
+    ;
+    ; Goal: push box (3) left onto target (2)
+    map_data:
+        db 1,1,1,1,1,1,1,1
+        db 1,0,0,0,0,0,0,1
+        db 1,0,2,3,4,0,0,1
+        db 1,0,0,0,0,0,0,1
+        db 1,0,0,0,0,0,0,1
+        db 1,0,0,0,0,0,0,1
+        db 1,0,0,0,0,0,0,1
+        db 1,1,1,1,1,1,1,1
+
+
+section .text
+    global _start
+
+
+_start:
+    call render_map
+
+.main_loop:
+    call handle_input
+    jmp .main_loop
+
+
+; =============================================================================
+; Input
+; =============================================================================
+handle_input:
+    push al
+
+    call get_keyboard_status
+    and al, 0x01
+    cmp al, 0
+    je .done
+
+    call get_keyboard_char
+
+    ; acknowledge key read
+    call set_keyboard_status
+
+    ; default: no movement
+    mov al, 0
+    mov [move_dx], al
+    mov [move_dy], al
+
+    ; Up (Z/W)
+    cmp al, KEY_Z
+    je .up
+    cmp al, KEY_W
+    je .up
+    cmp al, KEY_Z_UPPER
+    je .up
+    cmp al, KEY_W_UPPER
+    je .up
+
+    ; Down (S)
+    cmp al, KEY_S
+    je .down
+    cmp al, KEY_S_UPPER
+    je .down
+
+    ; Left (Q/A)
+    cmp al, KEY_Q
+    je .left
+    cmp al, KEY_A
+    je .left
+    cmp al, KEY_Q_UPPER
+    je .left
+    cmp al, KEY_A_UPPER
+    je .left
+
+    ; Right (D)
+    cmp al, KEY_D
+    je .right
+    cmp al, KEY_D_UPPER
+    je .right
+
+    jmp .done
+
+.up:
+    mov al, 0xFF
+    mov [move_dy], al
+    jmp .try
+
+.down:
+    mov al, 0x01
+    mov [move_dy], al
+    jmp .try
+
+.left:
+    mov al, 0xFF
+    mov [move_dx], al
+    jmp .try
+
+.right:
+    mov al, 0x01
+    mov [move_dx], al
+
+.try:
+    call try_move
+
+.done:
+    pop al
+    ret
+
+
+; =============================================================================
+; try_move
+; =============================================================================
+try_move:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    ; next = player + delta
+    mov al, [player_x]
+    add al, [move_dx]
+    mov [next_x], al
+
+    mov al, [player_y]
+    add al, [move_dy]
+    mov [next_y], al
+
+    ; tile_next in AL
+    mov fl, [next_x]
+    mov el, [next_y]
+    call get_tile
+
+    ; wall => blocked
+    cmp al, TILE_WALL
+    je .exit
+
+    ; box / box_on_target => push path
+    cmp al, TILE_BOX
+    je .push
+    cmp al, TILE_BOX_ON_TARGET
+    je .push
+
+    ; normal move only if next is floor or target
+    cmp al, TILE_FLOOR
+    je .normal_move
+    cmp al, TILE_TARGET
+    je .normal_move
+
+    jmp .exit
+
+.push:
+    ; next2 = next + delta
+    mov al, [next_x]
+    add al, [move_dx]
+    mov [next2_x], al
+
+    mov al, [next_y]
+    add al, [move_dy]
+    mov [next2_y], al
+
+    ; tile_next2 in AL
+    mov fl, [next2_x]
+    mov el, [next2_y]
+    call get_tile
+
+    ; next2 must be floor or target
+    cmp al, TILE_FLOOR
+    je .can_push
+    cmp al, TILE_TARGET
+    je .can_push
+    jmp .exit
+
+.can_push:
+    ; ------------------------------------------------------------
+    ; 1) Move box to next2
+    ; ------------------------------------------------------------
+    mov fl, [next2_x]
+    mov el, [next2_y]
+
+    ; AL currently has tile_next2 (floor/target)
+    cmp al, TILE_TARGET
+    je .box_to_target
+
+    mov al, TILE_BOX
+    call set_tile
+    jmp .after_box_move
+
+.box_to_target:
+    mov al, TILE_BOX_ON_TARGET
+    call set_tile
+
+.after_box_move:
+    ; ------------------------------------------------------------
+    ; 2) Move player into next
+    ; ------------------------------------------------------------
+    ; Determine tile_next again (it was box or box_on_target)
+    mov fl, [next_x]
+    mov el, [next_y]
+    call get_tile
+
+    ; if original next was box_on_target => player_on_target
+    cmp al, TILE_BOX_ON_TARGET
+    je .player_to_target_cell
+
+    mov al, TILE_PLAYER
+    call set_tile
+    jmp .after_player_to_next
+
+.player_to_target_cell:
+    mov al, TILE_PLAYER_ON_TGT
+    call set_tile
+
+.after_player_to_next:
+    ; ------------------------------------------------------------
+    ; 3) Clear old player cell (player or player_on_target)
+    ; ------------------------------------------------------------
+    mov fl, [player_x]
+    mov el, [player_y]
+    call get_tile
+
+    cmp al, TILE_PLAYER_ON_TGT
+    je .old_becomes_target
+
+    mov al, TILE_FLOOR
+    call set_tile
+    jmp .finalize_pos
+
+.old_becomes_target:
+    mov al, TILE_TARGET
+    call set_tile
+
+.finalize_pos:
+    mov al, [next_x]
+    mov [player_x], al
+    mov al, [next_y]
+    mov [player_y], al
+
+    call check_win
+    call render_map
+    jmp .exit
+
+.normal_move:
+    ; ------------------------------------------------------------
+    ; normal move into floor/target
+    ; AL currently tile_next
+    ; ------------------------------------------------------------
+    mov bl, al ; save tile_next
+
+    ; set next cell to player/player_on_target
+    mov fl, [next_x]
+    mov el, [next_y]
+
+    cmp bl, TILE_TARGET
+    je .to_target
+
+    mov al, TILE_PLAYER
+    call set_tile
+    jmp .clear_old
+
+.to_target:
+    mov al, TILE_PLAYER_ON_TGT
+    call set_tile
+
+.clear_old:
+    mov fl, [player_x]
+    mov el, [player_y]
+    call get_tile
+
+    cmp al, TILE_PLAYER_ON_TGT
+    je .old_target2
+
+    mov al, TILE_FLOOR
+    call set_tile
+    jmp .finalize_pos2
+
+.old_target2:
+    mov al, TILE_TARGET
+    call set_tile
+
+.finalize_pos2:
+    mov al, [next_x]
+    mov [player_x], al
+    mov al, [next_y]
+    mov [player_y], al
+
+    call check_win
+    call render_map
+
+.exit:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
+; check_win: win when no TILE_BOX remains
+; =============================================================================
+check_win:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    mov al, 1
+    mov [game_won], al
+
+    mov el, 0 ; y
+.y_loop:
+    cmp el, MAP_H
+    je .done
+
+    mov fl, 0 ; x
+.x_loop:
+    cmp fl, MAP_W
+    je .next_y
+
+    call get_tile
+    cmp al, TILE_BOX
+    jne .next_x
+
+    mov al, 0
+    mov [game_won], al
+    jmp .done
+
+.next_x:
+    inc fl
+    jmp .x_loop
+
+.next_y:
+    inc el
+    jmp .y_loop
+
+.done:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
+; render_map
+; =============================================================================
+render_map:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    mov el, 0 ; y
+.render_y:
+    cmp el, MAP_H
+    je .after_map
+
+    mov fl, 0 ; x
+.render_x:
+    cmp fl, MAP_W
+    je .next_render_y
+
+    call get_tile
+    call tile_to_color
+
+    ; draw 4x4 cell at tile (F,E)
+    call draw_cell4
+
+    inc fl
+    jmp .render_x
+
+.next_render_y:
+    inc el
+    jmp .render_y
+
+.after_map:
+    ; draw tiny 2x2 win marker in top-left corner
+    mov al, [game_won]
+    cmp al, 1
+    jne .done
+
+    mov al, COL_WIN
+    mov fl, 0
+    mov el, 0
+    call screen_set_pixel
+    mov fl, 1
+    mov el, 0
+    call screen_set_pixel
+    mov fl, 0
+    mov el, 1
+    call screen_set_pixel
+    mov fl, 1
+    mov el, 1
+    call screen_set_pixel
+
+.done:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
+; tile_to_color
+; in:  AL=tile
+; out: AL=color
+; =============================================================================
+tile_to_color:
+    cmp al, TILE_FLOOR
+    je .floor
+    cmp al, TILE_WALL
+    je .wall
+    cmp al, TILE_TARGET
+    je .target
+    cmp al, TILE_BOX
+    je .box
+    cmp al, TILE_PLAYER
+    je .player
+    cmp al, TILE_BOX_ON_TARGET
+    je .box_target
+    cmp al, TILE_PLAYER_ON_TGT
+    je .player_target
+
+    mov al, COL_FLOOR
+    ret
+
+.floor:
+    mov al, COL_FLOOR
+    ret
+.wall:
+    mov al, COL_WALL
+    ret
+.target:
+    mov al, COL_TARGET
+    ret
+.box:
+    mov al, COL_BOX
+    ret
+.player:
+    mov al, COL_PLAYER
+    ret
+.box_target:
+    mov al, COL_BOX_ON_TARGET
+    ret
+.player_target:
+    mov al, COL_PLAYER_ON_TGT
+    ret
+
+
+; =============================================================================
+; draw_cell4
+; in:  F=tile_x, E=tile_y, AL=color
+; =============================================================================
+draw_cell4:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    mov bl, al
+
+    ; tile coords -> pixel coords
+    shl fl, 2
+    shl el, 2
+
+    mov cl, 0 ; dy
+.row_loop:
+    cmp cl, 4
+    je .draw_done
+
+    mov dl, 0 ; dx
+.col_loop:
+    cmp dl, 4
+    je .next_row
+
+    mov al, bl
+    call screen_set_pixel
+
+    inc fl
+    inc dl
+    jmp .col_loop
+
+.next_row:
+    sub fl, 4
+    inc el
+    inc cl
+    jmp .row_loop
+
+.draw_done:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
+; get_tile
+; in:  F=x, E=y
+; out: AL=tile
+; =============================================================================
+get_tile:
+    push bl
+    push cl
+    push dl
+
+    mov al, el
+    shl al, 3
+    add al, fl
+
+    lea cl, dl, [map_data]
+    add cl, al
+    jnc .no_carry
+    inc dl
+.no_carry:
+    ldi al, cl, dl
+
+    pop dl
+    pop cl
+    pop bl
+    ret
+
+
+; =============================================================================
+; set_tile
+; in:  F=x, E=y, AL=tile
+; =============================================================================
+set_tile:
+    push bl
+    push cl
+    push dl
+
+    mov bl, al
+
+    mov al, el
+    shl al, 3
+    add al, fl
+
+    lea cl, dl, [map_data]
+    add cl, al
+    jnc .no_carry
+    inc dl
+.no_carry:
+    sti cl, dl, bl
+
+    pop dl
+    pop cl
+    pop bl
+    ret
