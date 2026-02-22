@@ -401,12 +401,20 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     const openAssemblyFileInEditor = async (filePath: string, selectedLine?: number) => {
+        if (editorCurrentFilepath === 'main.asm' && !filePath.startsWith('main.asm')) {
+            return;
+        }
+
         if (filePath !== editorCurrentFilepath) {
-            if (filePath.startsWith('main.asm')) return;
-            const response = await fetch(`/asm/${filePath}`);
-            const value = await response.text();
+            if (filePath.startsWith('main.asm')) {
+
+            } else {
+                const response = await fetch(`/asm/${filePath}`);
+                const value = await response.text();
+                setEditorInitialContent(value)
+            }
+
             setEditorCurrentFilepath(filePath)
-            setEditorInitialContent(value)
         }
 
         if (selectedLine) {

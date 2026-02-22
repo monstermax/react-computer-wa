@@ -1,6 +1,6 @@
 {
-  "generated": "2026-02-21T21:22:52.041Z",
-  "count": 37,
+  "generated": "2026-02-22T03:28:41.961Z",
+  "count": 38,
   "files": [
     "bootloader/lib_devices.asm",
     "bootloader/lib_string.asm",
@@ -10,6 +10,7 @@
     "bootloader/devices/lib_leds.asm",
     "bootloader/bootloader_v2.asm",
     "user/examples/draw_fractal_on_screen_hd.asm",
+    "user/examples/sokoban_game.asm",
     "user/examples/snake_game.asm",
     "user/examples/trex_game.asm",
     "user/examples/draw_fractal_on_screen.asm",

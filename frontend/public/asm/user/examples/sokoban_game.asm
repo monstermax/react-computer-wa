@@ -118,7 +118,7 @@ handle_input:
     call get_keyboard_status
     and al, 0x01
     cmp al, 0
-    je .done
+    je .handle_input_done
 
     call get_keyboard_char
 
@@ -162,7 +162,7 @@ handle_input:
     cmp al, KEY_D_UPPER
     je .right
 
-    jmp .done
+    jmp .handle_input_done
 
 .up:
     mov al, 0xFF
@@ -186,7 +186,7 @@ handle_input:
 .try:
     call try_move
 
-.done:
+.handle_input_done:
     pop al
     ret
 
@@ -399,7 +399,7 @@ check_win:
     mov el, 0 ; y
 .y_loop:
     cmp el, MAP_H
-    je .done
+    je .check_win_done
 
     mov fl, 0 ; x
 .x_loop:
@@ -412,7 +412,7 @@ check_win:
 
     mov al, 0
     mov [game_won], al
-    jmp .done
+    jmp .check_win_done
 
 .next_x:
     inc fl
@@ -422,7 +422,7 @@ check_win:
     inc el
     jmp .y_loop
 
-.done:
+.check_win_done:
     pop fl
     pop el
     pop dl
@@ -470,7 +470,7 @@ render_map:
     ; draw tiny 2x2 win marker in top-left corner
     mov al, [game_won]
     cmp al, 1
-    jne .done
+    jne .render_map_done
 
     mov al, COL_WIN
     mov fl, 0
@@ -486,7 +486,7 @@ render_map:
     mov el, 1
     call screen_set_pixel
 
-.done:
+.render_map_done:
     pop fl
     pop el
     pop dl
@@ -610,9 +610,9 @@ get_tile:
 
     lea cl, dl, [map_data]
     add cl, al
-    jnc .no_carry
+    jnc .get_tile_no_carry
     inc dl
-.no_carry:
+.get_tile_no_carry:
     ldi al, cl, dl
 
     pop dl
@@ -638,9 +638,9 @@ set_tile:
 
     lea cl, dl, [map_data]
     add cl, al
-    jnc .no_carry
+    jnc .set_tile_no_carry
     inc dl
-.no_carry:
+.set_tile_no_carry:
     sti cl, dl, bl
 
     pop dl
