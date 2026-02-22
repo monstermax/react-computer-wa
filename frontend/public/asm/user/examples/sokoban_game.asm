@@ -88,8 +88,8 @@ section .data
     ; RNG device base (see rng_test.asm)
     rng_io_base         dw 0xF0A0
 
-    msg_help_1          db "SOKOBAN: ZQSD/WASD to move", 0
-    msg_help_2          db "Push orange box onto yellow target", 0
+    msg_help_1          db "SOKOBAN: ZQSD/WASD to move. Escape to quit.", 13, 0
+    msg_help_2          db "Click the Console to set keyboard focus.", 13, "You are the pink box. Push orange box onto yellow target.", 13, 0
     msg_level_ok        db "Level solved. New target generated.", 0
     msg_eol             db 10, 0
 

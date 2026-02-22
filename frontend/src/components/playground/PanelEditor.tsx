@@ -136,7 +136,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     useEffect(() => {
 
         const _fetch = async () => {
-            openAssemblyFileInEditor(defaultCodeFilepath)
+            await openAssemblyFileInEditor(defaultCodeFilepath)
             return
             const codeUrl = `/asm/${defaultCodeFilepath}`;
             const response = await fetch(codeUrl);
@@ -147,6 +147,11 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         const timer = setTimeout(_fetch, 100);
         return () => clearTimeout(timer);
     }, []);
+
+
+    useEffect(() => {
+        handleEditorUpdate(editorInitialContent, {})
+    }, [editorInitialContent])
 
 
     useEffect(() => {
