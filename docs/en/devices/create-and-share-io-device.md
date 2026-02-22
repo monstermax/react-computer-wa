@@ -172,5 +172,12 @@ Good early community devices:
 - audio outputs
 - input controllers
 - storage-related helpers
+- a `network` device (WebSocket-based)
+
+A WebSocket-based network device is a strong candidate for community sharing:
+- browser-compatible networking model
+- multiplayer assembly games
+- chat-style assembly apps
+- message/event-driven experiments
 
 These give immediate visual feedback and are easy to validate in demos.
