@@ -114,6 +114,7 @@ _start:
 ; =============================================================================
 handle_input:
     push al
+    push bl
 
     call get_keyboard_status
     and al, 0x01
@@ -121,6 +122,7 @@ handle_input:
     je .handle_input_done
 
     call get_keyboard_char
+    mov bl, al ; save pressed key
 
     ; acknowledge key read
     call set_keyboard_status
@@ -129,6 +131,9 @@ handle_input:
     mov al, 0
     mov [move_dx], al
     mov [move_dy], al
+
+    ; restore pressed key for comparisons
+    mov al, bl
 
     ; Up (Z/W)
     cmp al, KEY_Z
@@ -187,6 +192,7 @@ handle_input:
     call try_move
 
 .handle_input_done:
+    pop bl
     pop al
     ret
 
