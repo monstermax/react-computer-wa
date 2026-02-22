@@ -4,18 +4,16 @@ Source file: [`frontend/src/components/devices/clock.tsx`](../../../frontend/src
 
 ## Description
 
-Device implementation used by the emulator frontend.
+Internal timing utility used by frontend runtime components.
+
+This file defines an event-emitting clock (`tick`) with configurable frequency.
 
 ## Main features
 
-- See source implementation for behavior details.
+- start/stop periodic timer
+- dynamic frequency update
+- tick event emitter
 
 ## Ports
 
-### Read
-
-- TBD
-
-### Write
-
-- TBD
+Not an I/O mapped device class (`IoDevice`) in current code, so no read/write ports are exposed.

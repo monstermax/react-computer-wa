@@ -4,18 +4,32 @@ Source file: [`frontend/src/components/devices/lcd.tsx`](../../../frontend/src/c
 
 ## Description
 
-Device implementation used by the emulator frontend.
+Character display device with cursor control.
+
+Default size is 16x2 characters.
 
 ## Main features
 
-- See source implementation for behavior details.
+- character write at current cursor
+- auto-advance cursor
+- clear/home commands
+- cursor visibility command
+- direct cursor positioning
 
 ## Ports
 
 ### Read
 
-- TBD
+- no dedicated readable data (device is effectively write-oriented)
 
 ### Write
 
-- TBD
+- `0x00` (`LCD_DATA`): write character at current cursor
+- `0x01` (`LCD_COMMAND`): command register
+  - `0x01`: clear display + home cursor
+  - `0x02`: home cursor
+  - `0x0C`: cursor off
+  - `0x0E`: cursor on
+  - `0x10`: cursor left
+  - `0x14`: cursor right
+- `0x02` (`LCD_CURSOR`): set cursor from linear index (`row*width + col`)

@@ -4,18 +4,29 @@ Source file: [`frontend/src/components/devices/interrupt_timer.tsx`](../../../fr
 
 ## Description
 
-Device implementation used by the emulator frontend.
+Programmable timer device that raises timer IRQ through the interrupt controller.
 
 ## Main features
 
-- See source implementation for behavior details.
+- tick counter
+- programmable period
+- enable/disable control
+- manual tick trigger via I/O write
+- requests `IRQ_TIMER` when counter reaches period
 
 ## Ports
 
 ### Read
 
-- TBD
+- `0x00`: current counter
+- `0x01`: control/status (`1` if enabled, else `0`)
+- `0x02`: period value
+- `0x03`: tick register (write-only behavior)
 
 ### Write
 
-- TBD
+- `0x01`: control
+  - bit 0: enable/disable
+  - bit 1: reset counter
+- `0x02`: set period
+- `0x03`: force one timer tick

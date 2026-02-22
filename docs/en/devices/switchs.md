@@ -4,18 +4,23 @@ Source file: [`frontend/src/components/devices/switchs.tsx`](../../../frontend/s
 
 ## Description
 
-Device implementation used by the emulator frontend.
+8-switch input bank with queued state-change acknowledgements.
 
 ## Main features
 
-- See source implementation for behavior details.
+- 8-bit switch state register
+- pending switch index for event handling
+- queue of pending switch transitions
+- CPU ack mechanism per switch event
 
 ## Ports
 
 ### Read
 
-- TBD
+- `0x00` (`SWITCHS_DATA`): current 8-bit switch state
+- `0x01` (`SWITCHS_STATUS`): pending switch index (`0..7`) or `0xFF` if none
 
 ### Write
 
-- TBD
+- `0x00`: direct state write + clear pending index
+- `0x01`: acknowledge pending switch index (on match, dequeues next event)
