@@ -91,10 +91,12 @@ export enum Opcode {
     CMP_REG_IMM = 0x50,
     CMP_REG_REG = 0x51,
     CMP_REG_MEM = 0x52,
+    CMP_MEM_IMM = 0x53,
 
-    TEST_REG_IMM = 0x53,
-    TEST_REG_REG = 0x54,
-    TEST_REG_MEM = 0x55,
+    TEST_REG_IMM = 0x54,
+    TEST_REG_REG = 0x55,
+    TEST_REG_MEM = 0x56,
+    TEST_MEM_IMM = 0x57,
 
     // TODO
 

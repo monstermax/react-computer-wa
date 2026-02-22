@@ -988,6 +988,17 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             };
             break;
 
+        case <u8>Opcode.CMP_MEM_IMM:
+            run = (cpu: Cpu) => {
+                const memAddress = cpu.readMem16(cpu.registers.PC);
+                const memValue = cpu.readMemory(memAddress);
+                const immValue = cpu.readMem8(cpu.registers.PC + 2);
+                const aluResult = cpu.alu.cmp(memValue, immValue);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.registers.PC += 4;
+            };
+            break;
+
         case <u8>Opcode.TEST_REG_IMM:
             run = (cpu: Cpu) => {
                 const regIdx = cpu.readMem8(cpu.registers.PC);
@@ -1018,6 +1029,17 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 const memAddress = cpu.readMem16(cpu.registers.PC + 1);
                 const memValue = cpu.readMemory(memAddress);
                 const aluResult = cpu.alu.test(regValue, memValue);
+                cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
+                cpu.registers.PC += 4;
+            };
+            break;
+
+        case <u8>Opcode.TEST_MEM_IMM:
+            run = (cpu: Cpu) => {
+                const memAddress = cpu.readMem16(cpu.registers.PC);
+                const memValue = cpu.readMemory(memAddress);
+                const immValue: u8 = cpu.readMem8(cpu.registers.PC + 2);
+                const aluResult = cpu.alu.test(memValue, immValue);
                 cpu.setFlags(aluResult.flags.zero, aluResult.flags.carry);
                 cpu.registers.PC += 4;
             };

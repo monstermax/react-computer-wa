@@ -8,7 +8,7 @@
 ; - ESC: quit
 
 
-; COMPILATION FAILED
+; A DEBUGUER
 
 
 .include "os/v3/drivers/lib_screen.asm"

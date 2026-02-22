@@ -913,7 +913,7 @@ export class CompilerV2 {
                     }
 
                     if (debugAddress !== size) {
-                        throw new Error(`debugAddress size mismatch : debugAddress=${debugAddress} VS size=${size}`);
+                        throw new Error(`debugAddress size mismatch (directive "${next.value}" in ${token.file}:${token.line}) : debugAddress=${debugAddress} VS size=${size}`);
                     }
 
 
@@ -940,7 +940,7 @@ export class CompilerV2 {
                 }
 
                 if (debugAddress !== size) {
-                    throw new Error(`debugAddress size mismatch : debugAddress=${debugAddress} VS size=${size}`);
+                    throw new Error(`debugAddress size mismatch (instruction "${token.value}" in ${token.file}:${token.line}) : debugAddress=${debugAddress} VS size=${size}`);
                 }
 
 

@@ -8,7 +8,7 @@
 ; - ESC: quit
 
 
-; COMPILATION FAILED
+; A DEBUGUER
 
 
 .include "os/v3/drivers/lib_screen.asm"
@@ -310,11 +310,14 @@ cs_get_top:
     je cs_gt2_2
     mov al, [tube2_3]
     jmp cs_gtd
-cs_gt2_0: mov al, [tube2_0] ;
+cs_gt2_0:
+    mov al, [tube2_0] ;
     jmp cs_gtd
-cs_gt2_1: mov al, [tube2_1]
+cs_gt2_1:
+    mov al, [tube2_1]
     jmp cs_gtd
-cs_gt2_2: mov al, [tube2_2]
+cs_gt2_2:
+    mov al, [tube2_2]
     jmp cs_gtd
 
 cs_gt0:
@@ -329,11 +332,14 @@ cs_gt0:
     je cs_gt0_2
     mov al, [tube0_3]
     jmp cs_gtd
-cs_gt0_0: mov al, [tube0_0]
+cs_gt0_0:
+    mov al, [tube0_0]
     jmp cs_gtd
-cs_gt0_1: mov al, [tube0_1]
+cs_gt0_1:
+    mov al, [tube0_1]
     jmp cs_gtd
-cs_gt0_2: mov al, [tube0_2]
+cs_gt0_2:
+    mov al, [tube0_2]
     jmp cs_gtd
 
 cs_gt1:
@@ -348,11 +354,14 @@ cs_gt1:
     je cs_gt1_2
     mov al, [tube1_3]
     jmp cs_gtd
-cs_gt1_0: mov al, [tube1_0]
+cs_gt1_0:
+    mov al, [tube1_0]
     jmp cs_gtd
-cs_gt1_1: mov al, [tube1_1]
+cs_gt1_1:
+    mov al, [tube1_1]
     jmp cs_gtd
-cs_gt1_2: mov al, [tube1_2]
+cs_gt1_2:
+    mov al, [tube1_2]
     jmp cs_gtd
 
 cs_gte:
@@ -413,15 +422,18 @@ cs_pop0:
     mov [tube0_3], 0
     dec [tube0_count]
     jmp cs_popd
-cs_pop0_0: mov al, [tube0_0]
+cs_pop0_0:
+    mov al, [tube0_0]
     mov [tube0_0], 0
     dec [tube0_count]
     jmp cs_popd
-cs_pop0_1: mov al, [tube0_1]
+cs_pop0_1:
+    mov al, [tube0_1]
     mov [tube0_1], 0
     dec [tube0_count]
     jmp cs_popd
-cs_pop0_2: mov al, [tube0_2]
+cs_pop0_2:
+    mov al, [tube0_2]
     mov [tube0_2], 0
     dec [tube0_count]
     jmp cs_popd
@@ -440,15 +452,18 @@ cs_pop1:
     mov [tube1_3], 0
     dec [tube1_count]
     jmp cs_popd
-cs_pop1_0: mov al, [tube1_0]
+cs_pop1_0:
+    mov al, [tube1_0]
     mov [tube1_0], 0
     dec [tube1_count]
     jmp cs_popd
-cs_pop1_1: mov al, [tube1_1]
+cs_pop1_1:
+    mov al, [tube1_1]
     mov [tube1_1], 0
     dec [tube1_count]
     jmp cs_popd
-cs_pop1_2: mov al, [tube1_2]
+cs_pop1_2:
+    mov al, [tube1_2]
     mov [tube1_2], 0
     dec [tube1_count]
     jmp cs_popd
@@ -477,13 +492,16 @@ cs_push:
     mov [tube2_3], fl
     inc [tube2_count]
     jmp cs_pushd
-cs_push2_0: mov [tube2_0], fl
+cs_push2_0:
+    mov [tube2_0], fl
     inc [tube2_count]
     jmp cs_pushd
-cs_push2_1: mov [tube2_1], fl
+cs_push2_1:
+    mov [tube2_1], fl
     inc [tube2_count]
     jmp cs_pushd
-cs_push2_2: mov [tube2_2], fl
+cs_push2_2:
+    mov [tube2_2], fl
     inc [tube2_count]
     jmp cs_pushd
 
@@ -498,13 +516,16 @@ cs_push0:
     mov [tube0_3], fl
     inc [tube0_count]
     jmp cs_pushd
-cs_push0_0: mov [tube0_0], fl
+cs_push0_0:
+    mov [tube0_0], fl
     inc [tube0_count]
     jmp cs_pushd
-cs_push0_1: mov [tube0_1], fl
+cs_push0_1:
+    mov [tube0_1], fl
     inc [tube0_count]
     jmp cs_pushd
-cs_push0_2: mov [tube0_2], fl
+cs_push0_2:
+    mov [tube0_2], fl
     inc [tube0_count]
     jmp cs_pushd
 
@@ -519,13 +540,16 @@ cs_push1:
     mov [tube1_3], fl
     inc [tube1_count]
     jmp cs_pushd
-cs_push1_0: mov [tube1_0], fl
+cs_push1_0:
+    mov [tube1_0], fl
     inc [tube1_count]
     jmp cs_pushd
-cs_push1_1: mov [tube1_1], fl
+cs_push1_1:
+    mov [tube1_1], fl
     inc [tube1_count]
     jmp cs_pushd
-cs_push1_2: mov [tube1_2], fl
+cs_push1_2:
+    mov [tube1_2], fl
     inc [tube1_count]
 
 cs_pushd:
