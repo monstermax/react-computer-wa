@@ -1,5 +1,7 @@
 # Carte mémoire
 
+Fichier source : [`web_assembly/src/memory_map.ts`](../../web_assembly/src/memory_map.ts)
+
 ## Plages d'adresses
 
 - ROM : `0x0000 - 0x04FF`

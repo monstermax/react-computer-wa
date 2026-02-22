@@ -1,5 +1,8 @@
 # Jeu d'instructions
 
+Fichier source : [`web_assembly/src/cpu_instructions.ts`](../../web_assembly/src/cpu_instructions.ts)  
+Fichier source : [`web_assembly/src/Cpu.ts`](../../web_assembly/src/Cpu.ts)  
+
 Définition des opcodes : `web_assembly/src/cpu_instructions.ts`
 Comportement à l'exécution : `web_assembly/src/Cpu.ts`
 

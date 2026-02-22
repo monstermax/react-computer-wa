@@ -15,3 +15,8 @@
 
 - `frontend/` : application React + Vite + TypeScript
 - `web_assembly/` : CPU/runtime en AssemblyScript compilé en WebAssembly
+
+## Portée FR
+
+La documentation FR reste orientée consignes et tutoriels de base.
+Les détails techniques approfondis sont documentés en anglais (`docs/en`).

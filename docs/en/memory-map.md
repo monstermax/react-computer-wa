@@ -1,5 +1,7 @@
 # Memory Map
 
+Source file: [`web_assembly/src/memory_map.ts`](../../web_assembly/src/memory_map.ts)
+
 ## Address ranges
 
 - ROM: `0x0000 - 0x04FF`
