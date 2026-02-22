@@ -75,6 +75,9 @@ section .data
 
     game_won            db 0
 
+    ; RNG device base (see rng_test.asm)
+    rng_io_base         dw 0xF0A0
+
     ; 8x8 map:
     ; 11111111
     ; 10000001
@@ -429,12 +432,128 @@ check_win:
     jmp .y_loop
 
 .check_win_done:
+    ; If solved, move target to a new random inner cell
+    mov al, [game_won]
+    cmp al, 1
+    jne .check_win_exit
+
+    call relocate_target
+
+    ; keep playing (no permanent win state)
+    mov al, 0
+    mov [game_won], al
+
+.check_win_exit:
     pop fl
     pop el
     pop dl
     pop cl
     pop bl
     pop al
+    ret
+
+
+; =============================================================================
+; relocate_target
+; - converts BOX_ON_TARGET -> BOX
+; - converts PLAYER_ON_TGT -> PLAYER
+; - places a new TARGET on a random inner floor cell (x,y in 1..6)
+; =============================================================================
+relocate_target:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    ; 1) remove old target overlays
+    mov el, 0
+reloc_scan_y:
+    cmp el, MAP_H
+    je reloc_place_target
+
+    mov fl, 0
+reloc_scan_x:
+    cmp fl, MAP_W
+    je reloc_next_y
+
+    call get_tile
+
+    cmp al, TILE_BOX_ON_TARGET
+    je reloc_box_on_target
+
+    cmp al, TILE_PLAYER_ON_TGT
+    je reloc_player_on_target
+
+    jmp reloc_next_x
+
+reloc_box_on_target:
+    mov al, TILE_BOX
+    call set_tile
+    jmp reloc_next_x
+
+reloc_player_on_target:
+    mov al, TILE_PLAYER
+    call set_tile
+
+reloc_next_x:
+    inc fl
+    jmp reloc_scan_x
+
+reloc_next_y:
+    inc el
+    jmp reloc_scan_y
+
+    ; 2) choose random inner floor cell for new target
+reloc_place_target:
+reloc_pick_cell:
+    call random_inner_coord
+    mov bl, al
+
+    call random_inner_coord
+    mov cl, al
+
+    mov fl, bl
+    mov el, cl
+    call get_tile
+
+    cmp al, TILE_FLOOR
+    jne reloc_pick_cell
+
+    mov al, TILE_TARGET
+    call set_tile
+
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
+; random_inner_coord
+; out: AL in range [1..6]
+; =============================================================================
+random_inner_coord:
+    push cl
+    push dl
+
+    mov cl, [rng_io_base]
+    mov dl, [rng_io_base + 1]
+
+random_inner_coord_loop:
+    ldi al, cl, dl
+    and al, 0x07
+    cmp al, 0
+    je random_inner_coord_loop
+    cmp al, 7
+    je random_inner_coord_loop
+
+    pop dl
+    pop cl
     ret
 
 
