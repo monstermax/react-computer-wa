@@ -91,26 +91,17 @@ section .data
     msg_level_ok        db "Level solved. New target generated.", 0
     msg_eol             db 10, 0
 
-    ; 8x8 map:
-    ; 11111111
-    ; 10000001
-    ; 10234001
-    ; 10000001
-    ; 10000001
-    ; 10000001
-    ; 10000001
-    ; 11111111
-    ;
-    ; Goal: push box (3) left onto target (2)
+    ; 8x8 map (no blocking wall tiles on borders)
+    ; visual frame is drawn separately
     map_data:
-        db 1,1,1,1,1,1,1,1
-        db 1,0,0,0,0,0,0,1
-        db 1,0,2,3,4,0,0,1
-        db 1,0,0,0,0,0,0,1
-        db 1,0,0,0,0,0,0,1
-        db 1,0,0,0,0,0,0,1
-        db 1,0,0,0,0,0,0,1
-        db 1,1,1,1,1,1,1,1
+        db 0,0,0,0,0,0,0,0
+        db 0,0,0,0,0,0,0,0
+        db 0,0,2,3,4,0,0,0
+        db 0,0,0,0,0,0,0,0
+        db 0,0,0,0,0,0,0,0
+        db 0,0,0,0,0,0,0,0
+        db 0,0,0,0,0,0,0,0
+        db 0,0,0,0,0,0,0,0
 
 
 section .text
@@ -507,6 +498,7 @@ check_win:
     jne .check_win_exit
 
     call relocate_target
+    call relocate_box
     call print_level_ok
 
     ; keep playing (no permanent win state)
@@ -514,6 +506,85 @@ check_win:
     mov [game_won], al
 
 .check_win_exit:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
+; relocate_box
+; - remove current BOX / BOX_ON_TARGET from map
+; - place BOX on a random inner floor cell (x,y in 1..6)
+; =============================================================================
+relocate_box:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    ; remove current box overlays first
+    mov el, 0
+rbox_scan_y:
+    cmp el, MAP_H
+    je rbox_place
+
+    mov fl, 0
+rbox_scan_x:
+    cmp fl, MAP_W
+    je rbox_next_y
+
+    call get_tile
+
+    cmp al, TILE_BOX
+    je rbox_clear_to_floor
+
+    cmp al, TILE_BOX_ON_TARGET
+    je rbox_clear_to_target
+
+    jmp rbox_next_x
+
+rbox_clear_to_floor:
+    mov al, TILE_FLOOR
+    call set_tile
+    jmp rbox_next_x
+
+rbox_clear_to_target:
+    mov al, TILE_TARGET
+    call set_tile
+
+rbox_next_x:
+    inc fl
+    jmp rbox_scan_x
+
+rbox_next_y:
+    inc el
+    jmp rbox_scan_y
+
+rbox_place:
+rbox_pick_cell:
+    call random_inner_coord
+    mov bl, al
+
+    call random_inner_coord
+    mov cl, al
+
+    mov fl, bl
+    mov el, cl
+    call get_tile
+
+    ; only place box on floor (not target/player)
+    cmp al, TILE_FLOOR
+    jne rbox_pick_cell
+
+    mov al, TILE_BOX
+    call set_tile
+
     pop fl
     pop el
     pop dl
