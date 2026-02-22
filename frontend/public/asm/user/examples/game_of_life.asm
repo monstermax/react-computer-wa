@@ -11,6 +11,10 @@
 ; - Switch 1: clear
 ; - Switch 2: random fill
 
+
+; NOT FONCTIONNAL
+
+
 .include "os/v3/drivers/lib_screen.asm"
 .include "os/v3/drivers/lib_keyboard.asm"
 .include "os/v3/drivers/lib_console.asm"

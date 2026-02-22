@@ -1,5 +1,6 @@
 
 - editor: files tabs
+- points d'arret (pour le cpu) dans l'editeur de code
 - os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - os: parser les arguments de la commande shell
 + os: gestion des io devices (recuperer ce que le bootloader a initialisé)
@@ -22,7 +23,7 @@
 - os: gestionnaire des users
 
 
-- jeux: t-rex, pong, arkanoid, snake, tetris, sokoban, pacman, game of life
+- jeux: t-rex, pong, arkanoid, snake, tetris, sokoban, pacman, game of life, frogger
 
 - partage de code & devices entre utilisateurs
 

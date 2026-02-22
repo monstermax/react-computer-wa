@@ -7,6 +7,10 @@
 ; - R: reset
 ; - ESC: quit
 
+
+; COMPILATION FAILED
+
+
 .include "os/v3/drivers/lib_screen.asm"
 .include "os/v3/drivers/lib_keyboard.asm"
 .include "os/v3/drivers/lib_console.asm"
