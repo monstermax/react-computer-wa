@@ -19,7 +19,8 @@ import type { Token } from "@/compiler/compiler_lexer";
 const defaultLoadAddress = '0xA000';
 
 //const defaultCodeFilepath = "user/examples/draw_fractal_on_screen.asm";
-const defaultCodeFilepath = "user/tests/lcd_test.asm";
+//const defaultCodeFilepath = "user/tests/lcd_test.asm";
+const defaultCodeFilepath = "user/examples/sokoban_game.asm";
 //const defaultCodeFilepath = "bootloader/bootloader_v2.asm";
 //const defaultCodeFilepath = "os/os_v3.asm";
 
