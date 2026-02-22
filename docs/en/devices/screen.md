@@ -1,5 +1,7 @@
 # Screen
 
+Source file: [`frontend/src/components/devices/screen.tsx`](../../frontend/src/components/devices/screen.tsx)
+
 ## Description
 
 Pixel output device with a 2D framebuffer.

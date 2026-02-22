@@ -1,5 +1,7 @@
 # Keyboard
 
+Source file: [`frontend/src/components/devices/keyboard.tsx`](../../frontend/src/components/devices/keyboard.tsx)
+
 ## Description
 
 Input device that exposes queued key events to the CPU.

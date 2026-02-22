@@ -1,5 +1,7 @@
 # Dma
 
+Source file: [`frontend/src/components/devices/dma.tsx`](../../frontend/src/components/devices/dma.tsx)
+
 ## Description
 
 Direct Memory Access controller used to copy byte ranges between RAM and a selected I/O device.

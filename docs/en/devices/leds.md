@@ -1,5 +1,7 @@
 # Leds
 
+Source file: [`frontend/src/components/devices/leds.tsx`](../../frontend/src/components/devices/leds.tsx)
+
 ## Description
 
 8-bit LED output register.

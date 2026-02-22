@@ -1,5 +1,7 @@
 # Console
 
+Source file: [`frontend/src/components/devices/console.tsx`](../../frontend/src/components/devices/console.tsx)
+
 ## Description
 
 Output text console device.

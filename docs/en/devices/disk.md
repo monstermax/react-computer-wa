@@ -1,5 +1,7 @@
 # Disk
 
+Source file: [`frontend/src/components/devices/disk.tsx`](../../frontend/src/components/devices/disk.tsx)
+
 ## Description
 
 Byte-addressable storage device with an internal address pointer.
