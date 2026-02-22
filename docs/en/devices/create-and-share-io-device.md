@@ -106,8 +106,15 @@ Keep your port map stable once shared.
 
 ## 4) Register and test in emulator flow
 
+A new device file does **not** appear automatically in the app.
+
+You must register it manually in `Playground.tsx`:
+
+- add the device to the emulated computer (using `addDevice`)
+- optionally mount its React component if it has one
+
 Validate:
-- device appears correctly in runtime
+- device is registered and reachable at runtime
 - read/write behavior matches expectations
 - reset behavior is deterministic
 - no blocking behavior in read/write

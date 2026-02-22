@@ -1,5 +1,7 @@
 # Périphériques I/O
 
+Pages détaillées des devices : [`docs/en/devices/README.md`](../en/devices/README.md)
+
 ## Modèle
 
 - Un périphérique possède 16 ports (`0x10`)

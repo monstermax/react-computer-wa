@@ -1,5 +1,7 @@
 # I/O Devices
 
+Detailed device pages: [`docs/en/devices/README.md`](./devices/README.md)
+
 ## Device model
 
 - One device owns 16 ports (`0x10`)
