@@ -60,6 +60,11 @@ section .data
     KEY_Q_UPPER         equ 81
     KEY_A_UPPER         equ 65
     KEY_D_UPPER         equ 68
+    KEY_ESC             equ 27
+
+    TILE_SIZE           equ 3
+    BOARD_OFFSET_X      equ 4
+    BOARD_OFFSET_Y      equ 4
 
     ; ------------------------------------------------------------------------
     ; Game state
@@ -76,6 +81,7 @@ section .data
     next2_y             db 0
 
     game_won            db 0
+    quit_requested      db 0
 
     ; RNG device base (see rng_test.asm)
     rng_io_base         dw 0xF0A0
@@ -112,12 +118,22 @@ section .text
 
 
 _start:
+    mov al, 0
+    mov [quit_requested], al
     call render_map
     call print_help
 
 .main_loop:
     call handle_input
+
+    mov al, [quit_requested]
+    cmp al, 1
+    je .quit_game
+
     jmp .main_loop
+
+.quit_game:
+    ret
 
 
 ; =============================================================================
@@ -213,6 +229,10 @@ handle_input:
     cmp al, KEY_D_UPPER
     je .right
 
+    ; Escape: request quit
+    cmp al, KEY_ESC
+    je .escape
+
     jmp .handle_input_done
 
 .up:
@@ -233,6 +253,12 @@ handle_input:
 .right:
     mov al, 0x01
     mov [move_dx], al
+    jmp .try
+
+.escape:
+    mov al, 1
+    mov [quit_requested], al
+    jmp .handle_input_done
 
 .try:
     call try_move
@@ -626,17 +652,8 @@ render_map:
     mov bl, al
     call tile_to_color
 
-    ; walls with thinner border (2x2), other tiles in 3x3
-    cmp bl, TILE_WALL
-    je .draw_wall
-
+    ; draw 3x3 tiles (walls are rendered as floor; border drawn separately)
     call draw_cell3
-    jmp .after_draw_cell
-
-.draw_wall:
-    call draw_cell2
-
-.after_draw_cell:
 
     inc fl
     jmp .render_x
@@ -646,6 +663,8 @@ render_map:
     jmp .render_y
 
 .after_map:
+    call draw_board_border
+
     ; draw tiny 2x2 win marker in top-left corner
     mov al, [game_won]
     cmp al, 1
@@ -703,7 +722,8 @@ tile_to_color:
     mov al, COL_FLOOR
     ret
 .wall:
-    mov al, COL_WALL
+    ; wall collision remains in map logic, but visual border is drawn by draw_board_border
+    mov al, COL_FLOOR
     ret
 .target:
     mov al, COL_TARGET
@@ -723,6 +743,114 @@ tile_to_color:
 
 
 ; =============================================================================
+; draw_board_border
+; draws a continuous 2px border around the 8x8*3 playfield
+; =============================================================================
+draw_board_border:
+    push al
+    push bl
+    push cl
+    push dl
+    push el
+    push fl
+
+    mov al, COL_WALL
+
+    ; top border y=2..3, x=2..29
+    mov el, 2
+bb_top_row1:
+    mov fl, 2
+bb_top_row1_x:
+    cmp fl, 30
+    je bb_top_row2
+    call screen_set_pixel
+    inc fl
+    jmp bb_top_row1_x
+
+bb_top_row2:
+    mov el, 3
+    mov fl, 2
+bb_top_row2_x:
+    cmp fl, 30
+    je bb_bottom_row1
+    call screen_set_pixel
+    inc fl
+    jmp bb_top_row2_x
+
+    ; bottom border y=28..29, x=2..29
+bb_bottom_row1:
+    mov el, 28
+    mov fl, 2
+bb_bottom_row1_x:
+    cmp fl, 30
+    je bb_bottom_row2
+    call screen_set_pixel
+    inc fl
+    jmp bb_bottom_row1_x
+
+bb_bottom_row2:
+    mov el, 29
+    mov fl, 2
+bb_bottom_row2_x:
+    cmp fl, 30
+    je bb_left_col
+    call screen_set_pixel
+    inc fl
+    jmp bb_bottom_row2_x
+
+    ; left border x=2..3, y=2..29
+bb_left_col:
+    mov fl, 2
+    mov el, 2
+bb_left_col_y:
+    cmp el, 30
+    je bb_left_col2
+    call screen_set_pixel
+    inc el
+    jmp bb_left_col_y
+
+bb_left_col2:
+    mov fl, 3
+    mov el, 2
+bb_left_col2_y:
+    cmp el, 30
+    je bb_right_col
+    call screen_set_pixel
+    inc el
+    jmp bb_left_col2_y
+
+    ; right border x=28..29, y=2..29
+bb_right_col:
+    mov fl, 28
+    mov el, 2
+bb_right_col_y:
+    cmp el, 30
+    je bb_right_col2
+    call screen_set_pixel
+    inc el
+    jmp bb_right_col_y
+
+bb_right_col2:
+    mov fl, 29
+    mov el, 2
+bb_right_col2_y:
+    cmp el, 30
+    je bb_done
+    call screen_set_pixel
+    inc el
+    jmp bb_right_col2_y
+
+bb_done:
+    pop fl
+    pop el
+    pop dl
+    pop cl
+    pop bl
+    pop al
+    ret
+
+
+; =============================================================================
 ; draw_cell3
 ; in:  F=tile_x, E=tile_y, AL=color
 ; =============================================================================
@@ -736,16 +864,16 @@ draw_cell3:
 
     mov bl, al
 
-    ; tile coords -> pixel coords (x3)
-    ; fl = fl * 3 => fl*2 + fl
+    ; tile coords -> pixel coords (x3) + board offset
     mov dl, fl
     shl fl, 1
     add fl, dl
+    add fl, BOARD_OFFSET_X
 
-    ; el = el * 3 => el*2 + el
     mov dl, el
     shl el, 1
     add el, dl
+    add el, BOARD_OFFSET_Y
 
     mov cl, 0 ; dy
 .draw3_row_loop:
@@ -794,14 +922,16 @@ draw_cell2:
 
     mov bl, al
 
-    ; tile coords -> pixel coords (x3) to stay aligned with grid
+    ; tile coords -> pixel coords (x3) + board offset
     mov dl, fl
     shl fl, 1
     add fl, dl
+    add fl, BOARD_OFFSET_X
 
     mov dl, el
     shl el, 1
     add el, dl
+    add el, BOARD_OFFSET_Y
 
     mov cl, 0 ; dy
 .draw2_row_loop:
