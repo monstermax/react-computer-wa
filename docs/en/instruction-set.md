@@ -8,18 +8,18 @@ Execution behavior is implemented in `web_assembly/src/Cpu.ts`.
 
 ## Control
 
-- `NOP`, `HALT`
-- `CALL`, `RET`
-- `DEBUG_IMM`, `DEBUG_REG`, `DEBUG_MEM`
-- `INT3` (breakpoint)
+- [`NOP`](./instructions/nop.md), [`HALT`](./instructions/halt.md)
+- [`CALL`](./instructions/call.md), [`RET`](./instructions/ret.md)
+- [`DEBUG_IMM`](./instructions/debug_imm.md), [`DEBUG_REG`](./instructions/debug_reg.md), [`DEBUG_MEM`](./instructions/debug_mem.md)
+- [`INT3`](./instructions/int3.md) (breakpoint)
 
 ## Jumps
 
-- `JMP`
-- `JZ`, `JNZ`
-- `JC`, `JNC`
-- `JL`, `JLE`
-- `JG`, `JGE`
+- [`JMP`](./instructions/jmp.md)
+- [`JZ`](./instructions/jz.md), [`JNZ`](./instructions/jnz.md)
+- [`JC`](./instructions/jc.md), [`JNC`](./instructions/jnc.md)
+- [`JL`](./instructions/jl.md), [`JLE`](./instructions/jle.md)
+- [`JG`](./instructions/jg.md), [`JGE`](./instructions/jge.md)
 
 Aliases in enum:
 
@@ -29,10 +29,10 @@ Aliases in enum:
 
 ## Move / Stack
 
-- `MOV_REG_IMM`, `MOV_REG_REG`, `MOV_REG_MEM`
-- `MOV_MEM_REG`, `MOV_MEM_IMM`
-- `XCHG`
-- `PUSH_REG`, `POP_REG`, `SET_SP`
+- [`MOV_REG_IMM`](./instructions/mov_reg_imm.md), [`MOV_REG_REG`](./instructions/mov_reg_reg.md), [`MOV_REG_MEM`](./instructions/mov_reg_mem.md)
+- [`MOV_MEM_REG`](./instructions/mov_mem_reg.md), [`MOV_MEM_IMM`](./instructions/mov_mem_imm.md)
+- [`XCHG`](./instructions/xchg.md)
+- [`PUSH_REG`](./instructions/push_reg.md), [`POP_REG`](./instructions/pop_reg.md), [`SET_SP`](./instructions/set_sp.md)
 
 ## ALU
 
@@ -45,8 +45,8 @@ Aliases in enum:
 
 ## Compare / test
 
-- `CMP_REG_IMM`, `CMP_REG_REG`, `CMP_REG_MEM`
-- `TEST_REG_IMM`, `TEST_REG_REG`, `TEST_REG_MEM`
+- [`CMP_REG_IMM`](./instructions/cmp_reg_imm.md), [`CMP_REG_REG`](./instructions/cmp_reg_reg.md), [`CMP_REG_MEM`](./instructions/cmp_reg_mem.md)
+- [`TEST_REG_IMM`](./instructions/test_reg_imm.md), [`TEST_REG_REG`](./instructions/test_reg_reg.md), [`TEST_REG_MEM`](./instructions/test_reg_mem.md)
 
 ## Shift
 
@@ -55,11 +55,11 @@ Aliases in enum:
 
 ## 16-bit addressing via register pairs
 
-- `LEA_REG_REG_IMM`
-- `LEA_REG_REG_MEM`
-- `LDI_REG_REG_REG`
-- `STI_REG_REG_REG`
-- `STI_REG_REG_IMM`
+- [`LEA_REG_REG_IMM`](./instructions/lea_reg_reg_imm.md)
+- [`LEA_REG_REG_MEM`](./instructions/lea_reg_reg_mem.md)
+- [`LDI_REG_REG_REG`](./instructions/ldi_reg_reg_reg.md)
+- [`STI_REG_REG_REG`](./instructions/sti_reg_reg_reg.md)
+- [`STI_REG_REG_IMM`](./instructions/sti_reg_reg_imm.md)
 
 ## Notes
 
