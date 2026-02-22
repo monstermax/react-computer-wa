@@ -4,6 +4,7 @@ One page per device.
 
 ## Index
 
+- [Create and Share an I/O Device](./create-and-share-io-device.md)
 - [Buzzer](./buzzer.md)
 - [Clock](./clock.md)
 - [Console](./console.md)
