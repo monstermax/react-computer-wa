@@ -1,19 +1,21 @@
 # FAQ
 
-## Why do some addresses look out of RAM range?
+## Where are opcodes defined?
 
-`MemoryBus` routes accesses through fixed ROM/RAM/I/O ranges.
-A TODO note exists in `Memory.ts` about address mapping and full RAM usage.
+`web_assembly/src/cpu_instructions.ts`
 
-## Where are CPU instructions defined?
+## Where is instruction behavior implemented?
 
-- Opcode enum: `web_assembly/src/cpu_instructions.ts`
-- Instruction execution: `web_assembly/src/Cpu.ts` (`fetchInstructionActions`)
+`web_assembly/src/Cpu.ts` (`fetchInstructionActions`)
 
-## Where are WebAssembly exports defined?
+## Where are wasm exports declared?
 
-In `web_assembly/src/index.ts`.
+`web_assembly/src/index.ts`
 
-## How are devices exposed to the system?
+## How does memory-mapped I/O work?
 
-`IoManager` writes a device table in RAM (count + entries + names), and I/O access is routed through `0xF000+`.
+Writes/reads in `0xF000-0xFFFF` are routed by `MemoryBus` to `IoManager`, then dispatched to host I/O callbacks.
+
+## Why are some interrupt/rotate opcodes listed but not available yet?
+
+They exist in the opcode enum, but not all are connected in the current execution switch.

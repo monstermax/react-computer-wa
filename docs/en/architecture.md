@@ -1,50 +1,47 @@
 # Architecture
 
-## Overview
+## What it does
 
-The project implements an 8-bit computer with a 16-bit address bus.
+The emulator models an 8-bit CPU with a 16-bit address space.
 
-Observed points:
+Core pieces:
 
-- CPU in AssemblyScript (`web_assembly/src/Cpu.ts`)
-- Compiled to a WebAssembly module
-- React/Vite/TypeScript frontend
-- Memory bus routing ROM / RAM / I/O (`Memory.ts`)
-- I/O manager (`IoManager.ts`)
+- CPU execution engine (`Cpu.ts`)
+- Memory bus routing (`Memory.ts`)
+- Device registration and I/O dispatch (`IoManager.ts`)
+- WebAssembly public API (`index.ts`)
 
-## CPU
+## CPU model
 
-Registers visible in `CpuRegisters`:
+Registers:
 
-- `A, B, C, D, E, F` (u8)
-- `PC` (u16)
-- `IR` (u8)
-- `SP` (u16)
-- `FLAGS` (u8)
+- 8-bit: `A B C D E F`
+- 16-bit: `PC SP`
+- 8-bit: `IR FLAGS`
 
-Current flags via `getFlag/setFlags`:
+Flags currently used:
 
-- bit 1 = zero
-- bit 0 = carry
+- `zero`
+- `carry`
 
-## Execution
+## Execution flow
 
-CPU cycle (`runCpuCycle`):
+Per cycle:
 
-1. fetch opcode at `PC`
-2. store opcode in `IR`
-3. execute instruction
+1. Read opcode at `PC`
+2. Store opcode in `IR`
+3. Execute instruction
+4. Update `PC` according to instruction format/behavior
 
-Instruction dispatch is implemented in `fetchInstructionActions`.
+Instruction dispatch is centralized in `fetchInstructionActions`.
 
-## Frontend / WASM boundary
+## WebAssembly API surface
 
-Main exports in `web_assembly/src/index.ts`:
+Main exported functions include:
 
-- `instanciateComputer()`
-- `computerloadCode(...)`
-- `computerRunCycles(...)`
-- register/memory getters
-- `computerSetMemory(...)`
-- `computerAddDevice(...)`
-- `computerResetComputer(...)`
+- Computer lifecycle: `instanciateComputer`, `computerResetComputer`
+- Program loading: `computerloadCode`
+- Execution: `computerRunCycles`, `computerGetCycles`
+- Inspection: register getters + `computerGetMemory`
+- Mutation: `computerSetMemory`
+- Devices: `computerAddDevice`

@@ -1,20 +1,17 @@
-# Frontend Usage
+# Utilisation Frontend
 
-Cette page documente uniquement ce qui est indiqué dans `README.md`.
+## Fonctionnalités du playground
 
-## Fonctionnalités mentionnées
-
-- Éditeur ASM avec syntax highlighting
-- Compilation + chargement du code utilisateur à une adresse configurable (défaut mentionné: `0xA000`)
-- Ouverture de fichiers `.asm`
-- Panneaux devices (console, screen 32x32, LEDs, keyboard, état CPU)
-- Explorer mémoire + dump registres
-- Contrôles d’exécution: start / stop / step / speed
-- Panneau droit par tabs (Devices / Memory / Docs)
-
-## Stack frontend mentionnée
-
-- React
-- TypeScript
-- Tailwind CSS
-- Vite
+- éditeur ASM avec coloration syntaxique
+- compilation et chargement des programmes utilisateur
+- adresse de chargement configurable (valeur par défaut indiquée : `0xA000`)
+- ouverture de fichiers `.asm`
+- panneaux périphériques :
+  - console
+  - écran (32x32)
+  - LEDs
+  - clavier
+  - état CPU
+- explorateur mémoire et dump des registres
+- contrôles d'exécution : start, stop, step, vitesse
+- onglets panneau droit : Devices / Memory / Docs

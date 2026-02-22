@@ -1,50 +1,36 @@
 # Architecture
 
-## Vue d’ensemble
+## Vue d'ensemble
 
-Le projet implémente un ordinateur 8-bit avec bus d’adresses 16-bit.
+L'émulateur modélise un CPU 8-bit avec un espace d'adressage 16-bit.
 
-Points observés :
+Composants centraux :
 
-- CPU en AssemblyScript (`web_assembly/src/Cpu.ts`)
-- Module compilé en WebAssembly
-- Frontend React/Vite/TypeScript
-- Bus mémoire qui route ROM / RAM / I/O (`Memory.ts`)
-- Gestionnaire I/O (`IoManager.ts`)
+- moteur CPU (`Cpu.ts`)
+- routage mémoire (`Memory.ts`)
+- gestion des périphériques et de l'I/O (`IoManager.ts`)
+- API publique WebAssembly (`index.ts`)
 
-## CPU
+## Modèle CPU
 
-Registres visibles dans `CpuRegisters` :
+Registres :
 
-- `A, B, C, D, E, F` (u8)
-- `PC` (u16)
-- `IR` (u8)
-- `SP` (u16)
-- `FLAGS` (u8)
+- 8-bit : `A B C D E F`
+- 16-bit : `PC SP`
+- 8-bit : `IR FLAGS`
 
-Flags gérés actuellement via `getFlag/setFlags` :
+Flags utilisés actuellement :
 
-- bit 1 = zero
-- bit 0 = carry
+- `zero`
+- `carry`
 
-## Exécution
+## Flux d'exécution
 
-Cycle CPU (`runCpuCycle`) :
+À chaque cycle :
 
-1. fetch opcode à `PC`
-2. stocke opcode dans `IR`
-3. exécute l’instruction
+1. lecture de l'opcode à `PC`
+2. stockage dans `IR`
+3. exécution de l'instruction
+4. mise à jour de `PC`
 
-Le dispatch d’instructions est dans `fetchInstructionActions`.
-
-## Frontend / WASM boundary
-
-Exports principaux visibles dans `web_assembly/src/index.ts` :
-
-- `instanciateComputer()`
-- `computerloadCode(...)`
-- `computerRunCycles(...)`
-- getters registres / mémoire
-- `computerSetMemory(...)`
-- `computerAddDevice(...)`
-- `computerResetComputer(...)`
+Le dispatch des instructions est dans `fetchInstructionActions`.

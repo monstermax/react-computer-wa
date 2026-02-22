@@ -1,19 +1,17 @@
 # FAQ
 
-## Pourquoi certaines adresses semblent “hors RAM” ?
+## Où sont définis les opcodes ?
 
-Le `MemoryBus` route les accès selon des plages fixes ROM/RAM/I/O.
-Une note TODO existe dans `Memory.ts` sur le mapping d’adresses et l’utilisation complète de la RAM.
+`web_assembly/src/cpu_instructions.ts`
 
-## Où sont définies les instructions CPU ?
+## Où est implémenté le comportement des instructions ?
 
-- Enum opcodes : `web_assembly/src/cpu_instructions.ts`
-- Exécution des instructions : `web_assembly/src/Cpu.ts` (`fetchInstructionActions`)
+`web_assembly/src/Cpu.ts` (`fetchInstructionActions`)
 
-## Où sont les exports WebAssembly ?
+## Où sont déclarés les exports wasm ?
 
-Dans `web_assembly/src/index.ts`.
+`web_assembly/src/index.ts`
 
-## Comment les devices sont exposés au système ?
+## Comment fonctionne l'I/O mémoire mappée ?
 
-`IoManager` écrit une table des devices en RAM (count + entries + noms), puis les accès I/O passent par plage mémoire `0xF000+`.
+Les accès `0xF000-0xFFFF` sont routés par `MemoryBus` vers `IoManager`, puis dispatchés vers les callbacks hôte.

@@ -1,50 +1,37 @@
 # Memory Map
 
-Reference: `web_assembly/src/memory_map.ts`
+## Address ranges
 
-## Ranges
-
-- ROM: `0x0000` → `0x04FF`
-- RAM: `0x0500` → `0xEFFF`
-- I/O: `0xF000` → `0xFFFF`
+- ROM: `0x0000 - 0x04FF`
+- RAM: `0x0500 - 0xEFFF`
+- I/O: `0xF000 - 0xFFFF`
 
 ## Device table in RAM
 
-Visible constants:
+Location:
 
-- `DEVICE_TABLE_COUNT = 0x0500`
-- `DEVICE_TABLE_START = 0x0501`
-- `DEVICE_TABLE_ENTRY_SIZE = 6`
-- `DEVICE_TABLE_MAX_ENTRIES = 20`
+- count byte: `0x0500`
+- entries start: `0x0501`
+- entry size: `6` bytes
+- max entries: `20`
 
-Entry layout (6 bytes):
+Entry format:
 
 1. device index
-2. type
+2. device type
 3. I/O base low
 4. I/O base high
-5. name ptr low
-6. name ptr high
+5. name pointer low
+6. name pointer high
 
-## Device name strings area
+## Device name strings
 
-- `DEVICE_STRINGS_START = 0x0580`
-- `DEVICE_STRINGS_END = 0x05FF`
+- start: `0x0580`
+- end: `0x05FF`
+- encoding: null-terminated bytes
 
-`IoManager` stores null-terminated device names there.
-
-## Stack / OS
-
-Exposed constants:
+## OS / stack constants
 
 - `OS_START = 0x1000`
 - `STACK_START = 0xEE00`
 - `STACK_END = 0xEFFF`
-
-## Helpers
-
-Available functions:
-
-- `isRomAddress(address)`
-- `isRamAddress(address)`
-- `isIoAddress(address)`

@@ -1,8 +1,6 @@
-# Documentation (EN)
+# 8-bit Computer Emulator Documentation
 
-This documentation currently focuses on what is directly visible in the codebase and project files.
-
-## Table of contents
+## Contents
 
 - [Getting Started](./getting-started.md)
 - [Architecture](./architecture.md)
@@ -13,11 +11,7 @@ This documentation currently focuses on what is directly visible in the codebase
 - [Assembly Examples](./assembly-examples.md)
 - [FAQ](./faq.md)
 
-## Scope
+## Project layout
 
-- `frontend/` = React / Vite / TypeScript application + WebAssembly integration
-- `web_assembly/` = AssemblyScript code compiled into the WebAssembly module
-
-## Note
-
-This documentation is intentionally factual and can be expanded incrementally.
+- `frontend/`: React + Vite + TypeScript application
+- `web_assembly/`: AssemblyScript CPU/runtime compiled to WebAssembly

@@ -1,20 +1,14 @@
 # Instruction Set
 
-References:
-
-- Opcode enum: `web_assembly/src/cpu_instructions.ts`
-- Execution switch: `web_assembly/src/Cpu.ts`
-
-This page lists only instruction families visible in the current code.
+Opcode definitions are in `web_assembly/src/cpu_instructions.ts`.
+Execution behavior is implemented in `web_assembly/src/Cpu.ts`.
 
 ## Control
 
-- `NOP`
-- `HALT`
-- `CALL`
-- `RET`
+- `NOP`, `HALT`
+- `CALL`, `RET`
 - `DEBUG_IMM`, `DEBUG_REG`, `DEBUG_MEM`
-- `INT3`
+- `INT3` (breakpoint)
 
 ## Jumps
 
@@ -24,46 +18,39 @@ This page lists only instruction families visible in the current code.
 - `JL`, `JLE`
 - `JG`, `JGE`
 
-Aliases exist in the enum (`JE/JNE/JA/JAE/JB/JBE`) and map to these opcodes.
+Aliases in enum:
+
+- `JE = JZ`, `JNE = JNZ`
+- `JA = JG`, `JAE = JGE`
+- `JB = JL`, `JBE = JLE`
 
 ## Move / Stack
 
-- `MOV_REG_IMM`
-- `MOV_REG_REG`
-- `MOV_REG_MEM`
-- `MOV_MEM_REG`
-- `MOV_MEM_IMM`
+- `MOV_REG_IMM`, `MOV_REG_REG`, `MOV_REG_MEM`
+- `MOV_MEM_REG`, `MOV_MEM_IMM`
 - `XCHG`
-- `PUSH_REG`
-- `POP_REG`
-- `SET_SP`
+- `PUSH_REG`, `POP_REG`, `SET_SP`
 
 ## ALU
 
-- `INC_REG`, `INC_MEM`
-- `DEC_REG`, `DEC_MEM`
-- `NOT_REG`, `NOT_MEM`
-- `ADD_*` (REG/IMM, REG/REG, REG/MEM, MEM/IMM, MEM/REG)
-- `SUB_*` (REG/IMM, REG/REG, REG/MEM, MEM/IMM, MEM/REG)
-- `AND_*` (REG/IMM, REG/REG, REG/MEM, MEM/IMM, MEM/REG)
-- `OR_*` (REG/IMM, REG/REG, REG/MEM, MEM/IMM, MEM/REG)
-- `XOR_*` (REG/IMM, REG/REG, REG/MEM, MEM/IMM, MEM/REG)
+- `INC_*`, `DEC_*`, `NOT_*`
+- `ADD_*`
+- `SUB_*`
+- `AND_*`
+- `OR_*`
+- `XOR_*`
 
-## Tests
+## Compare / test
 
-- `CMP_REG_IMM`
-- `CMP_REG_REG`
-- `CMP_REG_MEM`
-- `TEST_REG_IMM`
-- `TEST_REG_REG`
-- `TEST_REG_MEM`
+- `CMP_REG_IMM`, `CMP_REG_REG`, `CMP_REG_MEM`
+- `TEST_REG_IMM`, `TEST_REG_REG`, `TEST_REG_MEM`
 
-## Shifts
+## Shift
 
-- `SHL_*` (REG/IMM, REG/REG, REG/MEM, MEM/IMM, MEM/REG)
-- `SHR_*` (REG/IMM, REG/REG, REG/MEM, MEM/IMM, MEM/REG)
+- `SHL_*`
+- `SHR_*`
 
-## Indirect addressing / 16-bit register pairs
+## 16-bit addressing via register pairs
 
 - `LEA_REG_REG_IMM`
 - `LEA_REG_REG_MEM`
@@ -71,7 +58,6 @@ Aliases exist in the enum (`JE/JNE/JA/JAE/JB/JBE`) and map to these opcodes.
 - `STI_REG_REG_REG`
 - `STI_REG_REG_IMM`
 
-## Factual notes
+## Notes
 
-- The enum also includes rotate opcodes (`ROL/ROR/RCL/RCR`) and interrupt-related opcodes (`INT/EI/DI/IRET/SYSCALL`) marked TODO or not implemented in the current execution switch.
-- The CPU currently uses `zero` and `carry` flags.
+The opcode enum already includes rotate and interrupt-related entries (`ROL/ROR/RCL/RCR`, `INT/EI/DI/IRET/SYSCALL`), but they are not all wired in the current execution switch.

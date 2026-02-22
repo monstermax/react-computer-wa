@@ -1,34 +1,33 @@
 # I/O Devices
 
-Reference: `web_assembly/src/IoManager.ts`
+## Device model
 
-## Model
+- One device owns 16 ports (`0x10`)
+- Device `N` base address: `0xF000 + N * 0x10`
+- Access is memory-mapped through the global memory bus
 
-- One device = 16 ports (`DEVICE_PORT_SIZE = 0x10`)
-- I/O base for device `N` = `MEMORY_MAP.IO_START + N * 0x10`
-- Read/write go through `jsIo.read(...)` / `jsIo.write(...)`
+## Registration flow
 
-## Registration
+`computerAddDevice(...)` calls `IoManager.addDevice(name, typeId)`.
 
-`IoManager.addDevice(name, typeId)`:
+During registration, the runtime:
 
-- creates a device index
-- writes a device-table entry in RAM
-- stores the device name in RAM (strings area)
-- updates device count
+1. allocates a device index
+2. writes device metadata into RAM device table
+3. stores the device name in RAM string region
+4. increments device count
 
-## Reset
+## Runtime read/write path
 
-`resetDevices()` calls `jsIo.reset(idx)` for each registered device.
+- CPU reads/writes `0xF000-0xFFFF`
+- Memory bus forwards to `IoManager`
+- `IoManager` resolves `(device, port)`
+- host callbacks are called via `jsIo.read` / `jsIo.write`
 
-## Type constants
-
-From `memory_map.ts`:
+## Device type constants
 
 - `DEVICE_TYPE_SYSTEM = 0x00`
 - `DEVICE_TYPE_INPUT = 0x01`
 - `DEVICE_TYPE_OUTPUT = 0x02`
 - `DEVICE_TYPE_INPUT_OUTPUT = 0x03`
 - `DEVICE_TYPE_STORAGE = 0x03`
-
-Factual note: `DEVICE_TYPE_INPUT_OUTPUT` and `DEVICE_TYPE_STORAGE` currently share the same value (`0x03`).
