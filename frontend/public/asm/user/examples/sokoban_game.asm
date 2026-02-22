@@ -271,13 +271,39 @@ try_move:
     push el
     push fl
 
-    ; next = player + delta
+    ; next = player + delta (with wrap-around on borders)
     mov al, [player_x]
     add al, [move_dx]
+
+    ; wrap X into [0..MAP_W-1]
+    cmp al, 0xFF
+    je .try_move_wrap_next_x_neg
+    cmp al, MAP_W
+    je .try_move_wrap_next_x_pos
+    jmp .try_move_wrap_next_x_done
+.try_move_wrap_next_x_neg:
+    mov al, MAP_W - 1
+    jmp .try_move_wrap_next_x_done
+.try_move_wrap_next_x_pos:
+    mov al, 0
+.try_move_wrap_next_x_done:
     mov [next_x], al
 
     mov al, [player_y]
     add al, [move_dy]
+
+    ; wrap Y into [0..MAP_H-1]
+    cmp al, 0xFF
+    je .try_move_wrap_next_y_neg
+    cmp al, MAP_H
+    je .try_move_wrap_next_y_pos
+    jmp .try_move_wrap_next_y_done
+.try_move_wrap_next_y_neg:
+    mov al, MAP_H - 1
+    jmp .try_move_wrap_next_y_done
+.try_move_wrap_next_y_pos:
+    mov al, 0
+.try_move_wrap_next_y_done:
     mov [next_y], al
 
     ; tile_next in AL
@@ -304,13 +330,37 @@ try_move:
     jmp .exit
 
 .push:
-    ; next2 = next + delta
+    ; next2 = next + delta (with wrap-around on borders)
     mov al, [next_x]
     add al, [move_dx]
+
+    cmp al, 0xFF
+    je .try_move_wrap_next2_x_neg
+    cmp al, MAP_W
+    je .try_move_wrap_next2_x_pos
+    jmp .try_move_wrap_next2_x_done
+.try_move_wrap_next2_x_neg:
+    mov al, MAP_W - 1
+    jmp .try_move_wrap_next2_x_done
+.try_move_wrap_next2_x_pos:
+    mov al, 0
+.try_move_wrap_next2_x_done:
     mov [next2_x], al
 
     mov al, [next_y]
     add al, [move_dy]
+
+    cmp al, 0xFF
+    je .try_move_wrap_next2_y_neg
+    cmp al, MAP_H
+    je .try_move_wrap_next2_y_pos
+    jmp .try_move_wrap_next2_y_done
+.try_move_wrap_next2_y_neg:
+    mov al, MAP_H - 1
+    jmp .try_move_wrap_next2_y_done
+.try_move_wrap_next2_y_pos:
+    mov al, 0
+.try_move_wrap_next2_y_done:
     mov [next2_y], al
 
     ; tile_next2 in AL
