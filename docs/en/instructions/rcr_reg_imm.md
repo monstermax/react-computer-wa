@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `RCR_REG_IMM`
+- `rcr`
 
 ## Opcode
 
-- `0x6F`
+- `RCR_REG_IMM`
 
 ## Description
 
@@ -19,10 +19,10 @@ Rotate right through carry.
 
 ## Runtime status
 
-- Defined in enum but not connected in the current execution switch.
+- Defined but not currently connected in `web_assembly/src/Cpu.ts`.
 
 ## Assembly example
 
 ```asm
-RCR REG IMM
+rcr
 ```

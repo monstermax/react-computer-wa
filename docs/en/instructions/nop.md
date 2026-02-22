@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `NOP`
+- `nop`
 
 ## Opcode
 
-- `0x00`
+- `NOP`
 
 ## Description
 
@@ -23,5 +23,5 @@ No operation.
 ## Assembly example
 
 ```asm
-NOP
+nop
 ```

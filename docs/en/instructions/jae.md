@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `JAE`
+- `jae`
 
 ## Opcode
 
-- Alias of `JGE` (same opcode value)
+- `JAE`
 
 ## Description
 
@@ -19,5 +19,5 @@ Same as `JGE`.
 ## Assembly example
 
 ```asm
-JGE greater_or_eq
+jae above_or_equal
 ```

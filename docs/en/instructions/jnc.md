@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JNC`
+- `jnc`
 
 ## Opcode
 
-- `0x14`
+- `JNC`
 
 ## Description
 
-Jump if carry flag is clear.
+Jump when carry flag is clear.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if carry flag is clear.
 ## Assembly example
 
 ```asm
-JNC 0x1100
+jnc 0x1100
 ```

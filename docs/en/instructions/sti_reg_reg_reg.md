@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `STI_REG_REG_REG`
+- `sti`
 
 ## Opcode
 
-- `0x83`
+- `STI_REG_REG_REG`
 
 ## Description
 
-Store indirect via register pair address.
+Store register value at address formed by register pair.
 
 ## Operands
 
@@ -25,5 +25,5 @@ Store indirect via register pair address.
 ## Assembly example
 
 ```asm
-STI A, B, C
+sti a, b, c
 ```

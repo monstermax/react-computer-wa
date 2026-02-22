@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `RET`
+- `ret`
 
 ## Opcode
 
-- `0x03`
+- `RET`
 
 ## Description
 
-Return from subroutine using stack return address.
+Return from subroutine using stack.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Return from subroutine using stack return address.
 ## Assembly example
 
 ```asm
-RET
+ret
 ```

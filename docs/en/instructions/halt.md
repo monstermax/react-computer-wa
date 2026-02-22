@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `HALT`
+- `halt`
 
 ## Opcode
 
-- `0x01`
+- `HALT`
 
 ## Description
 
@@ -23,5 +23,5 @@ Stop CPU execution.
 ## Assembly example
 
 ```asm
-HALT
+halt
 ```

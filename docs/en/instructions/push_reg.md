@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `PUSH_REG`
+- `push`
 
 ## Opcode
 
-- `0x26`
+- `PUSH_REG`
 
 ## Description
 
@@ -23,5 +23,5 @@ Push register value on stack.
 ## Assembly example
 
 ```asm
-PUSH A
+push a
 ```

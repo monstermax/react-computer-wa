@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `LEA_REG_REG_IMM`
+- `lea`
 
 ## Opcode
 
-- `0x80`
+- `LEA_REG_REG_IMM`
 
 ## Description
 
-Load 16-bit value/address into register pair.
+Load 16-bit immediate into a register pair.
 
 ## Operands
 
@@ -25,5 +25,5 @@ Load 16-bit value/address into register pair.
 ## Assembly example
 
 ```asm
-LEA A, B, 0x1234
+lea a, b, 0x1234
 ```

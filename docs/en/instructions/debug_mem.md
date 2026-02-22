@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `DEBUG_MEM`
+- `debug`
 
 ## Opcode
 
-- `0x06`
+- `DEBUG_MEM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Debug helper instruction.
 ## Assembly example
 
 ```asm
-DEBUG_MEM 1, 0xA000
+debug_mem 1, 0xa000
 ```

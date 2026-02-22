@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `POP_REG`
+- `pop`
 
 ## Opcode
 
-- `0x27`
+- `POP_REG`
 
 ## Description
 
-Pop value from stack into register.
+Pop stack value into register.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Pop value from stack into register.
 ## Assembly example
 
 ```asm
-POP A
+pop a
 ```

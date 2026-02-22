@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `DEC_REG`
+- `dec`
 
 ## Opcode
 
-- `0x32`
+- `DEC_REG`
 
 ## Description
 
-Decrement operand by 1.
+Decrement value by 1.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Decrement operand by 1.
 ## Assembly example
 
 ```asm
-DEC A
+dec a
 ```

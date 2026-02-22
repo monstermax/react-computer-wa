@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `SHR_REG_MEM`
+- `shr`
 
 ## Opcode
 
-- `0x7B`
+- `SHR_REG_MEM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Logical shift right.
 ## Assembly example
 
 ```asm
-SHR A, [0xA000]
+shr a, [0xa000]
 ```

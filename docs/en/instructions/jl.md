@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JL`
+- `jl`
 
 ## Opcode
 
-- `0x15`
+- `JL`
 
 ## Description
 
-Jump if lower (carry=1 and zero=0).
+Jump when lower condition is met.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if lower (carry=1 and zero=0).
 ## Assembly example
 
 ```asm
-JL lower
+jl lower
 ```

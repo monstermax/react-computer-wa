@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JG`
+- `jg`
 
 ## Opcode
 
-- `0x17`
+- `JG`
 
 ## Description
 
-Jump if greater.
+Jump when greater condition is met.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if greater.
 ## Assembly example
 
 ```asm
-JG greater
+jg greater
 ```

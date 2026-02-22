@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `XOR_MEM_REG`
+- `xor`
 
 ## Opcode
 
-- `0x4E`
+- `XOR_MEM_REG`
 
 ## Description
 
@@ -24,5 +24,5 @@ Bitwise XOR.
 ## Assembly example
 
 ```asm
-XOR [0xA000], A
+xor [0xa000], a
 ```

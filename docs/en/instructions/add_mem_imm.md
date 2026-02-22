@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `ADD_MEM_IMM`
+- `add`
 
 ## Opcode
 
-- `0x39`
+- `ADD_MEM_IMM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Add source to destination.
 ## Assembly example
 
 ```asm
-ADD [0xA000], 0x01
+add [0xa000], 0x01
 ```

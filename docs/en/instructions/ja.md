@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `JA`
+- `ja`
 
 ## Opcode
 
-- Alias of `JG` (same opcode value)
+- `JA`
 
 ## Description
 
@@ -19,5 +19,5 @@ Same as `JG`.
 ## Assembly example
 
 ```asm
-JG greater
+ja above
 ```

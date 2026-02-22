@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `TEST_REG_MEM`
+- `test`
 
 ## Opcode
 
-- `0x55`
+- `TEST_REG_MEM`
 
 ## Description
 
-Bitwise test (AND) and update flags.
+Bitwise test and update flags.
 
 ## Operands
 
@@ -24,5 +24,5 @@ Bitwise test (AND) and update flags.
 ## Assembly example
 
 ```asm
-TEST A, [0xA000]
+test a, [0xa000]
 ```

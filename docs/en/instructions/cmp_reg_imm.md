@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `CMP_REG_IMM`
+- `cmp`
 
 ## Opcode
 
-- `0x50`
+- `CMP_REG_IMM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Compare operands and update flags.
 ## Assembly example
 
 ```asm
-CMP A, 0x00
+cmp a, 0x00
 ```

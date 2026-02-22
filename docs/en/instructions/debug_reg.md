@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `DEBUG_REG`
+- `debug`
 
 ## Opcode
 
-- `0x05`
+- `DEBUG_REG`
 
 ## Description
 
@@ -24,5 +24,5 @@ Debug helper instruction.
 ## Assembly example
 
 ```asm
-DEBUG_REG 1, A
+debug_reg 1, a
 ```

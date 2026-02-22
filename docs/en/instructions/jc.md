@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JC`
+- `jc`
 
 ## Opcode
 
-- `0x13`
+- `JC`
 
 ## Description
 
-Jump if carry flag is set.
+Jump when carry flag is set.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if carry flag is set.
 ## Assembly example
 
 ```asm
-JC 0x1100
+jc 0x1100
 ```

@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `JMP`
+- `jmp`
 
 ## Opcode
 
-- `0x10`
+- `JMP`
 
 ## Description
 
@@ -23,5 +23,5 @@ Unconditional jump.
 ## Assembly example
 
 ```asm
-JMP 0x1000
+jmp 0x1000
 ```

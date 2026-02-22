@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JNZ`
+- `jnz`
 
 ## Opcode
 
-- `0x12`
+- `JNZ`
 
 ## Description
 
-Jump if zero flag is clear.
+Jump when zero flag is clear.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if zero flag is clear.
 ## Assembly example
 
 ```asm
-JNZ loop
+jnz loop
 ```

@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `INC_MEM`
+- `inc`
 
 ## Opcode
 
-- `0x31`
+- `INC_MEM`
 
 ## Description
 
-Increment operand by 1.
+Increment value by 1.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Increment operand by 1.
 ## Assembly example
 
 ```asm
-INC [0xA000]
+inc [0xa000]
 ```

@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `MOV_MEM_REG`
+- `mov`
 
 ## Opcode
 
-- `0x23`
+- `MOV_MEM_REG`
 
 ## Description
 
-Move data between registers/memory/immediate.
+Move data.
 
 ## Operands
 
@@ -24,5 +24,5 @@ Move data between registers/memory/immediate.
 ## Assembly example
 
 ```asm
-MOV [0xA000], A
+mov [0xa000], a
 ```

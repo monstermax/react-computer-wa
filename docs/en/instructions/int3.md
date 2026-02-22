@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `INT3`
+- `int3`
 
 ## Opcode
 
-- `0x09`
+- `INT3`
 
 ## Description
 
@@ -23,5 +23,5 @@ Breakpoint trap.
 ## Assembly example
 
 ```asm
-INT3
+int3
 ```

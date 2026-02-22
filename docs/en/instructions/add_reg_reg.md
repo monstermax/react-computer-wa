@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `ADD_REG_REG`
+- `add`
 
 ## Opcode
 
-- `0x37`
+- `ADD_REG_REG`
 
 ## Description
 
@@ -24,5 +24,5 @@ Add source to destination.
 ## Assembly example
 
 ```asm
-ADD A, B
+add a, b
 ```

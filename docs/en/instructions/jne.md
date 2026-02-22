@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `JNE`
+- `jne`
 
 ## Opcode
 
-- Alias of `JNZ` (same opcode value)
+- `JNE`
 
 ## Description
 
@@ -19,5 +19,5 @@ Same as `JNZ`.
 ## Assembly example
 
 ```asm
-JNZ loop
+jne not_equal
 ```

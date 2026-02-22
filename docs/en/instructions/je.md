@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `JE`
+- `je`
 
 ## Opcode
 
-- Alias of `JZ` (same opcode value)
+- `JE`
 
 ## Description
 
@@ -19,5 +19,5 @@ Same as `JZ`.
 ## Assembly example
 
 ```asm
-JZ done
+je equal
 ```

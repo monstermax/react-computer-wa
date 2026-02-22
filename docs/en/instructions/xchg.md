@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `XCHG`
+- `xchg`
 
 ## Opcode
 
-- `0x25`
+- `XCHG`
 
 ## Description
 
@@ -14,8 +14,8 @@ Exchange two register values.
 
 ## Operands
 
-- `reg_dst`
-- `reg_src`
+- `reg_a`
+- `reg_b`
 
 ## Runtime status
 
@@ -24,5 +24,5 @@ Exchange two register values.
 ## Assembly example
 
 ```asm
-XCHG A, B
+xchg a, b
 ```

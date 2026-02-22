@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `CALL`
+- `call`
 
 ## Opcode
 
-- `0x02`
+- `CALL`
 
 ## Description
 
-Call subroutine: push return address, then jump.
+Call subroutine: push return address and jump.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Call subroutine: push return address, then jump.
 ## Assembly example
 
 ```asm
-CALL 0x1200
+call 0x1200
 ```

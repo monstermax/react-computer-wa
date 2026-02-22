@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `SUB_REG_MEM`
+- `sub`
 
 ## Opcode
 
-- `0x3D`
+- `SUB_REG_MEM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Subtract source from destination.
 ## Assembly example
 
 ```asm
-SUB A, [0xA000]
+sub a, [0xa000]
 ```

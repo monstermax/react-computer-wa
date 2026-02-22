@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `ROR_MEM_IMM`
+- `ror`
 
 ## Opcode
 
-- `0x68`
+- `ROR_MEM_IMM`
 
 ## Description
 
@@ -19,10 +19,10 @@ Rotate right.
 
 ## Runtime status
 
-- Defined in enum but not connected in the current execution switch.
+- Defined but not currently connected in `web_assembly/src/Cpu.ts`.
 
 ## Assembly example
 
 ```asm
-ROR MEM IMM
+ror
 ```

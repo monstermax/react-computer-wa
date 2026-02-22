@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `LDI_REG_REG_REG`
+- `ldi`
 
 ## Opcode
 
-- `0x82`
+- `LDI_REG_REG_REG`
 
 ## Description
 
-Load indirect via register pair address.
+Load indirect from address formed by register pair.
 
 ## Operands
 
@@ -25,5 +25,5 @@ Load indirect via register pair address.
 ## Assembly example
 
 ```asm
-LDI C, A, B
+ldi c, a, b
 ```

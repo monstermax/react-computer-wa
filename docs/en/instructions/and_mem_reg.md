@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `AND_MEM_REG`
+- `and`
 
 ## Opcode
 
-- `0x44`
+- `AND_MEM_REG`
 
 ## Description
 
@@ -24,5 +24,5 @@ Bitwise AND.
 ## Assembly example
 
 ```asm
-AND [0xA000], A
+and [0xa000], a
 ```

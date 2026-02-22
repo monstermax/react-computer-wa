@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `ADD_MEM_REG`
+- `add`
 
 ## Opcode
 
-- `0x3A`
+- `ADD_MEM_REG`
 
 ## Description
 
@@ -24,5 +24,5 @@ Add source to destination.
 ## Assembly example
 
 ```asm
-ADD [0xA000], A
+add [0xa000], a
 ```

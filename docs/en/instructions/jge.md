@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JGE`
+- `jge`
 
 ## Opcode
 
-- `0x18`
+- `JGE`
 
 ## Description
 
-Jump if greater or equal.
+Jump when greater-or-equal condition is met.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if greater or equal.
 ## Assembly example
 
 ```asm
-JGE greater_or_eq
+jge greater_or_eq
 ```

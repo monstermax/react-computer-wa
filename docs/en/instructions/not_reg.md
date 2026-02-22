@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `NOT_REG`
+- `not`
 
 ## Opcode
 
-- `0x34`
+- `NOT_REG`
 
 ## Description
 
@@ -23,5 +23,5 @@ Bitwise NOT.
 ## Assembly example
 
 ```asm
-NOT A
+not a
 ```

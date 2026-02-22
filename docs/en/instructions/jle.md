@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JLE`
+- `jle`
 
 ## Opcode
 
-- `0x16`
+- `JLE`
 
 ## Description
 
-Jump if lower or equal.
+Jump when lower-or-equal condition is met.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if lower or equal.
 ## Assembly example
 
 ```asm
-JLE lower_or_eq
+jle lower_or_eq
 ```

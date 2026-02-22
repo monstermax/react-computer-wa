@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `SHL_REG_MEM`
+- `shl`
 
 ## Opcode
 
-- `0x76`
+- `SHL_REG_MEM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Logical shift left.
 ## Assembly example
 
 ```asm
-SHL A, [0xA000]
+shl a, [0xa000]
 ```

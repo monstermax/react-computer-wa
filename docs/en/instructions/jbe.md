@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `JBE`
+- `jbe`
 
 ## Opcode
 
-- Alias of `JLE` (same opcode value)
+- `JBE`
 
 ## Description
 
@@ -19,5 +19,5 @@ Same as `JLE`.
 ## Assembly example
 
 ```asm
-JLE lower_or_eq
+jbe below_or_equal
 ```

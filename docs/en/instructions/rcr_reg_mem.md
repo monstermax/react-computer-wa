@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `RCR_REG_MEM`
+- `rcr`
 
 ## Opcode
 
-- `0x71`
+- `RCR_REG_MEM`
 
 ## Description
 
@@ -19,10 +19,10 @@ Rotate right through carry.
 
 ## Runtime status
 
-- Defined in enum but not connected in the current execution switch.
+- Defined but not currently connected in `web_assembly/src/Cpu.ts`.
 
 ## Assembly example
 
 ```asm
-RCR REG MEM
+rcr
 ```

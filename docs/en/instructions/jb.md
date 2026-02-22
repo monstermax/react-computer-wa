@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `JB`
+- `jb`
 
 ## Opcode
 
-- Alias of `JL` (same opcode value)
+- `JB`
 
 ## Description
 
@@ -19,5 +19,5 @@ Same as `JL`.
 ## Assembly example
 
 ```asm
-JL lower
+jb below
 ```

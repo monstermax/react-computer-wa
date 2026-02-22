@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `DEBUG_IMM`
+- `debug`
 
 ## Opcode
 
-- `0x04`
+- `DEBUG_IMM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Debug helper instruction.
 ## Assembly example
 
 ```asm
-DEBUG_IMM 1, 0x2A
+debug_imm 1, 0x2a
 ```

@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `JZ`
+- `jz`
 
 ## Opcode
 
-- `0x11`
+- `JZ`
 
 ## Description
 
-Jump if zero flag is set.
+Jump when zero flag is set.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Jump if zero flag is set.
 ## Assembly example
 
 ```asm
-JZ done
+jz done
 ```

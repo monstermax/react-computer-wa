@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `OR_REG_MEM`
+- `or`
 
 ## Opcode
 
-- `0x47`
+- `OR_REG_MEM`
 
 ## Description
 
@@ -24,5 +24,5 @@ Bitwise OR.
 ## Assembly example
 
 ```asm
-OR A, [0xA000]
+or a, [0xa000]
 ```

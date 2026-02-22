@@ -2,11 +2,11 @@
 
 ## Mnemonic
 
-- `RCL_MEM_REG`
+- `rcl`
 
 ## Opcode
 
-- `0x6E`
+- `RCL_MEM_REG`
 
 ## Description
 
@@ -19,10 +19,10 @@ Rotate left through carry.
 
 ## Runtime status
 
-- Defined in enum but not connected in the current execution switch.
+- Defined but not currently connected in `web_assembly/src/Cpu.ts`.
 
 ## Assembly example
 
 ```asm
-RCL MEM REG
+rcl
 ```

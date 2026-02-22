@@ -2,15 +2,15 @@
 
 ## Mnemonic
 
-- `SET_SP`
+- `set_sp`
 
 ## Opcode
 
-- `0x28`
+- `SET_SP`
 
 ## Description
 
-Set special register value.
+Set stack pointer.
 
 ## Operands
 
@@ -23,5 +23,5 @@ Set special register value.
 ## Assembly example
 
 ```asm
-SET_SP 0xEFFF
+set_sp 0xefff
 ```
