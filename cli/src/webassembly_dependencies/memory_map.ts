@@ -1,0 +1,89 @@
+import { u16, u8 } from "@/types";
+
+export namespace MEMORY_MAP {
+
+    // ## ROM ## (0x0000-0x04FF) - 1280 bytes
+    export const ROM_START: u16 = 0x0000 as u16;
+    export const ROM_END: u16 = 0x04FF as u16;
+
+
+    // ## RAM ## (0x0500-0xEFFF) - ~60KB (OS + STACK)
+    export const RAM_START: u16 = 0x0500 as u16;
+    export const RAM_END: u16 = 0xEFFF as u16;
+
+        // ## RAM / Device Table ## (0x0500-0x057F) - 4096 bytes
+        // Header: 1 byte (device count)
+        // Entries: N * 6 bytes each:
+        //   offset 0: device index (1 byte)
+        //   offset 1: type (1 byte) - 0x01=input, 0x02=output, 0x03=input/output
+        //   offset 2-3: I/O base address (2 bytes, little-endian)
+        //   offset 4-5: pointer to name string (2 bytes, little-endian)
+        export const DEVICE_TABLE_COUNT: u16 = 0x0500 as u16;
+        export const DEVICE_TABLE_START: u16 = 0x0501 as u16;
+        export const DEVICE_TABLE_ENTRY_SIZE: u8 = 6 as u8;
+        export const DEVICE_TABLE_MAX_ENTRIES: u8 = 20 as u8;
+
+        // ## Device Name Strings ## (0x0580-0x05FF) - 128 bytes
+        // Null-terminated strings, allocated sequentially
+        export const DEVICE_STRINGS_START: u16 = 0x0580 as u16;
+        export const DEVICE_STRINGS_END: u16 = 0x05FF as u16;
+
+
+        // RAM / OS (0x1000-???)
+        export const OS_START: u16 = 0x1000 as u16;
+
+        // RAM / STACK (0xE000-0xEFFF) - 512 bytes
+        export const STACK_START: u16 = 0xEE00 as u16;
+        export const STACK_END: u16 = 0xEFFF as u16;
+
+
+    // ## I/O Devices ## (0xF000-0xFFFF) - 4096 ports (256 devices x 16 ports)
+    export const IO_START: u16 = 0xF000 as u16;
+    export const IO_END: u16 = 0xFFFF as u16;
+
+};
+
+
+
+// IRQ Sources (pour référence)
+export namespace IRQ_MAP {
+    export const IRQ_TIMER: u8 = 0 as u8;      // Bit 0 - Timer
+    export const IRQ_KEYBOARD: u8 = 1 as u8;   // Bit 1 - Clavier
+    export const IRQ_DISK: u8 = 2 as u8;       // Bit 2 - Disque
+    export const IRQ_UART: u8 = 3 as u8;       // Bit 3 - UART/Console
+    export const IRQ_BUTTON: u8 = 4 as u8;     // Bit 4 - Boutons UI
+};
+
+
+
+export const DEVICE_TYPE_SYSTEM: u8 = 0x00 as u8;
+export const DEVICE_TYPE_INPUT: u8 = 0x01 as u8;
+export const DEVICE_TYPE_OUTPUT: u8 = 0x02 as u8;
+export const DEVICE_TYPE_INPUT_OUTPUT: u8 = 0x03 as u8;
+export const DEVICE_TYPE_STORAGE: u8 = 0x03 as u8;
+
+
+//export function deviceTypeFromString(type: string): u8 {
+//    if (type === 'system') return DEVICE_TYPE_SYSTEM;
+//    if (type === 'input') return DEVICE_TYPE_INPUT;
+//    if (type === 'output') return DEVICE_TYPE_OUTPUT;
+//    if (type === 'input/output' || type === 'both') return DEVICE_TYPE_INPUT_OUTPUT;
+//    if (type === 'storage') return DEVICE_TYPE_STORAGE;
+//    return 0;
+//}
+
+
+export function isRomAddress(address: u16): boolean {
+    return address >= MEMORY_MAP.ROM_START && address <= MEMORY_MAP.ROM_END;
+}
+
+
+export function isRamAddress(address: u16): boolean {
+    return address >= MEMORY_MAP.RAM_START && address <= MEMORY_MAP.RAM_END;
+}
+
+
+export function isIoAddress(address: u16): boolean {
+    return address >= MEMORY_MAP.IO_START && address <= MEMORY_MAP.IO_END;
+}
+

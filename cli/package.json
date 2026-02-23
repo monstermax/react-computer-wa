@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "eventemitter3": "^5.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0"
+  }
+}

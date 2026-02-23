@@ -1,16 +1,17 @@
 
-import { useEffect, useMemo, useRef, useState } from "react";
+//import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { IoDevice } from "@/components/devices/IoDevice";
+import { type IoDevice } from "./IoDevice";
+import type { u8 } from "../types";
 
 
 export function useDevicesManager() {
-    const devicesRef = useRef<Map<u8, IoDevice>>(new Map);
-    const [devicesMap, setDevicesMap] = useState<Map<string, u8>>(new Map)
+    const devicesRef = new Map as Map<u8, IoDevice>;
+    const devicesMap = new Map as Map<string, u8>;
 
 
     const getDeviceByIdx = <T extends IoDevice>(deviceIdx: u8): T | null => {
-        const device = devicesRef.current.get(deviceIdx) as T | null ?? null;
+        const device = devicesRef.get(deviceIdx) as T | null ?? null;
         return device;
     }
 
@@ -24,7 +25,6 @@ export function useDevicesManager() {
     const devicesManagerHook: DevicesManagerHook = {
         devicesRef,
         devicesMap,
-        setDevicesMap,
         getDeviceByIdx,
         getDeviceByName,
     }
@@ -34,9 +34,8 @@ export function useDevicesManager() {
 
 
 export type DevicesManagerHook = {
-    devicesRef: React.RefObject<Map<u8, IoDevice>>;
+    devicesRef: Map<u8, IoDevice>;
     devicesMap: Map<string, u8>;
-    setDevicesMap: React.Dispatch<React.SetStateAction<Map<string, u8>>>;
     getDeviceByIdx: <T extends IoDevice>(deviceIdx: u8) => T | null
     getDeviceByName: <T extends IoDevice>(deviceName: string) => T | null;
 }
@@ -45,25 +44,23 @@ export type DevicesManagerHook = {
 
 export type useDeviceParams = {
     deviceName: string;
-    devicesRef: React.RefObject<Map<u8, IoDevice>>;
+    devicesRef: Map<u8, IoDevice>;
     devicesMap: Map<string, u8>;
 }
 
 export function useDevice<T>(devicesManager: DevicesManagerHook, deviceName: string, deviceClass: any, optionalParams: any) {
     const { devicesRef, devicesMap } = devicesManager;
 
-    const deviceIdx: number | null = useMemo(() => devicesMap.get(deviceName), [devicesMap]) ?? null;
+    const deviceIdx: u8 | null = devicesMap.get(deviceName) ?? null;
 
-    const instance: T | null = useMemo(() => {
-        return (devicesRef.current && deviceIdx !== null)
-            ? (devicesRef.current.get(deviceIdx) ?? null) as T
-            : null;
-    }, [deviceIdx]);
+    const instance: T | null = (devicesRef && deviceIdx !== null)
+        ? (devicesRef.get(deviceIdx) ?? null) as T
+        : null;
 
     const instanciate = (deviceIdx: u8) => {
         const deviceType: string = deviceClass.type;
         const device = new deviceClass(deviceIdx, deviceName, { type: deviceType, vendor: '', model: '', ...optionalParams });
-        devicesManager.devicesRef.current.set(deviceIdx, device);
+        devicesManager.devicesRef.set(deviceIdx, device);
     }
 
     const deviceHook: DeviceHook<T> = {
@@ -88,11 +85,11 @@ export type DeviceHook<T> = {
 
 
 
-export const DEVICE_TYPE_SYSTEM: u8 = 0x00;
-export const DEVICE_TYPE_INPUT: u8 = 0x01;
-export const DEVICE_TYPE_OUTPUT: u8 = 0x02;
-export const DEVICE_TYPE_INPUT_OUTPUT: u8 = 0x03;
-export const DEVICE_TYPE_STORAGE: u8 = 0x03;
+export const DEVICE_TYPE_SYSTEM: u8 = 0x00 as u8;
+export const DEVICE_TYPE_INPUT: u8 = 0x01 as u8;
+export const DEVICE_TYPE_OUTPUT: u8 = 0x02 as u8;
+export const DEVICE_TYPE_INPUT_OUTPUT: u8 = 0x03 as u8;
+export const DEVICE_TYPE_STORAGE: u8 = 0x03 as u8;
 
 
 export function deviceTypeFromString(type: string): u8 {
@@ -101,5 +98,5 @@ export function deviceTypeFromString(type: string): u8 {
     if (type === 'output') return DEVICE_TYPE_OUTPUT;
     if (type === 'input/output' || type === 'both') return DEVICE_TYPE_INPUT_OUTPUT;
     if (type === 'storage') return DEVICE_TYPE_STORAGE;
-    return 0;
+    return 0 as u8;
 }

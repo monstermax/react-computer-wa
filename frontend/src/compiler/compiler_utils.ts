@@ -2,12 +2,12 @@
 import { Compiler } from "./compiler";
 import { resolveIncludes } from "./compiler_preprocessor";
 import { CUSTOM_CPU } from "./arch_custom";
-
-import type { CompiledProgram, CompilerOptions, CPUArchitecture } from "@/types/compiler.types";
-import type { u16, u8 } from "@/types/computer.types";
 import { assembleSourceCode, parseSourceCode, parseSourceCodeFile, type ParsedFile } from "./precompiler";
 import { CompilerV2 } from "./compiler.v2";
 import { toHex } from "@/lib/lib_numbers";
+
+import type { CompiledProgram, CompilerOptions, CPUArchitecture } from "@/types/compiler.types";
+import type { u16, u8 } from "@/types/computer.types";
 import type { Token } from "./compiler_lexer";
 
 
@@ -78,7 +78,7 @@ export async function compileFileV2(filePath: string, options: Partial<CompilerO
 }
 
 
-export async function compileCodeV2(sourceCode: string, filepath="main.asm", options: Partial<CompilerOptions> = {}) {
+export async function compileCodeV2(sourceCode: string, filepath="main.asm", options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
     //const bootloaderFilepath = "bootloader/bootloader_v2.asm";
     const caseSensitive = options.caseSensitive || false;
     const architecture = options.architecture || CUSTOM_CPU;
