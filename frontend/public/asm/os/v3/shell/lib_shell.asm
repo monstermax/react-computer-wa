@@ -95,6 +95,7 @@ run_shell:
 
     ; ecoute les boutons du GUI
     call get_switchs_pending
+
     cmp al, 0xFF
     je SKIP_HANDLE_BUTTONS
 
@@ -107,7 +108,6 @@ run_shell:
     mov al, 0
     call set_switchs_value ; reinitialise la valeur du bouton
     pop al
-
 
     ; check si c'est bouton #0
     cmp al, 0x00
@@ -697,6 +697,7 @@ run_command_leds:
 
 run_command_custom:
     debug 9, 7
+    debug 8, 8
     mov al, [CUSTOM_CODE_LOAD_ADDR] ; detecte si du code est présent a l'adresse CUSTOM_CODE_LOAD_ADDR
     cmp al, 0
     jnz CUSTOM_CODE_START ; si code trouvé on pouvoir l'executer

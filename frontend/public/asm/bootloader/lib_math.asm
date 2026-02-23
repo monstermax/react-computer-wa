@@ -13,6 +13,14 @@ section .text
     global sub_cd_e
 
 
+; Incrémente (A:B)
+inc_ab:
+    inc al
+    jnc INC_AB_END
+    inc Bl
+    INC_AB_END:
+    ret
+
 ; Incrémente (C:D)
 inc_cd:
     inc cl

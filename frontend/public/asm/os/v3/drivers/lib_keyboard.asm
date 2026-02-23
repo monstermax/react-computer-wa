@@ -4,11 +4,14 @@
 ; Description: Keyboard Driver
 
 
+.include "os/v3/drivers/lib_devices.asm"
 .include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
-    keyboard_io_base    dw 0xF000 ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    str_keyboard         db "keyboard", 0
+    keyboard_device_idx  db 0x00   ; must be followed by keyboard_io_base. will be auto filled
+    keyboard_io_base     dw 0x0000 ; 0xF000 ; must be placed just after keyboard_device_idx. will be auto filled
 
 
 section .text
@@ -19,6 +22,15 @@ section .text
 
 _exit:
     ret
+
+
+init_device_keyboard:
+    ; initialise le device keyboard
+    lea al, bl, [str_keyboard]
+    lea cl, dl, [keyboard_device_idx]
+    call init_device ; set and store keyboard_device_idx value
+    ret
+
 
 
 ; lit le statut du clavier (SORTIE : A = boolean)

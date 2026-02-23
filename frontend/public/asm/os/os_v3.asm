@@ -4,7 +4,7 @@
 ; Description: OS for React Machine (v3)
 
 
-.include "os/v3/drivers/lib_console.asm"
+.include "os/v3/drivers/init_devices.asm"
 .include "os/v3/shell/lib_shell.asm"
 
 
@@ -19,13 +19,14 @@ section .text
 _start:
     mov dl, OS_VERSION ; set register D with the OS version => D = OS_VERSION
 
-    call console_clear
+    ; init drivers
+    call init_drivers
 
     ; init virtual file system
     call init_vfs
 
-    ; init drivers
-    call init_drivers
+    ; clear console
+    call console_clear
 
     ; init open files
     call init_open_files
@@ -54,7 +55,7 @@ init_vfs:
 
 
 init_drivers:
-    ; todo
+    call init_devices
     ret
 
 

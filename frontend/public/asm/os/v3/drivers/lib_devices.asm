@@ -1,11 +1,11 @@
 ; Author: yomax
 ; Date: 2026-02
 ; Name: lib_devices
-; Description: Lib devices for bootloader_v2
+; Description: Lib devices for OS v3
 
 
-.include "bootloader/lib_math.asm"
-.include "bootloader/lib_string.asm"
+.include "os/v3/arithmetic/lib_math.asm"
+.include "os/v3/strings/lib_string.asm"
 
 
 ; Table Device Entry format :
@@ -65,7 +65,7 @@ init_device:
     ; Check if found (C:D == 0?)
     mov el, cl
     or el, dl
-    jz .init_device_not_found
+    jz .not_found
 
     ; ── Read device index at table entry +0 ──
     ldi fl, cl, dl          ; F = device idx
@@ -94,13 +94,11 @@ init_device:
     call inc_cd
     sti cl, dl, bl
 
-    jmp .init_device_end
+    ret
 
-    .init_device_not_found:
+    .not_found:
     pop dl
     pop cl
-
-    .init_device_end:
     ret
 
 

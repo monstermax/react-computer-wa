@@ -280,9 +280,9 @@ display_devices:
 
     ; TODO: verifier que le device console existe (pour la sortie). sinon quitter ou halt
 
-    mov bl, [DEVICE_TABLE_COUNT] ; nb de devices restantes à parcourir = nb de devices
+    mov bl, el ; nb de devices restantes à parcourir = nb de devices
 
-    mov al, [DEVICE_TABLE_COUNT]
+    mov al, el
     add al, 48 ; conversion number en ASCII => TODO: utiliser fonction int_to_str (pour gérer les chiffres >= 10)
     call console_print_char ; affiche le nombre de device trouvées
 

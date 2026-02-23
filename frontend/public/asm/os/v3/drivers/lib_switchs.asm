@@ -8,17 +8,23 @@
 ;   +1 = SWITCHS_STATUS   (lecture) - index du switch en attente (0-7) ou 0xFF si aucun
 ;   +1 = SWITCHS_ACK      (écriture) - acquitter l'index traité
 
+.include "os/v3/drivers/lib_devices.asm"
 .include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
-    switchs_io_base  dw 0xF0C0  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+
+    ; pour l'initialisation du device
+    str_switchs         db "switchs", 0
+    switchs_device_idx  db 0x00   ; must be followed by switchs_io_base. will be auto filled
+    switchs_io_base     dw 0x0000 ; must be placed just after switchs_device_idx. will be auto filled
 
     ; Constantes
     SWITCHS_NO_PENDING equ 0xFF  ; valeur retournée quand aucun switch en attente
 
 
 section .text
+    global init_device_switchs
     global get_switchs_value
     global get_switchs_pending
     global set_switchs_value
@@ -28,6 +34,16 @@ section .text
 
 
 _exit:
+    ret
+
+
+init_device_switchs:
+    ; initialise le device Switchs
+    lea al, bl, [str_switchs]
+    lea cl, dl, [switchs_device_idx]
+    call init_device
+;debug 4, [switchs_io_base]
+;debug 4, [switchs_io_base+1]
     ret
 
 

@@ -11,11 +11,14 @@
 ; Couleur HSL : 0=rouge, 42=orange, 85=jaune/vert, 128=cyan, 170=bleu, 213=violet, 255=rouge
 
 
+.include "os/v3/drivers/lib_devices.asm"
 .include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
-    screenhd_io_base  dw 0xF0D0  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    str_screenhd         db "screen_hd", 0
+    screenhd_device_idx  db 0x00   ; must be followed by screenhd_io_base. will be auto filled
+    screenhd_io_base     dw 0x0000 ; 0xF0D0 ; must be placed just after screenhd_device_idx. will be auto filled
 
     SCREENHD_WIDTH equ 256
     SCREENHD_HEIGHT equ 256
@@ -28,6 +31,15 @@ section .text
 
 _exit:
     ret
+
+
+init_device_screenhd:
+    ; initialise le device screenhd
+    lea al, bl, [str_screenhd]
+    lea cl, dl, [screenhd_device_idx]
+    call init_device ; set and store screenhd_device_idx value
+    ret
+
 
 
 screenhd_print_pixel:

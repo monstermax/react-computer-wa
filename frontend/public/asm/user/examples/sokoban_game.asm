@@ -111,6 +111,10 @@ section .text
 
 
 _start:
+    call init_device_screen
+    call init_device_keyboard
+    call init_device_console
+
     mov al, 0
     mov [quit_requested], al
     call render_map

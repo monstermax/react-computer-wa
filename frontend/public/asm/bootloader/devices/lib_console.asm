@@ -10,8 +10,8 @@
 
 section .data
     str_console         db "console", 0 ; libellé du device
-    console_device_idx  db 0x00
-    console_io_base     dw 0x0000
+    console_device_idx  db 0x00    ; must be followed by console_io_base. will be auto filled
+    console_io_base     dw 0x0000  ; must be placed just after console_device_idx. will be auto filled
 
 
 

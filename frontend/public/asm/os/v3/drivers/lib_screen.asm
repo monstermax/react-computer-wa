@@ -11,11 +11,14 @@
 ; Couleur HSL : 0=rouge, 42=orange, 85=jaune/vert, 128=cyan, 170=bleu, 213=violet, 255=rouge
 
 
+.include "os/v3/drivers/lib_devices.asm"
 .include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
-    screen_io_base  dw 0xF030  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    str_screen         db "screen", 0
+    screen_device_idx  db 0x00   ; must be followed by screen_io_base. will be auto filled
+    screen_io_base     dw 0x0000 ; 0xF030 ; must be placed just after screen_device_idx. will be auto filled
 
     SCREEN_WIDTH equ 32
     SCREEN_HEIGHT equ 32
@@ -28,6 +31,15 @@ section .text
 
 _exit:
     ret
+
+
+init_device_screen:
+    ; initialise le device screen
+    lea al, bl, [str_screen]
+    lea cl, dl, [screen_device_idx]
+    call init_device ; set and store screen_device_idx value
+    ret
+
 
 
 screen_print_pixel:

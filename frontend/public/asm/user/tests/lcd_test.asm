@@ -1,6 +1,7 @@
 
-.include "os/v3/arithmetic/lib_math.asm"
+
 .include "os/v3/drivers/lib_lcd.asm"
+.include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
@@ -12,6 +13,7 @@ section .text
 
 
 _start:
+    call init_device_lcd
     call lcd_clear
 
     lea cl, dl, [STR_DEMO]

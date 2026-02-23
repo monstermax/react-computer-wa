@@ -18,6 +18,7 @@ import { DmaDevice } from './frontend_dependencies/devices/dma';
 import { RtcDevice } from './frontend_dependencies/devices/rtc';
 import { RngDevice } from './frontend_dependencies/devices/rng';
 import { toHex } from './lib/lib_numbers';
+import { SwitchsDevice } from './frontend_dependencies/devices/switchs';
 
 
 export type WasmExports = typeof releaseModule.__AdaptedExports;
@@ -120,7 +121,7 @@ async function main() {
         //const consoleDeviceHook = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
         //const screenDeviceHook = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
         //const screenHdDeviceHook = useDevice<ScreenCanvasDevice>(emulator.devicesManager, 'screen_hd', ScreenCanvasDevice, { width: 256, height: 256, pixelSize: 2 });
-        //const switchsDeviceHook = useDevice<SwitchsDevice>(emulator.devicesManager, 'switchs', SwitchsDevice, {});
+        const switchsDeviceHook = useDevice<SwitchsDevice>(emulator.devicesManager, 'switchs', SwitchsDevice, {});
         //const ledsDeviceHook = useDevice<LedsDevice>(emulator.devicesManager, 'leds', LedsDevice, {});
         const osDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
         const userDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { persistent: true });
@@ -147,7 +148,7 @@ async function main() {
             rtcDeviceHook,
             rngDeviceHook,
             //buzzerDeviceHook,
-            //switchsDeviceHook,
+            switchsDeviceHook,
             //screenHdDeviceHook,
             //speakerDeviceHook,
             //lcdDeviceHook,

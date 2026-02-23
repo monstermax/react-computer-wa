@@ -98,30 +98,35 @@ export enum Opcode {
     TEST_REG_MEM = 0x56,
     TEST_MEM_IMM = 0x57,
 
-    // TODO
+    // TODO 👇
 
-    // BITS ROL
+    // BITS ROL (with Carry)
     ROL_REG_IMM = 0x60,     // Rotate Left (avec carry)
     ROL_REG_REG = 0x61,     // Rotate Left (avec carry)
     ROL_REG_MEM = 0x62,     // Rotate Left (avec carry)
     ROL_MEM_IMM = 0x63,     // Rotate Left (avec carry)
     ROL_MEM_REG = 0x64,     // Rotate Left (avec carry)
+
     ROR_REG_IMM = 0x65,     // Rotate Right (avec carry)
     ROR_REG_REG = 0x66,     // Rotate Right (avec carry)
     ROR_REG_MEM = 0x67,     // Rotate Right (avec carry)
     ROR_MEM_IMM = 0x68,     // Rotate Right (avec carry)
     ROR_MEM_REG = 0x69,     // Rotate Right (avec carry)
 
+    // BITS ROL (through Carry)
     RCL_REG_IMM = 0x6A,     // Rotate Left through Carry
     RCL_REG_REG = 0x6B,     // Rotate Left through Carry
     RCL_REG_MEM = 0x6C,     // Rotate Left through Carry
     RCL_MEM_IMM = 0x6D,     // Rotate Left through Carry
     RCL_MEM_REG = 0x6E,     // Rotate Left through Carry
+
     RCR_REG_IMM = 0x6F,     // Rotate Right through Carry
     RCR_REG_REG = 0x70,     // Rotate Right through Carry
     RCR_REG_MEM = 0x71,     // Rotate Right through Carry
     RCR_MEM_IMM = 0x72,     // Rotate Right through Carry
     RCR_MEM_REG = 0x73,     // Rotate Right through Carry
+
+    // OK 👇
 
     // BITS SHIFT
     SHL_REG_IMM = 0x74, // Shift Left, N bits
@@ -129,20 +134,21 @@ export enum Opcode {
     SHL_REG_MEM = 0x76, // Shift Left, N bits
     SHL_MEM_IMM = 0x77, // Shift Left, N bits
     SHL_MEM_REG = 0x78, // Shift Left, N bits
+
     SHR_REG_IMM = 0x79, // Shift Right, N bits
     SHR_REG_REG = 0x7A, // Shift Right, N bits
     SHR_REG_MEM = 0x7B, // Shift Right, N bits
     SHR_MEM_IMM = 0x7C, // Shift Right, N bits
     SHR_MEM_REG = 0x7D, // Shift Right, N bits
 
-    // OK
 
     LEA_REG_REG_IMM = 0x80, // (REG, REG) = IMM16
     LEA_REG_REG_MEM = 0x81, // (REG, REG) = MEM
 
     LDI_REG_REG_REG = 0x82, // REG = [REG:REG]    // (load indirect)
+
     STI_REG_REG_REG = 0x83, // [REG:REG] = REG    // (store indirect)
-    STI_REG_REG_IMM = 0x84, // [REG:REG] = IMM
+    STI_REG_REG_IMM = 0x84, // [REG:REG] = IMM8
 
 };
 

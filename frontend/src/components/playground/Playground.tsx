@@ -61,7 +61,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // ── Clock ──
     const [clockFrequency, setClockFrequency] = useState(10 as u32);       // nb tick per second
-    const [speedMultiplier, setSpeedMultiplier] = useState(10_000 as u32); // nb cycles per tick
+    const [speedMultiplier, setSpeedMultiplier] = useState(1000 as u32); // nb cycles per tick
 
     // ── Boot state ──
     const [devicesLoaded, setDevicesLoaded] = useState(false);

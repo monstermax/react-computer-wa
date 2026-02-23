@@ -10,8 +10,8 @@
 
 section .data
     str_leds            db "leds", 0 ; libellé du device
-    leds_device_idx     db 0x00
-    leds_io_base        dw 0x0000
+    leds_device_idx     db 0x00    ; must be followed by leds_io_base. will be auto filled
+    leds_io_base        dw 0x0000  ; must be placed just after leds_device_idx. will be auto filled
 
     LEDS_STATE_ALL_OFF  equ 0x00
     LEDS_STATE_ALL_ON   equ 0xFF

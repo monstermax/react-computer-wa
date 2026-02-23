@@ -26,9 +26,8 @@ strcmp:
     cmp el, 0
     je STRCMP_END
 
-    mov el, 1
-    call add_ab_e
-    call add_cd_e
+    call inc_ab
+    call inc_cd
     jmp STRCMP_START
 
     STRCMP_END:

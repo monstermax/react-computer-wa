@@ -4,15 +4,19 @@
 ; Description: LCD Driver
 
 
+.include "os/v3/drivers/lib_devices.asm"
 .include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
-    lcd_io_base  dw 0xF0F0  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    str_lcd         db "lcd", 0
+    lcd_device_idx  db 0x00   ; must be followed by lcd_io_base. will be auto filled
+    lcd_io_base     dw 0x0000 ; 0xF0F0 ; must be placed just after lcd_device_idx. will be auto filled
 
 
 section .text
-    ;global lcd_clear ; TODO
+    global init_device_lcd
+    global lcd_clear
     global lcd_print_char
     global lcd_print_string
 
@@ -21,9 +25,33 @@ _exit:
     ret
 
 
+init_device_lcd:
+    ; initialise le device lcd
+    lea al, bl, [str_lcd]
+    lea cl, dl, [lcd_device_idx]
+
+    debug 1, al
+    debug 1, bl
+    debug 1, cl
+    debug 1, dl
+
+    call init_device ; set and store lcd_device_idx value followed by lcd_io_base value
+
+    debug 2, [lcd_device_idx]
+    debug 2, [lcd_io_base]
+    debug 2, [lcd_io_base + 1]
+
+    ret
+
+
+
 
 
 lcd_clear:
+    debug 3, [lcd_device_idx]
+    debug 3, [lcd_io_base]
+    debug 3, [lcd_io_base + 1]
+
     mov cl, [lcd_io_base]
     mov dl, [lcd_io_base + 1]
 

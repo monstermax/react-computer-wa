@@ -4,14 +4,18 @@
 ; Description: Console Driver
 
 
+.include "os/v3/drivers/lib_devices.asm"
 .include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
-    console_io_base  dw 0xF010  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    str_console         db "console", 0
+    console_device_idx  db 0x00   ; must be followed by console_io_base. will be auto filled
+    console_io_base     dw 0x0000 ; 0xF010 ; must be placed just after console_device_idx. will be auto filled
 
 
 section .text
+    global init_device_console
     global console_print_char
     global console_clear
     global console_print_string
@@ -20,6 +24,15 @@ section .text
 
 _exit:
     ret
+
+
+init_device_console:
+    ; initialise le device console
+    lea al, bl, [str_console]
+    lea cl, dl, [console_device_idx]
+    call init_device ; set and store console_device_idx value
+    ret
+
 
 
 console_clear:

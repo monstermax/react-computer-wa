@@ -4,8 +4,13 @@
 ; Description: LEDs Display Driver
 
 
+.include "os/v3/drivers/lib_devices.asm"
+
+
 section .data
-    leds_io_base  dw 0xF020  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    str_leds         db "leds", 0
+    leds_device_idx  db 0x00   ; must be followed by leds_io_base. will be auto filled
+    leds_io_base     dw 0x0000 ; 0xF020 ; must be placed just after leds_device_idx. will be auto filled
 
     LEDS_STATE_ALL_OFF  equ 0x00
     LEDS_STATE_ALL_ON   equ 0xFF
@@ -20,6 +25,15 @@ section .text
 
 _exit:
     ret
+
+
+init_device_leds:
+    ; initialise le device leds
+    lea al, bl, [str_leds]
+    lea cl, dl, [leds_device_idx]
+    call init_device ; set and store leds_device_idx value
+    ret
+
 
 
 
