@@ -1,6 +1,6 @@
 
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
 import { compileCode, compileCodeV2, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
@@ -141,7 +141,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     const [editorInitialContent, setEditorInitialContent] = useState("");
     const [editorHightLine, setEditorHightLine] = useState<number | null>(null);
-    const [editorCurrentFilepath, setEditorCurrentFilepath] = useState<string | null>(null);
+    //const [editorCurrentFilepath, setEditorCurrentFilepath] = useState<string | null>(null);
+    const editorCurrentFilepathRef = useRef<string | null>(null);
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 
 
@@ -228,12 +229,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     const handleResetComputer = async () => {
+        setCodeMapping({});
+
         // Reload OS on OS_DISK
         if (osDiskDeviceHook.instance) {
-            const diskData = await compileAndLoadOsCode();
-            setOsDiskData(diskData);
-
-            osDiskDeviceHook.instance.loadRawData(new Map(diskData))
+//            const diskData = await compileAndLoadOsCode();
+//            setOsDiskData(diskData);
+//
+//            osDiskDeviceHook.instance.loadRawData(new Map(diskData))
         }
 
         // Reset Computer
@@ -393,6 +396,24 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     };
 
 
+    useEffect(() => {
+        if (emulator.clockStatus) return;
+
+        dumpRegisters()
+            .then(registers => {
+                if (!registers) return;
+                const { registers16 } = registers;
+                const PC = toHex(Number(registers16.PC), 4);
+                const currentCodeMapped = codeMapping[PC]
+
+                if (currentCodeMapped) {
+                    openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)
+                }
+            })
+
+    }, [emulator.clockStatus])
+
+
     const togglePanelEmulator = () => {
         setPanelEmulatorHidden(b => !b)
     }
@@ -403,11 +424,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     const openAssemblyFileInEditor = async (filePath: string, selectedLine?: number) => {
-        if (editorCurrentFilepath === 'main.asm' && !filePath.startsWith('main.asm')) {
+        if (editorCurrentFilepathRef.current === 'main.asm' && !filePath.startsWith('main.asm')) {
             return;
         }
 
-        if (filePath !== editorCurrentFilepath) {
+        if (filePath !== editorCurrentFilepathRef.current) {
             if (filePath.startsWith('main.asm')) {
 
             } else {
@@ -416,7 +437,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 setEditorInitialContent(value)
             }
 
-            setEditorCurrentFilepath(filePath)
+            //setEditorCurrentFilepath(filePath)
+            editorCurrentFilepathRef.current = filePath;
         }
 
         if (selectedLine) {
@@ -477,10 +499,13 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         addLog={addLog}
                         togglePanelEmulator={togglePanelEmulator}
                         editorInitialContent={editorInitialContent}
+                        //editorCurrentFilepath={editorCurrentFilepath}
+                        editorCurrentFilepathRef={editorCurrentFilepathRef}
                         setEditorInitialContent={setEditorInitialContent}
                         setEditorHightLine={setEditorHightLine}
                         openAssemblyFileInEditor={openAssemblyFileInEditor}
                         updateCodeMapping={updateCodeMapping}
+                        setEditorBreakpointsForCpu={emulator.setEditorBreakpointsForCpu}
                         />
                 </div>
 

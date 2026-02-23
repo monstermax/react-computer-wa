@@ -146,7 +146,10 @@ export function getAssemblyCodeMapping(program: CompiledProgram): Record<string,
 
         for (const entry of section.data) {
             const hexAddr = toHex(entry.address + program.startAddress, 4);
-            mapping[hexAddr] = entry.opcodeToken;
+
+            if (entry.isOpcode) {
+                mapping[hexAddr] = entry.opcodeToken;
+            }
         }
     }
 

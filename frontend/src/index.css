@@ -78,3 +78,13 @@ html, body, #root, #root>div {
     }
 }
 
+
+
+.breakpoint-dot {
+    background: #ff4444 !important;
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    margin-left: 0px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}

@@ -113,6 +113,14 @@ declare namespace __AdaptedExports {
    * @param computer `src/Computer/Computer`
    */
   export function computerResetComputer(computer: __Internref4): void;
+  /**
+   * src/index/computerSetBreakpoints
+   * @param computer `src/Computer/Computer`
+   * @param addresses `~lib/array/Array<u16>`
+   * @param files `~lib/array/Array<~lib/string/String>`
+   * @param lines `~lib/array/Array<u16>`
+   */
+  export function computerSetBreakpoints(computer: __Internref4, addresses: Array<number>, files: Array<string>, lines: Array<number>): void;
 }
 /** src/Computer/Computer */
 declare class __Internref4 extends Number {

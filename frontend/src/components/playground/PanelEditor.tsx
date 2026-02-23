@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Editor, { useMonaco, type Monaco } from '@monaco-editor/react';
 import { shikiToMonaco } from '@shikijs/monaco'
 import { createHighlighter } from 'shiki'
@@ -38,18 +38,21 @@ export type PanelEditorProps = {
     editorInitialContent: string;
     panelEmulatorHidden: boolean;
     codeMapping: Record<string, Token | undefined>;
+    //editorCurrentFilepath: string | null;
+    editorCurrentFilepathRef:  React.RefObject<string | null>;
     addLog: (msg: string) => void;
     togglePanelEmulator: () => void;
     setEditorInitialContent: React.Dispatch<React.SetStateAction<string>>;
     setEditorHightLine: React.Dispatch<React.SetStateAction<number | null>>;
-    openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>
-    updateCodeMapping: (newCodeMapping: Record<string, Token | undefined>) => void
+    openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>;
+    updateCodeMapping: (newCodeMapping: Record<string, Token | undefined>) => void;
+    setEditorBreakpointsForCpu: (breakpoints: Array<{ address: u16, file: string, line: number }>) => void;
 }
 
 
 export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
-    const { emulator, logs, panelEmulatorHidden, editorInitialContent, editorHightLine, codeMapping } = props;
-    const { addLog, togglePanelEmulator, setEditorInitialContent, setEditorHightLine, openAssemblyFileInEditor, updateCodeMapping } = props;
+    const { emulator, logs, panelEmulatorHidden, editorInitialContent, editorHightLine, codeMapping, editorCurrentFilepathRef } = props;
+    const { addLog, togglePanelEmulator, setEditorInitialContent, setEditorHightLine, openAssemblyFileInEditor, updateCodeMapping, setEditorBreakpointsForCpu } = props;
 
     const monaco = useMonaco();
 
@@ -68,6 +71,10 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     const [isFileModalOpen, setIsFileModalOpen] = useState(false);
     const [codeLoaded, setCodeLoaded] = useState(false);
 
+    //const [breakpoints, setBreakpoints] = useState<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
+    const breakpointsRef = useRef<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
+    const decorationsRef = useRef([]);
+    const [editorMounted, setEditorMounted] = useState(false);
 
     // ── Logs ──
     const [activeTab, setActiveTab] = useState<'editor' | 'compiled' | 'labels' | 'log'>('editor');
@@ -79,9 +86,99 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     }, [logs]);
 
 
+    const codeMappingReverse = useMemo(() => {
+        const _codeMappingReverse = Object.fromEntries(
+            Object.entries(codeMapping)
+                .map(([address, v]) => [`${v?.file}:${v?.line}`, address])
+        )
+
+        console.log('codeMapping changed:', Object.keys(codeMapping).length, codeMapping)
+        console.log('_codeMapping changed:', Object.keys(_codeMappingReverse).length, _codeMappingReverse)
+        return _codeMappingReverse
+    }, [codeMapping])
+
+
+    useEffect(() => {
+        if (editorMounted && editorRef.current && monaco) {
+            const handleMouseDown = (e: any) => {
+                if (e.target?.type === monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+                    const lineNumber = e.target.position.lineNumber;
+                    //const filepath = "main.asm";
+                    //const filepath = editorCurrentFilepath;
+                    //toggleBreakpoint(filepath, lineNumber);
+                    //emulator.eventEmitter.emit('toggleBreakpoint', { file: null, line: lineNumber })
+                }
+            }
+
+            editorRef.current.onMouseDown(handleMouseDown);
+        }
+
+    }, [editorMounted, emulator.eventEmitter])
+
+
+    useEffect(() => {
+        if (!editorMounted) return;
+
+        const handleState = (state: any) => {
+            const filepath = editorCurrentFilepathRef.current ?? '';
+            const breakpointKey = `${filepath}:${state.line}`;
+            console.log('bb', breakpointKey)
+            toggleBreakpoint(filepath, state.line);
+        };
+
+        emulator.eventEmitter.on('toggleBreakpoint', handleState)
+
+        return () => {
+            emulator.eventEmitter.off('toggleBreakpoint', handleState)
+        }
+
+    }, [editorMounted, emulator.eventEmitter, codeMapping, codeMappingReverse, editorCurrentFilepathRef.current])
+
+
     const handleEditorDidMount = async (editor: any, monaco: Monaco) => {
         editorRef.current = editor;
         monacoRef.current = monaco;
+
+        // Configurer le gutter pour les breakpoints
+        editor.onMouseDown((e: any) => {
+
+            if (e.target?.type === monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+                const lineNumber = e.target.position.lineNumber;
+                //const filepath = 'main.asm';
+                //console.log('e:', e, lineNumber)
+                //toggleBreakpoint(filepath, lineNumber);
+                emulator.eventEmitter.emit('toggleBreakpoint', { file: null, line: lineNumber })
+            }
+        });
+
+        // Ajouter un menu contextuel
+        editor.addAction({
+            id: 'add-breakpoint',
+            label: 'Add Breakpoint',
+            contextMenuGroupId: 'navigation',
+            contextMenuOrder: 1.5,
+            run: (ed: any) => {
+                const position = ed.getPosition();
+                if (position) {
+                    //updateBreakpoints(position.lineNumber, 'add');
+                }
+            }
+        });
+
+        editor.addAction({
+            id: 'remove-breakpoint',
+            label: 'Remove Breakpoint',
+            contextMenuGroupId: 'navigation',
+            contextMenuOrder: 1.6,
+            run: (ed: any) => {
+                const position = ed.getPosition();
+                if (position && breakpointsRef.current?.has(position.lineNumber)) {
+                //if (position && breakpoints.has(position.lineNumber)) {
+                    //updateBreakpoints(position.lineNumber, 'remove');
+                }
+            }
+        });
+
 
         const highlighter = await createHighlighter({
             themes: ['vitesse-dark'],
@@ -90,6 +187,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
         monaco.languages.register({ id: 'asm' });
         shikiToMonaco(highlighter, monaco);
+
+        setEditorMounted(true)
     };
 
 
@@ -128,6 +227,106 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     };
 
 
+    const setBreakpoint = (filepath: string, lineNumber: number, active = true) => {
+        const breakpointKey = `${filepath}:${lineNumber}`;
+
+        const newBreakpoints = new Map(breakpointsRef.current ?? []);
+        //const newBreakpoints = new Map(breakpoints);
+        //console.log({ before: newBreakpoints }, active, codeMappingReverse)
+
+        //const filepath = 'main.asm';
+        const instructionMappingRev = codeMappingReverse[`${filepath}:${lineNumber}`] ?? '';            //if (!mapping) return;
+        const address = (instructionMappingRev ? Number(instructionMappingRev) : 0) as u16;
+        const breakpoint = { address, file: filepath, line: lineNumber as u16 };
+
+        if (!active && breakpointsRef.current.has(breakpointKey)) {
+        //if (!active && newBreakpoints.has(breakpointKey)) {
+            newBreakpoints.delete(breakpointKey);
+
+        } else if (active) {
+            newBreakpoints.set(breakpointKey, breakpoint);
+        }
+
+        //console.log({ after: newBreakpoints }, active, Object.keys(codeMappingReverse).length)
+
+        //setBreakpoints(newBreakpoints);
+        breakpointsRef.current = newBreakpoints;
+        //setBreakpoints(newBreakpoints);
+
+        updateBreakpointDecorations(newBreakpoints);
+        //console.log('padone', emulator.wasmExports, emulator.computerPointer)
+
+        //return;
+
+        if (setEditorBreakpointsForCpu && emulator.wasmExports && emulator.computerPointer) {
+            //const filepath = 'main.asm';
+            //const registers = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer)
+
+            //const breakpointKey = `${filepath}:${lineNumber}`;
+            //const instructionMappingRev = codeMappingReverse[breakpointKey] ?? '';            //if (!mapping) return;
+
+            //const address = (instructionMappingRev ? Number(instructionMappingRev) : 0) as u16;
+
+            const instructionMapping = codeMapping[toHex(address, 4)];
+            console.log({ address: toHex(address, 4), instructionMapping }, breakpointKey, instructionMapping, instructionMappingRev)
+            //if (!instructionMapping) return;
+
+            const cpuBreakpoints = Array.from(newBreakpoints.values())
+            setEditorBreakpointsForCpu(cpuBreakpoints)
+        }
+    }
+
+
+
+    const toggleBreakpoint = (filepath: string, lineNumber: number) => {
+        const breakpointKey = `${filepath}:${lineNumber}`;
+
+        console.log('cc', breakpointKey)
+        //console.log({filepath, lineNumber, breakpoints: breakpointsRef.current})
+        //const _breakpoints = new Map(breakpoints)
+        //breakpointsRef.current.set('a', { address: -1 as u16, file: filepath, line: lineNumber as u16 })
+        //setBreakpoints(_breakpoints)
+
+
+        //if (breakpointsRef.current.has(lineNumber)) {
+        if (breakpointsRef.current.has(breakpointKey)) {
+            // remove breakpoint
+            setBreakpoint(filepath, lineNumber, false);
+
+        } else {
+            // add breakpoint
+            setBreakpoint(filepath, lineNumber, true);
+        }
+
+    }
+
+
+    const updateBreakpointDecorations = (_breakpoints: Map<string, any>) => {
+        const monaco = monacoRef.current;
+        if (!editorRef.current || !monaco) return;
+
+
+        // Nettoyer les anciennes décorations
+        if (decorationsRef.current.length > 0) {
+            editorRef.current.deltaDecorations(decorationsRef.current, []);
+        }
+
+        // Créer les nouvelles décorations
+        const decorations = Array.from(_breakpoints.values())
+            //.filter(breakpoint => breakpoint.file === editorCurrentFilepathRef.current)
+            .map(breakpoint => ({
+                range: new monaco.Range(breakpoint.line, 1, breakpoint.line, 1),
+                options: {
+                    isWholeLine: false,
+                    glyphMarginClassName: 'breakpoint-dot',
+                    glyphMarginHoverMessage: 'Breakpoint',
+                }
+            }));
+
+        decorationsRef.current = editorRef.current.deltaDecorations([], decorations);
+    };
+
+
     // ═══════════════════════════════════════════
     //  Editor: Compile & Load user code to RAM
     // ═══════════════════════════════════════════
@@ -137,11 +336,6 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
         const _fetch = async () => {
             await openAssemblyFileInEditor(defaultCodeFilepath)
-            return
-            const codeUrl = `/asm/${defaultCodeFilepath}`;
-            const response = await fetch(codeUrl);
-            const content = await response.text();
-            setEditorInitialContent(defaultCodePrefix + content)
         }
 
         const timer = setTimeout(_fetch, 100);
@@ -355,7 +549,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             </div>
 
             {/* Editor / Log content */}
-            <div className={`flex-1 overflow-y-auto overscroll-contain flex flex-col ${activeTab === 'editor' ? "" : "hidden"}`}>
+            <div className={`-code-editor flex-1 overflow-y-auto overscroll-contain flex flex-col ${activeTab === 'editor' ? "" : "hidden"}`}>
 
                 <div>
                     {/* Editor Toolbar */}
@@ -413,6 +607,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                     onChange={handleEditorUpdate}
                     beforeMount={handleEditorWillMount}
                     onMount={handleEditorDidMount}
+                    options={{ glyphMargin: true }}
                 >
                 </Editor>
             </div>

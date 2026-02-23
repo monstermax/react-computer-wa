@@ -234,3 +234,7 @@ export function computerResetComputer(computer: Computer): void {
     }
 }
 
+
+export function computerSetBreakpoints(computer: Computer, addresses: u16[], files: string[], lines: u16[]): void {
+    computer.setBreakpoints(addresses, files, lines);
+}

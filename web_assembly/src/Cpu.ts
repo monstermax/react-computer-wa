@@ -153,7 +153,7 @@ export class Cpu {
         if (regIdx === 6) return 'F';
         //if (regIdx === 11) return 'SP';
 
-        throw new Error(`Register #${regIdx} not found`);
+        throw new Error(`Register #${regIdx} not found at address ${toHex(this.registers.PC, 4)}`);
     }
 
     public getRegisterValueByIdx(regIdx: u8): u8 {
@@ -165,7 +165,7 @@ export class Cpu {
         if (regIdx === 6) return this.registers.F;
         //if (regIdx === 11) return this.registers.SP; // TODO: u16
 
-        throw new Error(`Register #${regIdx} not found`);
+        throw new Error(`Register #${regIdx} not found at address ${toHex(this.registers.PC, 4)}`);
     }
 
     public setRegisterValueByIdx(regIdx: u8, value: u8): void {
@@ -198,17 +198,44 @@ export class Cpu {
         //    return;
         //}
 
-        throw new Error(`Register #${regIdx} not found`);
+        throw new Error(`Register #${regIdx} not found at address ${toHex(this.registers.PC, 4)}`);
     }
 
 
     private executeInstruction(opcode: u8): void {
         const memoryBus = this.computer.memoryBus;
+        const PcHex = toHex(this.registers.PC, 4);
 
         if (!memoryBus) {
-            console.warn(`MemoryBus not found`);
+            console.warn(`MemoryBus not found at address ${PcHex}`);
             return;
         }
+
+        const PC = this.registers.PC as u16;
+        //const xx = this.computer.breakpoints.findIndex(b => b.address as u16 === PC)
+
+        const breakpoints = this.computer.breakpoints;
+        //console.log(`cpu exec breakpoints: ${breakpoints.length}`)
+
+        for (let i=0; i<breakpoints.length; i++) {
+            const breakpoint = breakpoints[i];
+            //console.log(`addy: ${breakpoint.address} VS ${PC}`)
+
+            if (breakpoint.address as u16 === PC) {
+                if (breakpoint.address === this.computer.pendingBreakpoint) {
+                    this.computer.pendingBreakpoint = 0xFFFF;
+
+                } else {
+                    console.log(`CPU editor Breakpoint at address ${PcHex}`)
+                    this.computer.pendingBreakpoint = PC;
+                    this.isOnBreakpoint = true;
+                    jsCpu.breakpoint()
+                    //this.registers.PC++
+                    return;
+                }
+            }
+        }
+
 
         // TODO: gérer les Interrupts
 
@@ -325,7 +352,8 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
 
         case <u8>Opcode.INT3:
             run = (cpu: Cpu) => {
-                console.log(`CPU Breakpoint`)
+                const PcHex = toHex(cpu.registers.PC, 4);
+                console.log(`CPU Breakpoint (int3) at address ${PcHex}`)
                 cpu.isOnBreakpoint = true;
                 jsCpu.breakpoint()
                 cpu.registers.PC += 1;

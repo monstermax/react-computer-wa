@@ -1,5 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
+import EventEmitter from "eventemitter3";
+
 
 import { getBytecodeArray } from "@/compiler/compiler_utils";
 import { deviceTypeFromString, useDevicesManager, type DeviceHook, type DevicesManagerHook } from "./useDevice";
@@ -51,6 +53,8 @@ export const useEmulator = (params: useEmulatorParams) => {
 
     // ── Devices Manager ──
     const devicesManager = useDevicesManager();
+
+    const [eventEmitter] = useState(() => new EventEmitter)
 
 
     // Add a device
@@ -276,6 +280,17 @@ export const useEmulator = (params: useEmulatorParams) => {
     }
 
 
+    const setEditorBreakpointsForCpu = (breakpoints: Array<{ address: u16, file: string, line: number }>) => {
+        if (!wasmExports || computerPointer === null) return;
+
+        console.log({ breakpoints })
+        const addresses: u16[] = breakpoints.map(b => b.address)
+        const files: string[] = breakpoints.map(b => b.file)
+        const lines: u16[] = breakpoints.map(b => b.line as u16)
+        wasmExports.computerSetBreakpoints(computerPointer, addresses, files, lines);
+    }
+
+
     // ═══════════════════════════════════════════
     //  Register & memory dump (on demand only)
     // ═══════════════════════════════════════════
@@ -359,6 +374,9 @@ export const useEmulator = (params: useEmulatorParams) => {
         setClockStatus(false)
         cyclesPerSecondRef.current = 0
 
+        // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
+        dumpRegisters()
+
         error.message = "[WASM ERROR] " + error.message;
         throw error;
     }
@@ -395,6 +413,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         cyclesPerSecondRef,
         clockStatus,
         devicesManager,
+        eventEmitter,
         cpuHalted,
         addDevicesToComputer,
         runCycles,
@@ -408,6 +427,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         writeRam,
         resetComputer,
         loadBootloader,
+        setEditorBreakpointsForCpu,
         wasmError,
     };
 
@@ -422,6 +442,7 @@ export type EmulatorHook = {
     cyclesPerSecondRef: React.RefObject<number>;
     clockStatus: boolean;
     devicesManager: DevicesManagerHook;
+    eventEmitter: EventEmitter;
     cpuHalted: boolean;
     addDevicesToComputer: (deviceHooks: DeviceHook<IoDevice>[]) => void;
     runCycles: (cyclesCount?: number) => void;
@@ -435,6 +456,7 @@ export type EmulatorHook = {
     writeRam: (address: u16, value: u8) => void;
     resetComputer: () => void;
     loadBootloader: (compiled: CompiledProgram) => number;
+    setEditorBreakpointsForCpu: (breakpoints: { address: u16, file: string, line: number }[]) => void;
     wasmError: (error: Error) => never;
 }
 

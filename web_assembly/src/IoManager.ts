@@ -49,12 +49,25 @@ export class IoManager {
     }
 
 
+    // Reset devices states
     public resetDevices(): void {
         for (let i=0; i<this.devices.length; i++) {
             const device = this.devices[i];
 
             if (device) {
                 jsIo.reset(i as u8);
+            }
+        }
+    }
+
+
+    // Reload devices in RAM
+    public reloadDevices(): void {
+        for (let i=0; i<this.devices.length; i++) {
+            const device = this.devices[i];
+
+            if (device) {
+                this.writeDeviceTableEntry(device.idx, device.name, device.typeId);
             }
         }
     }

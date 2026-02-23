@@ -186,6 +186,7 @@ run_os:
     mov esp, STACK_END
 
     ; Saute à l'adresse de l'OS
+;int3
     jmp OS_START
 
     hlt ; Jamais atteint
