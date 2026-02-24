@@ -128,12 +128,9 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     };
 
 
-    const assemblyEditorHook = useAssemblyEditor({ asmPrefixUrl })
-    const debuggerHook = useDebugger();
-
-
     // ── Emulator ──
     const emulator = useEmulator({ clockFrequency, speedMultiplier, addLog, dumpRegisters });
+
 
     // ── Devices ──
     const keyboardDeviceHook = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
@@ -152,6 +149,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const buzzerDeviceHook = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {});
     const speakerDeviceHook = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
     const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
+
+
+    const assemblyEditorHook = useAssemblyEditor({ asmPrefixUrl })
+    const debuggerHook = useDebugger(emulator);
 
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 

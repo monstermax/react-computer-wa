@@ -1,24 +1,24 @@
 
 // useDebugger { address: u16, file: string, line: u16 }
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { EmulatorHook } from "./useEmulator";
 
 
 export type Breakpoint = {
     address: u16,
     file: string,
-    line: u16;
+    line: number;
 }
 
 
-export const useDebugger = (): DebuggerHook => {
+export const useDebugger = (emulator: EmulatorHook): DebuggerHook => {
     //const breakpointsRef = useRef<Map<string, Breakpoint>>(new Map());
     const [breakpoints, setBreakpoints] = useState<Map<string, Breakpoint>>(new Map());
 
 
-    const setBreakpoint = (file: string, line: number, active=true) => {
+    const setBreakpoint = (file: string, line: number, address: u16, active=true) => {
         const breakpointKey = `${file}:${line}`
-        const address: number | null = 0; // TODO: utiliser codeMappingReverse
 
         setBreakpoints(old => {
             const _new = new Map(old);
@@ -35,9 +35,8 @@ export const useDebugger = (): DebuggerHook => {
     }
 
 
-    const toggleBreakpoint = (file: string, line: number) => {
+    const toggleBreakpoint = (file: string, line: number, address: u16) => {
         const breakpointKey = `${file}:${line}`
-        const address: number | null = 0; // TODO: utiliser codeMappingReverse
 
         setBreakpoints(old => {
             const _new = new Map(old);
@@ -53,6 +52,13 @@ export const useDebugger = (): DebuggerHook => {
         })
     }
 
+
+    useEffect(() => {
+        const cpuBreakpoints = Array.from(breakpoints.values())
+        emulator.setEditorBreakpointsForCpu(cpuBreakpoints)
+    }, [breakpoints])
+
+
     const hook = {
         breakpoints,
         setBreakpoints,
@@ -67,7 +73,7 @@ export const useDebugger = (): DebuggerHook => {
 export type DebuggerHook = {
     breakpoints: Map<string, Breakpoint>;
     setBreakpoints: React.Dispatch<React.SetStateAction<Map<string, Breakpoint>>>;
-    setBreakpoint: (file: string, line: number, active?: boolean) => void;
-    toggleBreakpoint: (file: string, line: number) => void;
+    setBreakpoint: (file: string, line: number, address: u16, active?: boolean) => void;
+    toggleBreakpoint: (file: string, line: number, address: u16) => void;
 }
 

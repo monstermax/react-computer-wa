@@ -15,6 +15,7 @@ import type { CompiledProgram } from "@/types/compiler.types";
 import type { IoDevice } from "@/components/devices/IoDevice";
 import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer";
 import type { RegistersDump } from "@/components/playground/Playground";
+import type { Breakpoint } from "./useDebugger";
 
 
 declare global {
@@ -280,11 +281,11 @@ export const useEmulator = (params: useEmulatorParams) => {
     }
 
 
-    const setEditorBreakpointsForCpu = (breakpoints: Array<{ address: u16, file: string, line: number }>) => {
+    const setEditorBreakpointsForCpu = (breakpoints: Breakpoint[]) => {
         if (!wasmExports || computerPointer === null) return;
 
         console.log({ breakpoints })
-        const addresses: u16[] = breakpoints.map(b => b.address)
+        const addresses: u16[] = breakpoints.map(b => b.address as u16)
         const files: string[] = breakpoints.map(b => b.file)
         const lines: u16[] = breakpoints.map(b => b.line as u16)
         wasmExports.computerSetBreakpoints(computerPointer, addresses, files, lines);
@@ -456,7 +457,7 @@ export type EmulatorHook = {
     writeRam: (address: u16, value: u8) => void;
     resetComputer: () => void;
     loadBootloader: (compiled: CompiledProgram) => number;
-    setEditorBreakpointsForCpu: (breakpoints: { address: u16, file: string, line: number }[]) => void;
+    setEditorBreakpointsForCpu: (breakpoints: Breakpoint[]) => void;
     wasmError: (error: Error) => never;
 }
 

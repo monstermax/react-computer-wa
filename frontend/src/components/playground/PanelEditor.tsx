@@ -92,7 +92,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     // ── Marker & Breakpoints ──
     const [currentHighlight, setCurrentHighlight] = useState<any[]>([]); // Marker decoration (blue)
     const decorationsRef = useRef([]); // Breakpoints decortions
-    const breakpointsRef = useRef<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
+    //const breakpointsRef = useRef<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
 
     // ── Logs ──
     const [activeTab, setActiveTab] = useState<'editor' | 'compiled' | 'labels' | 'log'>('editor');
@@ -147,7 +147,20 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
             const breakpointKey = `${filepath}:${state.line}`;
             console.log('bb', breakpointKey)
-            toggleBreakpoint(filepath, state.line);
+            //toggleBreakpoint(filepath, state.line);
+
+            const file = assemblyEditorHook.activeFile;
+            const lineNumber = state.line;
+
+            const instructionMappingRev = codeMappingReverse[`${filepath}:${lineNumber}`] ?? '';            //if (!mapping) return;
+            const address = (instructionMappingRev ? Number(instructionMappingRev) : 0) as u16;
+            //const breakpoint = { address, file: filepath, line: lineNumber as u16 };
+
+
+            if (file) {
+                //console.log('toggleBreakpoint:', file, lineNumber)
+                debuggerHook.toggleBreakpoint(file, lineNumber, address)
+            }
         };
 
         emulator.eventEmitter.on('toggleBreakpoint', handleState)
@@ -196,8 +209,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             contextMenuOrder: 1.6,
             run: (ed: any) => {
                 const position = ed.getPosition();
-                if (position && breakpointsRef.current?.has(position.lineNumber)) {
-                //if (position && breakpoints.has(position.lineNumber)) {
+                //if (position && breakpointsRef.current?.has(position.lineNumber)) {
+                if (position && debuggerHook.breakpoints.has(position.lineNumber)) {
                     //updateBreakpoints(position.lineNumber, 'remove');
                 }
             }
@@ -252,10 +265,13 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
 
     const setBreakpoint = (filepath: string, lineNumber: number, active = true) => {
+
+        throw new Error("DEPRECATED");
+
         const breakpointKey = `${filepath}:${lineNumber}`;
 
-        const newBreakpoints = new Map(breakpointsRef.current ?? []);
-        //const newBreakpoints = new Map(breakpoints);
+        //const newBreakpoints = new Map(breakpointsRef.current ?? []);
+        const newBreakpoints = new Map(debuggerHook.breakpoints);
         //console.log({ before: newBreakpoints }, active, codeMappingReverse)
 
         //const filepath = 'main.asm';
@@ -263,8 +279,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         const address = (instructionMappingRev ? Number(instructionMappingRev) : 0) as u16;
         const breakpoint = { address, file: filepath, line: lineNumber as u16 };
 
-        if (!active && breakpointsRef.current.has(breakpointKey)) {
-        //if (!active && newBreakpoints.has(breakpointKey)) {
+        //if (!active && breakpointsRef.current.has(breakpointKey)) {
+        if (!active && newBreakpoints.has(breakpointKey)) {
             newBreakpoints.delete(breakpointKey);
 
         } else if (active) {
@@ -274,7 +290,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         //console.log({ after: newBreakpoints }, active, Object.keys(codeMappingReverse).length)
 
         //setBreakpoints(newBreakpoints);
-        breakpointsRef.current = newBreakpoints;
+//        breakpointsRef.current = newBreakpoints;
+        debuggerHook.setBreakpoint(filepath, lineNumber, address)
         //setBreakpoints(newBreakpoints);
 
         updateBreakpointDecorations(newBreakpoints);
@@ -282,7 +299,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
         //return;
 
-        if (setEditorBreakpointsForCpu && emulator.wasmExports && emulator.computerPointer) {
+        if (/*setEditorBreakpointsForCpu && */ emulator.wasmExports && emulator.computerPointer) {
             //const filepath = 'main.asm';
             //const registers = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer)
 
@@ -295,14 +312,17 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             console.log({ address: toHex(address, 4), instructionMapping }, breakpointKey, instructionMapping, instructionMappingRev)
             //if (!instructionMapping) return;
 
-            const cpuBreakpoints = Array.from(newBreakpoints.values())
-            setEditorBreakpointsForCpu(cpuBreakpoints)
+            //const cpuBreakpoints = Array.from(newBreakpoints.values())
+//            setEditorBreakpointsForCpu(cpuBreakpoints)
         }
     }
 
 
 
     const toggleBreakpoint = (filepath: string, lineNumber: number) => {
+
+        throw new Error("DEPRECATED");
+
         const breakpointKey = `${filepath}:${lineNumber}`;
 
         console.log('cc', breakpointKey)
@@ -312,8 +332,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         //setBreakpoints(_breakpoints)
 
 
-        //if (breakpointsRef.current.has(lineNumber)) {
-        if (breakpointsRef.current.has(breakpointKey)) {
+        //if (breakpointsRef.current.has(breakpointKey)) {
+        if (debuggerHook.breakpoints.has(breakpointKey)) {
             // remove breakpoint
             setBreakpoint(filepath, lineNumber, false);
 
@@ -321,8 +341,13 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             // add breakpoint
             setBreakpoint(filepath, lineNumber, true);
         }
-
     }
+
+
+    useEffect(() => {
+        updateBreakpointDecorations(debuggerHook.breakpoints)
+    }, [assemblyEditorHook.activeFile, debuggerHook.breakpoints])
+
 
 
     const updateBreakpointDecorations = (_breakpoints: Map<string, any>) => {
@@ -337,7 +362,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
         // Créer les nouvelles décorations
         const decorations = Array.from(_breakpoints.values())
-            //.filter(breakpoint => breakpoint.file === editorCurrentFilepathRef.current)
+            .filter(breakpoint => breakpoint.file === assemblyEditorHook.activeFile)
             .map(breakpoint => ({
                 range: new monaco.Range(breakpoint.line, 1, breakpoint.line, 1),
                 options: {
