@@ -12,10 +12,13 @@ export type AssemblyEditorFile = {
 
 
 export type AssemblyEditorParams = {
+    asmPrefixUrl?: string;
 }
 
 
 export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditorHook => {
+    const { asmPrefixUrl='' } = params ?? {};
+
     const [openFiles, setOpenFiles] = useState<Map<string, AssemblyEditorFile>>(new Map);
     const [activeFile, setActiveFile] = useState<string | null>(null);
     const [activeLine, setActiveLine] = useState<number | null>(null);
@@ -89,7 +92,7 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
     }
 
     const fetchFile = async (filepath: string) => {
-        const response = await fetch(`/asm/${filepath}`);
+        const response = await fetch(`${asmPrefixUrl}/asm/${filepath}`);
         const value = await response.text();
         return value;
     }

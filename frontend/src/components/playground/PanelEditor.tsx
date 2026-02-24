@@ -15,6 +15,7 @@ import type { u16, u8, u32 } from "@/types/computer.types";
 import type { EmulatorHook } from "@/hooks/useEmulator";
 import type { Token } from "@/compiler/compiler_lexer";
 import type { AssemblyEditorFile, AssemblyEditorHook } from "@/hooks/useAssemblyEditor";
+import type { DebuggerHook } from "@/hooks/useDebugger";
 
 
 const defaultLoadAddress = '0xA000';
@@ -41,7 +42,8 @@ export type PanelEditorProps = {
     codeMapping: Record<string, Token | undefined>;
     //editorCurrentFilepath: string | null;
     //editorCurrentFilepathRef:  React.RefObject<string | null>;
-    assemblyEditorHook: AssemblyEditorHook
+    assemblyEditorHook: AssemblyEditorHook;
+    debuggerHook: DebuggerHook;
     addLog: (msg: string) => void;
     togglePanelEmulator: () => void;
     //setEditorInitialContent: React.Dispatch<React.SetStateAction<string>>;
@@ -53,7 +55,7 @@ export type PanelEditorProps = {
 
 
 export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
-    const { emulator, logs, panelEmulatorHidden, codeMapping, assemblyEditorHook } = props;
+    const { emulator, logs, panelEmulatorHidden, codeMapping, assemblyEditorHook, debuggerHook } = props;
     const { addLog, togglePanelEmulator, openAssemblyFileInEditor, updateCodeMapping, setEditorBreakpointsForCpu } = props;
 
     const monaco = useMonaco();
@@ -88,9 +90,9 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     const [codeLoaded, setCodeLoaded] = useState(false);
 
     // ── Marker & Breakpoints ──
-    const [currentHighlight, setCurrentHighlight] = useState<any[]>([]); // Marker (blue)
+    const [currentHighlight, setCurrentHighlight] = useState<any[]>([]); // Marker decoration (blue)
+    const decorationsRef = useRef([]); // Breakpoints decortions
     const breakpointsRef = useRef<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
-    const decorationsRef = useRef([]);
 
     // ── Logs ──
     const [activeTab, setActiveTab] = useState<'editor' | 'compiled' | 'labels' | 'log'>('editor');
@@ -630,27 +632,29 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                             {editorStatus || 'Ready to compile'}
                         </div>
                     )}
-                </div>
 
-                <div className="-file-tabs flex gap-px text-xs items-center overflow-x-auto min-h-10">
-                    {Array.from(assemblyEditorHook.openFiles.values()).map(file => {
-                        return (
-                            <div
-                                key={file.filepath}
-                                className={`p-1 rounded-b-sm cursor-pointer ${(file.filepath === assemblyEditorHook.activeFile) ? "bg-background-light-2xl" : "bg-background-light"}`}
-                                onClick={() => assemblyEditorHook.switchToFile(file.filepath)}
-                                >
-                                {basename(file.filepath)}
-                            </div>
-                        );
-                    })}
-                    <div
-                        className="bg-background-light px-1 h-4 rounded-sm cursor-pointer"
-                        onClick={() => assemblyEditorHook.newFile()}
-                         >
-                        +
+                    <div className="-file-tabs flex gap-px text-xs items-center overflow-x-auto min-h-10">
+                        {Array.from(assemblyEditorHook.openFiles.values()).map(file => {
+                            return (
+                                <div
+                                    key={file.filepath}
+                                    className={`p-1 rounded-b-sm cursor-pointer ${(file.filepath === assemblyEditorHook.activeFile) ? "bg-background-light-2xl" : "bg-background-light"}`}
+                                    onClick={() => assemblyEditorHook.switchToFile(file.filepath)}
+                                    >
+                                    {basename(file.filepath)}
+                                </div>
+                            );
+                        })}
+                        <div
+                            className="bg-background-light px-1 h-4 rounded-sm cursor-pointer"
+                            onClick={() => assemblyEditorHook.newFile()}
+                            >
+                            +
+                        </div>
                     </div>
                 </div>
+
+                {/* overflow-scroll content */}
 
                 <Editor
                     //ref={editorRef}

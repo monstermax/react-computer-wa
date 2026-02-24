@@ -34,6 +34,7 @@ import { DmaDevice } from "@/components/devices/dma";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
 import type { Token } from "@/compiler/compiler_lexer";
+import { useDebugger } from "@/hooks/useDebugger";
 
 
 
@@ -58,6 +59,8 @@ export type RegistersDump = {
 const defaultCodeFilepath = "user/examples/sokoban_game.asm";
 const osCodeFilepath = "os/os_v3.asm";
 const bootloaderCodeFilepath = "bootloader/bootloader_v2.asm";
+
+const asmPrefixUrl = "";
 
 
 // ─────────────────────────────────────────────
@@ -125,6 +128,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     };
 
 
+    const assemblyEditorHook = useAssemblyEditor({ asmPrefixUrl })
+    const debuggerHook = useDebugger();
+
+
     // ── Emulator ──
     const emulator = useEmulator({ clockFrequency, speedMultiplier, addLog, dumpRegisters });
 
@@ -146,12 +153,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const speakerDeviceHook = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
     const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
 
-    const assemblyEditorHook = useAssemblyEditor()
-
-    //const [editorInitialContent, setEditorInitialContent] = useState("");
-    //const [editorHightLine, setEditorHightLine] = useState<number | null>(null);
-    //const [editorCurrentFilepath, setEditorCurrentFilepath] = useState<string | null>(null);
-    //const editorCurrentFilepathRef = useRef<string | null>(null);
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 
 
@@ -450,28 +451,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     const openAssemblyFileInEditor = async (filepath: string, selectedLine?: number) => {
-        //if (editorCurrentFilepathRef.current === 'main.asm' && !filePath.startsWith('main.asm')) {
-        //    return;
-        //}
-
-        //if (filepath !== editorCurrentFilepathRef.current) {
-            if (filepath.startsWith('main.asm')) {
-
-            } else {
-                const response = await fetch(`/asm/${filepath}`);
-                const content = await response.text();
-                //setEditorInitialContent(content)
-
-                assemblyEditorHook.openFile(filepath, content, selectedLine)
-            }
-
-            //setEditorCurrentFilepath(filePath)
-            //editorCurrentFilepathRef.current = filepath;
-        //}
-
-        if (selectedLine) {
-            //setEditorHightLine(selectedLine)
-        }
+        const content = await assemblyEditorHook.fetchFile(filepath);
+        assemblyEditorHook.openFile(filepath, content, selectedLine)
     }
 
 
@@ -508,6 +489,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         panelEditorHidden={panelEditorHidden}
                         codeMapping={codeMapping}
                         assemblyEditorHook={assemblyEditorHook}
+                        debuggerHook={debuggerHook}
                         dumpMemory={dumpMemory}
                         dumpRam={dumpRam}
                         dumpDisk={dumpDisk}
@@ -526,6 +508,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         //editorHightLine={editorHightLine}
                         codeMapping={codeMapping}
                         assemblyEditorHook={assemblyEditorHook}
+                        debuggerHook={debuggerHook}
                         addLog={addLog}
                         togglePanelEmulator={togglePanelEmulator}
                         //editorInitialContent={editorInitialContent}
