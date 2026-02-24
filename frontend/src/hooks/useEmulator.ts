@@ -185,7 +185,7 @@ export const useEmulator = (params: useEmulatorParams) => {
             if (wasmExports && computerPointer) {
                 try {
                     // Run cycles
-                    wasmExports.computerRunCycles(computerPointer, speedMultiplier);
+                    wasmExports.computerRunCycles(computerPointer, speedMultiplier, false);
 
                     // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
                     delayer('dump-registers', dumpRegisters, 100, 200, []);
@@ -265,7 +265,8 @@ export const useEmulator = (params: useEmulatorParams) => {
         if (!wasmExports || computerPointer === null) return;
 
         try {
-            wasmExports.computerRunCycles(computerPointer, cyclesCount);
+            const skipBreakpoints = (cyclesCount === 1);
+            wasmExports.computerRunCycles(computerPointer, cyclesCount, skipBreakpoints);
 
         } catch (err: any) {
             wasmError(err);

@@ -9,6 +9,7 @@ const demoCode = `
 section .text
 
 _start:
+    mov dl, 0xFF
     nop
     nop
 

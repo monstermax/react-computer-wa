@@ -25,7 +25,7 @@ export class Cpu {
     public halted: boolean = false;
     public cycles: u64 = 0;
     public alu: ALU = new ALU;
-    public isOnBreakpoint: boolean = false;
+    public isOnBreakpoint: boolean = false; // TODO: a revoir. (a deplacer sur le computer ? à prevoir sur chaque core ?)
 
     constructor(computer: Computer) {
         this.computer = computer;
@@ -41,24 +41,23 @@ export class Cpu {
     }
 
 
-    public runCpuCycle(): void {
+    public runCpuCycle(skipBreakpoints: boolean=false): void {
         if (this.halted) return;
 
+        // Unblock current INT3 breakpoint (go to PC + 1)
+        if (this.computer.pendingBreakpointType === BreakpointType.INT3) {
+            this.computer.pendingBreakpointType = BreakpointType.NONE;
+            this.registers.PC++;
+        }
+
+        // Inrement cycles count
         this.cycles++;
+
+        // Fetch current instruction
         this.fetchInstruction();
-        this.executeInstruction(this.registers.IR);
-    }
 
-
-    private fetchInstruction(): void {
-        let opcode: u8 = 0;
-
-        const address = this.registers.PC;
-        opcode = this.readMemory(address);
-
-        //console.log(`Executing instruction ${toHex(opcode)} (${opcode}) at address ${toHex(address, 4)} (${address})`);
-
-        this.registers.IR = opcode;
+        // Execute current instruction
+        this.executeInstruction(this.registers.IR, skipBreakpoints);
     }
 
 
@@ -110,6 +109,7 @@ export class Cpu {
         return value;
     }
 
+
     public writeMemory(address: u16, value: u8): void {
         const memoryBus = this.computer.memoryBus;
         if (!memoryBus) throw new Error("Missing MemoryBus")
@@ -156,6 +156,7 @@ export class Cpu {
         throw new Error(`Register #${regIdx} not found at address ${toHex(this.registers.PC, 4)}`);
     }
 
+
     public getRegisterValueByIdx(regIdx: u8): u8 {
         if (regIdx === 1) return this.registers.A;
         if (regIdx === 2) return this.registers.B;
@@ -167,6 +168,7 @@ export class Cpu {
 
         throw new Error(`Register #${regIdx} not found at address ${toHex(this.registers.PC, 4)}`);
     }
+
 
     public setRegisterValueByIdx(regIdx: u8, value: u8): void {
         if (regIdx === 1) {
@@ -202,20 +204,20 @@ export class Cpu {
     }
 
 
-    private executeInstruction(opcode: u8): void {
+    // Read current instruction at memory address of PC
+    private fetchInstruction(): void {
+        const opcode: u8 = this.readMemory(this.registers.PC);
+        this.registers.IR = opcode;
+    }
+
+
+    private executeInstruction(opcode: u8, skipBreakpoints: boolean=false): void {
         const memoryBus = this.computer.memoryBus;
         const PcHex = toHex(this.registers.PC, 4);
 
         if (!memoryBus) {
             console.warn(`MemoryBus not found at address ${PcHex}`);
             return;
-        }
-
-
-        // Unblock current INT3 breakpoint (go to PC + 1)
-        if (this.computer.pendingBreakpointType === BreakpointType.INT3) {
-            this.computer.pendingBreakpointType = BreakpointType.NONE;
-            this.registers.PC++;
         }
 
 
@@ -233,9 +235,9 @@ export class Cpu {
             if (!breakpoint) throw new Error('missing breakpoint');
             //console.log(`Checking BP at ${breakpoint.address} VS ${PC} (pending=${this.computer.pendingBreakpointType})`)
 
-            if (this.computer.pendingBreakpointType === BreakpointType.NONE) {
+            if (this.computer.pendingBreakpointType === BreakpointType.NONE && !skipBreakpoints) {
                 // Trigger breakpoint
-                console.log(`CPU editor Breakpoint at address ${PcHex}`)
+                console.log(`CPU Breakpoint (IDE) at address ${PcHex}`)
                 this.computer.pendingBreakpointType = BreakpointType.IDE;
                 this.isOnBreakpoint = true; // empeche de traiter d'autres cycles au cours de ce tick. (en attendant l'arret de la clock)
                 jsCpu.breakpoint()
@@ -259,11 +261,13 @@ export class Cpu {
         // Fetch instructions actions (fetch & execute)
         const actions: InstructionActions = fetchInstructionActions(opcode);
 
-        if (actions.fetch && actions.execute) {
+        if (actions.execute) {
             // New API
 
             // 1. Fetch data (read-only)
-            const data: Uint8Array = actions.fetch(this);
+            const data: Uint8Array = actions.fetch
+                ? actions.fetch(this)
+                : new Uint8Array(0);
 
             // 2. Execute instruction (write)
             actions.execute(this, data);
@@ -371,10 +375,10 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
         case <u8>Opcode.INT3:
             run = (cpu: Cpu) => {
                 const PcHex = toHex(cpu.registers.PC, 4);
-                console.log(`CPU Breakpoint (int3) at address ${PcHex}`)
+                console.log(`CPU Breakpoint (INT3) at address ${PcHex}`)
                 cpu.isOnBreakpoint = true; // empeche de traiter d'autres cycles au cours de ce tick. (en attendant l'arret de la clock)
-                jsCpu.breakpoint();
                 cpu.computer.pendingBreakpointType = BreakpointType.INT3; // permet de skipper le breakpoint lors du restart
+                jsCpu.breakpoint();
             };
             break;
 

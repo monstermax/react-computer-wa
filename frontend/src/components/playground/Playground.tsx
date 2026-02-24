@@ -365,15 +365,15 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const runCpuStep = () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
 
-        const controlBefore = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
-        const dataBefore = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
-        console.log('BEFORE', controlBefore, dataBefore);
+        //const controlBefore = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
+        //const dataBefore = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
+        //console.log('BEFORE', controlBefore, dataBefore);
 
         emulator.runCycles(1);
 
-        const controlAfter = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
-        const dataAfter = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
-        console.log('AFTER', controlAfter, dataAfter);
+        //const controlAfter = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
+        //const dataAfter = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
+        //console.log('AFTER', controlAfter, dataAfter);
 
         dumpRegisters()
             .then(registers => {

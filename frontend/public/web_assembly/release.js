@@ -45,10 +45,12 @@ export async function instantiate(module, imports = {}) {
       computer = __lowerInternref(computer) || __notnull();
       exports.computerloadCode(computer, valPtr, dataLen);
     },
-    computerRunCycles(computer, cycles) {
-      // src/index/computerRunCycles(src/Computer/Computer, u32) => void
+    computerRunCycles(computer, cycles, skipBreakpoints) {
+      // src/index/computerRunCycles(src/Computer/Computer, u32, bool?) => void
       computer = __lowerInternref(computer) || __notnull();
-      exports.computerRunCycles(computer, cycles);
+      skipBreakpoints = skipBreakpoints ? 1 : 0;
+      exports.__setArgumentsLength(arguments.length);
+      exports.computerRunCycles(computer, cycles, skipBreakpoints);
     },
     computerGetCycles(computer) {
       // src/index/computerGetCycles(src/Computer/Computer) => u64
