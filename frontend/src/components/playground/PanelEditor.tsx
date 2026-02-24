@@ -264,86 +264,6 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     };
 
 
-    const setBreakpoint = (filepath: string, lineNumber: number, active = true) => {
-
-        throw new Error("DEPRECATED");
-
-        const breakpointKey = `${filepath}:${lineNumber}`;
-
-        //const newBreakpoints = new Map(breakpointsRef.current ?? []);
-        const newBreakpoints = new Map(debuggerHook.breakpoints);
-        //console.log({ before: newBreakpoints }, active, codeMappingReverse)
-
-        //const filepath = 'main.asm';
-        const instructionMappingRev = codeMappingReverse[`${filepath}:${lineNumber}`] ?? '';            //if (!mapping) return;
-        const address = (instructionMappingRev ? Number(instructionMappingRev) : 0) as u16;
-        const breakpoint = { address, file: filepath, line: lineNumber as u16 };
-
-        //if (!active && breakpointsRef.current.has(breakpointKey)) {
-        if (!active && newBreakpoints.has(breakpointKey)) {
-            newBreakpoints.delete(breakpointKey);
-
-        } else if (active) {
-            newBreakpoints.set(breakpointKey, breakpoint);
-        }
-
-        //console.log({ after: newBreakpoints }, active, Object.keys(codeMappingReverse).length)
-
-        //setBreakpoints(newBreakpoints);
-//        breakpointsRef.current = newBreakpoints;
-        debuggerHook.setBreakpoint(filepath, lineNumber, address)
-        //setBreakpoints(newBreakpoints);
-
-        updateBreakpointDecorations(newBreakpoints);
-        //console.log('padone', emulator.wasmExports, emulator.computerPointer)
-
-        //return;
-
-        if (/*setEditorBreakpointsForCpu && */ emulator.wasmExports && emulator.computerPointer) {
-            //const filepath = 'main.asm';
-            //const registers = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer)
-
-            //const breakpointKey = `${filepath}:${lineNumber}`;
-            //const instructionMappingRev = codeMappingReverse[breakpointKey] ?? '';            //if (!mapping) return;
-
-            //const address = (instructionMappingRev ? Number(instructionMappingRev) : 0) as u16;
-
-            const instructionMapping = codeMapping[toHex(address, 4)];
-            console.log({ address: toHex(address, 4), instructionMapping }, breakpointKey, instructionMapping, instructionMappingRev)
-            //if (!instructionMapping) return;
-
-            //const cpuBreakpoints = Array.from(newBreakpoints.values())
-//            setEditorBreakpointsForCpu(cpuBreakpoints)
-        }
-    }
-
-
-
-    const toggleBreakpoint = (filepath: string, lineNumber: number) => {
-
-        throw new Error("DEPRECATED");
-
-        const breakpointKey = `${filepath}:${lineNumber}`;
-
-        console.log('cc', breakpointKey)
-        //console.log({filepath, lineNumber, breakpoints: breakpointsRef.current})
-        //const _breakpoints = new Map(breakpoints)
-        //breakpointsRef.current.set('a', { address: -1 as u16, file: filepath, line: lineNumber as u16 })
-        //setBreakpoints(_breakpoints)
-
-
-        //if (breakpointsRef.current.has(breakpointKey)) {
-        if (debuggerHook.breakpoints.has(breakpointKey)) {
-            // remove breakpoint
-            setBreakpoint(filepath, lineNumber, false);
-
-        } else {
-            // add breakpoint
-            setBreakpoint(filepath, lineNumber, true);
-        }
-    }
-
-
     useEffect(() => {
         updateBreakpointDecorations(debuggerHook.breakpoints)
     }, [assemblyEditorHook.activeFile, debuggerHook.breakpoints])
@@ -379,38 +299,6 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     // ═══════════════════════════════════════════
     //  Editor: Compile & Load user code to RAM
     // ═══════════════════════════════════════════
-
-    // Load default editor code
-//    useEffect(() => {
-//
-//        const _fetch = async () => {
-//            await openAssemblyFileInEditor(defaultCodeFilepath)
-//        }
-//
-//        const timer = setTimeout(_fetch, 100);
-//        return () => clearTimeout(timer);
-//    }, []);
-
-
-//    useEffect(() => {
-//        handleEditorUpdate(editorInitialContent, {})
-//    }, [editorInitialContent])
-//
-//
-//    useEffect(() => {
-//        if (editorInitialContent && editorHightLine !== null) {
-//            //console.log('editorHightLine:', editorHightLine)
-//            highlightLine(editorHightLine);
-//        }
-//    }, [editorInitialContent, editorHightLine])
-
-    useEffect(() => {
-        if (assemblyEditorHook.activeLine !== null) {
-            //console.log('editorHightLine:', editorHightLine)
-            highlightLine(assemblyEditorHook.activeLine);
-        }
-    }, [assemblyEditorHook.activeLine])
-
 
     const handleCompileEditorCode = async () => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return;
@@ -506,6 +394,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     }
 
 
+    // Handle editor changes
     const handleEditorUpdate = (value: string | undefined, event: any) => {
         if (assemblyEditorHook.activeFile) {
             assemblyEditorHook.updateFileContent(assemblyEditorHook.activeFile, value ?? '')
@@ -518,11 +407,23 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     };
 
 
+    // Handle files modal opening
     const handleOpenAssemblyFile = async () => {
         setIsFileModalOpen(true)
     }
 
 
+
+    // Met à jour le marker (bleu) quand la ligne active change
+    useEffect(() => {
+        if (assemblyEditorHook.activeLine !== null) {
+            //console.log('editorHightLine:', editorHightLine)
+            highlightLine(assemblyEditorHook.activeLine);
+        }
+    }, [assemblyEditorHook.activeLine])
+
+
+    // Ajoute un marker (bleu) sur la ligne active
     const highlightLine = (lineNumber: number) => {
         const editor = editorRef.current;
         const monaco = monacoRef.current;

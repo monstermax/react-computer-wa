@@ -697,7 +697,6 @@ run_command_leds:
 
 run_command_custom:
     debug 9, 7
-    debug 8, 8
     mov al, [CUSTOM_CODE_LOAD_ADDR] ; detecte si du code est présent a l'adresse CUSTOM_CODE_LOAD_ADDR
     cmp al, 0
     jnz CUSTOM_CODE_START ; si code trouvé on pouvoir l'executer
