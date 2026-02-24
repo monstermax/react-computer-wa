@@ -63,6 +63,11 @@ export class IoManager {
 
     // Reload devices in RAM
     public reloadDevices(): void {
+
+        return
+
+        // TODO: debug => Device strings memory overflow
+
         for (let i=0; i<this.devices.length; i++) {
             const device = this.devices[i];
 

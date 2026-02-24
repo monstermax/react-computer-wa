@@ -4,16 +4,17 @@ import Editor, { useMonaco, type Monaco } from '@monaco-editor/react';
 import { shikiToMonaco } from '@shikijs/monaco'
 import { createHighlighter } from 'shiki'
 
-
 import { toHex } from "@/lib/lib_numbers";
 import { compileCode, compileCodeV2, formatBytecode, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
+import { basename } from "@/lib/lib_strings";
 
 import { FileModal } from "./FileModal";
 
 import type { u16, u8, u32 } from "@/types/computer.types";
 import type { EmulatorHook } from "@/hooks/useEmulator";
 import type { Token } from "@/compiler/compiler_lexer";
+import type { AssemblyEditorFile, AssemblyEditorHook } from "@/hooks/useAssemblyEditor";
 
 
 const defaultLoadAddress = '0xA000';
@@ -34,16 +35,17 @@ const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
 export type PanelEditorProps = {
     emulator: EmulatorHook;
     logs: string[];
-    editorHightLine: number | null;
-    editorInitialContent: string;
+    //editorHightLine: number | null;
+    //editorInitialContent: string;
     panelEmulatorHidden: boolean;
     codeMapping: Record<string, Token | undefined>;
     //editorCurrentFilepath: string | null;
-    editorCurrentFilepathRef:  React.RefObject<string | null>;
+    //editorCurrentFilepathRef:  React.RefObject<string | null>;
+    assemblyEditorHook: AssemblyEditorHook
     addLog: (msg: string) => void;
     togglePanelEmulator: () => void;
-    setEditorInitialContent: React.Dispatch<React.SetStateAction<string>>;
-    setEditorHightLine: React.Dispatch<React.SetStateAction<number | null>>;
+    //setEditorInitialContent: React.Dispatch<React.SetStateAction<string>>;
+    //setEditorHightLine: React.Dispatch<React.SetStateAction<number | null>>;
     openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>;
     updateCodeMapping: (newCodeMapping: Record<string, Token | undefined>) => void;
     setEditorBreakpointsForCpu: (breakpoints: Array<{ address: u16, file: string, line: number }>) => void;
@@ -51,34 +53,49 @@ export type PanelEditorProps = {
 
 
 export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
-    const { emulator, logs, panelEmulatorHidden, editorInitialContent, editorHightLine, codeMapping, editorCurrentFilepathRef } = props;
-    const { addLog, togglePanelEmulator, setEditorInitialContent, setEditorHightLine, openAssemblyFileInEditor, updateCodeMapping, setEditorBreakpointsForCpu } = props;
+    const { emulator, logs, panelEmulatorHidden, codeMapping, assemblyEditorHook } = props;
+    const { addLog, togglePanelEmulator, openAssemblyFileInEditor, updateCodeMapping, setEditorBreakpointsForCpu } = props;
 
     const monaco = useMonaco();
 
     // ── Editor ──
     const editorRef = useRef<any>(null); // Monaco Editor
     const monacoRef = useRef<Monaco>(null);
-    const [currentHighlight, setCurrentHighlight] = useState<any[]>([]);
+    //const [editorContent, setEditorContent] = useState('');
+    const [editorMounted, setEditorMounted] = useState(false);
+    const [isFileModalOpen, setIsFileModalOpen] = useState(false);
 
+    const editorContent = useMemo(() => {
+        const file: AssemblyEditorFile | null = assemblyEditorHook.activeFile
+            ? assemblyEditorHook.openFiles.get(assemblyEditorHook.activeFile) ?? null
+            : null;
+
+        //console.log('new openFile:', assemblyEditorHook.activeFile, assemblyEditorHook.openFiles)
+
+        //console.log('openfile:', file?.highlightedLine)
+
+        return file?.content ?? '';
+
+    }, [assemblyEditorHook.activeFile]); // NOTE: ne pas refresh en fonction de assemblyEditorHook.openFiles sinon l'edition fonctionne mal
+
+    // ── Compiler ──
     const [machineCode, setMachineCode] = useState<string | null>(null);
     const [machineCodeLabels, setMachineCodeLabels] = useState<string | null>(null);
     const [bytecode, setBytecode] = useState<Map<u16, u8> | null>(null);
-    const [editorContent, setEditorContent] = useState(editorInitialContent);
     const [loadAddress, setLoadAddress] = useState(defaultLoadAddress);
     const [editorError, setEditorError] = useState<string | null>(null);
     const [editorStatus, setEditorStatus] = useState<string | null>(null);
-    const [isFileModalOpen, setIsFileModalOpen] = useState(false);
     const [codeLoaded, setCodeLoaded] = useState(false);
 
-    //const [breakpoints, setBreakpoints] = useState<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
+    // ── Marker & Breakpoints ──
+    const [currentHighlight, setCurrentHighlight] = useState<any[]>([]); // Marker (blue)
     const breakpointsRef = useRef<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
     const decorationsRef = useRef([]);
-    const [editorMounted, setEditorMounted] = useState(false);
 
     // ── Logs ──
     const [activeTab, setActiveTab] = useState<'editor' | 'compiled' | 'labels' | 'log'>('editor');
     const logEndRef = useRef<HTMLDivElement>(null);
+
 
     // Handle Logs Scroll
     useEffect(() => {
@@ -86,18 +103,20 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     }, [logs]);
 
 
+    // A REVOIR
     const codeMappingReverse = useMemo(() => {
         const _codeMappingReverse = Object.fromEntries(
             Object.entries(codeMapping)
                 .map(([address, v]) => [`${v?.file}:${v?.line}`, address])
         )
 
-        console.log('codeMapping changed:', Object.keys(codeMapping).length, codeMapping)
-        console.log('_codeMapping changed:', Object.keys(_codeMappingReverse).length, _codeMappingReverse)
+        //console.log('codeMapping changed:', Object.keys(codeMapping).length, codeMapping)
+        //console.log('_codeMapping changed:', Object.keys(_codeMappingReverse).length, _codeMappingReverse)
         return _codeMappingReverse
     }, [codeMapping])
 
 
+    // A REVOIR
     useEffect(() => {
         if (editorMounted && editorRef.current && monaco) {
             const handleMouseDown = (e: any) => {
@@ -116,11 +135,14 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     }, [editorMounted, emulator.eventEmitter])
 
 
+    // A REVOIR
     useEffect(() => {
         if (!editorMounted) return;
 
         const handleState = (state: any) => {
-            const filepath = editorCurrentFilepathRef.current ?? '';
+            const filepath = assemblyEditorHook.activeFile;
+            if (!filepath) return;
+
             const breakpointKey = `${filepath}:${state.line}`;
             console.log('bb', breakpointKey)
             toggleBreakpoint(filepath, state.line);
@@ -132,7 +154,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             emulator.eventEmitter.off('toggleBreakpoint', handleState)
         }
 
-    }, [editorMounted, emulator.eventEmitter, codeMapping, codeMappingReverse, editorCurrentFilepathRef.current])
+    }, [editorMounted, /* emulator.eventEmitter, codeMapping, codeMappingReverse.current, */ assemblyEditorHook.activeFile])
 
 
     const handleEditorDidMount = async (editor: any, monaco: Monaco) => {
@@ -332,28 +354,35 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     // ═══════════════════════════════════════════
 
     // Load default editor code
+//    useEffect(() => {
+//
+//        const _fetch = async () => {
+//            await openAssemblyFileInEditor(defaultCodeFilepath)
+//        }
+//
+//        const timer = setTimeout(_fetch, 100);
+//        return () => clearTimeout(timer);
+//    }, []);
+
+
+//    useEffect(() => {
+//        handleEditorUpdate(editorInitialContent, {})
+//    }, [editorInitialContent])
+//
+//
+//    useEffect(() => {
+//        if (editorInitialContent && editorHightLine !== null) {
+//            //console.log('editorHightLine:', editorHightLine)
+//            highlightLine(editorHightLine);
+//        }
+//    }, [editorInitialContent, editorHightLine])
+
     useEffect(() => {
-
-        const _fetch = async () => {
-            await openAssemblyFileInEditor(defaultCodeFilepath)
-        }
-
-        const timer = setTimeout(_fetch, 100);
-        return () => clearTimeout(timer);
-    }, []);
-
-
-    useEffect(() => {
-        handleEditorUpdate(editorInitialContent, {})
-    }, [editorInitialContent])
-
-
-    useEffect(() => {
-        if (editorInitialContent && editorHightLine !== null) {
+        if (assemblyEditorHook.activeLine !== null) {
             //console.log('editorHightLine:', editorHightLine)
-            highlightLine(editorHightLine);
+            highlightLine(assemblyEditorHook.activeLine);
         }
-    }, [editorInitialContent, editorHightLine])
+    }, [assemblyEditorHook.activeLine])
 
 
     const handleCompileEditorCode = async () => {
@@ -451,7 +480,11 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
 
     const handleEditorUpdate = (value: string | undefined, event: any) => {
-        setEditorContent(value ?? '');
+        if (assemblyEditorHook.activeFile) {
+            assemblyEditorHook.updateFileContent(assemblyEditorHook.activeFile, value ?? '')
+        }
+
+        //setEditorContent(value ?? '');
         setBytecode(null)
         setCodeLoaded(false)
         setMachineCode(null)
@@ -599,11 +632,31 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                     )}
                 </div>
 
+                <div className="-file-tabs flex gap-px text-xs items-center overflow-x-auto min-h-10">
+                    {Array.from(assemblyEditorHook.openFiles.values()).map(file => {
+                        return (
+                            <div
+                                key={file.filepath}
+                                className={`p-1 rounded-b-sm cursor-pointer ${(file.filepath === assemblyEditorHook.activeFile) ? "bg-background-light-2xl" : "bg-background-light"}`}
+                                onClick={() => assemblyEditorHook.switchToFile(file.filepath)}
+                                >
+                                {basename(file.filepath)}
+                            </div>
+                        );
+                    })}
+                    <div
+                        className="bg-background-light px-1 h-4 rounded-sm cursor-pointer"
+                        onClick={() => assemblyEditorHook.newFile()}
+                         >
+                        +
+                    </div>
+                </div>
+
                 <Editor
                     //ref={editorRef}
                     theme="vs-dark"
                     defaultLanguage="asm"
-                    value={editorInitialContent}
+                    value={editorContent}
                     onChange={handleEditorUpdate}
                     beforeMount={handleEditorWillMount}
                     onMount={handleEditorDidMount}
@@ -615,11 +668,11 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             <div className={`flex-1 overflow-y-auto overscroll-contain ${activeTab === 'compiled' ? "" : "hidden"}`}>
                 <Editor
                     className="h-full"
-                    language="nasm"
+                    language="javascript"
                     value={machineCode ?? ''}
-                //tabSize={4}
-                //insertSpaces={true}
-                //readOnly
+                    //tabSize={4}
+                    //insertSpaces={true}
+                    //readOnly
                 >
                 </Editor>
             </div>
@@ -627,11 +680,11 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             <div className={`flex-1 overflow-y-auto overscroll-contain ${activeTab === 'labels' ? "" : "hidden"}`}>
                 <Editor
                     className="h-full"
-                    language="nasm"
+                    language="yaml"
                     value={machineCodeLabels ?? ''}
-                //tabSize={4}
-                //insertSpaces={true}
-                //readOnly
+                    //tabSize={4}
+                    //insertSpaces={true}
+                    //readOnly
                 >
                 </Editor>
             </div>
@@ -656,4 +709,5 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         </>
     );
 }
+
 

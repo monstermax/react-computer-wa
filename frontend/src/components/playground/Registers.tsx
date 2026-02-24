@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { toHex } from "@/lib/lib_numbers";
+import { basename } from "@/lib/lib_strings";
 
 import type { u16, u8 } from "@/types/computer.types";
 import type { Token } from "@/compiler/compiler_lexer";
@@ -27,11 +28,6 @@ export const Registers: React.FC<RegistersProps> = (props) => {
         setCurrentCodeMapped(_currentCodeMapped)
     }, [registers16, codeMapping])
 
-    const basename = (filepath: string) => {
-        const parts = filepath.split('/');
-        const filename = parts.at(-1);
-        return filename;
-    }
 
     return (
         <>

@@ -4134,6 +4134,9 @@
   local.get $this
   i32.load offset=4
  )
+ (func $src/IoManager/IoManager#reloadDevices (param $this i32)
+  return
+ )
  (func $~lib/array/Array<u16>#get:length_ (param $this i32) (result i32)
   local.get $this
   i32.load offset=12
@@ -5590,7 +5593,7 @@
   if
    i32.const 608
    i32.const 720
-   i32.const 131
+   i32.const 136
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -6975,7 +6978,7 @@
    local.get $9
    call $~lib/string/String#concat
    i32.const 720
-   i32.const 164
+   i32.const 169
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -7773,7 +7776,7 @@
    local.get $8
    call $~lib/string/String#concat
    i32.const 720
-   i32.const 143
+   i32.const 148
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -26528,7 +26531,7 @@
   if
    i32.const 9648
    i32.const 720
-   i32.const 110
+   i32.const 115
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -27384,6 +27387,16 @@
     local.set $i
     br $for-loop|0
    end
+  end
+  local.get $ioManager
+  if
+   local.get $ioManager
+   local.set $5
+   global.get $~lib/memory/__stack_pointer
+   local.get $5
+   i32.store
+   local.get $5
+   call $src/IoManager/IoManager#reloadDevices
   end
   global.get $~lib/memory/__stack_pointer
   i32.const 20

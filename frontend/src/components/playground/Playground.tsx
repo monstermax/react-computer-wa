@@ -18,6 +18,9 @@ import { RtcDevice } from "../devices/rtc";
 import { SwitchsDevice } from "../devices/switchs";
 import { SpeakerDevice } from "../devices/speaker";
 import { LcdDevice } from "../devices/lcd";
+import { Navbar } from "./Navbar";
+import { toHex } from "@/lib/lib_numbers";
+import { useAssemblyEditor } from "@/hooks/useAssemblyEditor";
 
 import { PanelEmulator } from "./PanelEmulator";
 import { PanelEditor } from "./PanelEditor";
@@ -28,10 +31,9 @@ import { LedsDevice } from "@/components/devices/leds";
 import { DiskDevice } from "@/components/devices/disk";
 import { DmaDevice } from "@/components/devices/dma";
 
+
 import type { u16, u8, u32 } from "@/types/computer.types";
-import { Navbar } from "./Navbar";
 import type { Token } from "@/compiler/compiler_lexer";
-import { toHex } from "@/lib/lib_numbers";
 
 
 
@@ -51,6 +53,11 @@ export type RegistersDump = {
     };
     cyclesCount: number;
 }
+
+
+const defaultCodeFilepath = "user/examples/sokoban_game.asm";
+const osCodeFilepath = "os/os_v3.asm";
+const bootloaderCodeFilepath = "bootloader/bootloader_v2.asm";
 
 
 // ─────────────────────────────────────────────
@@ -139,10 +146,12 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const speakerDeviceHook = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
     const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
 
-    const [editorInitialContent, setEditorInitialContent] = useState("");
-    const [editorHightLine, setEditorHightLine] = useState<number | null>(null);
+    const assemblyEditorHook = useAssemblyEditor()
+
+    //const [editorInitialContent, setEditorInitialContent] = useState("");
+    //const [editorHightLine, setEditorHightLine] = useState<number | null>(null);
     //const [editorCurrentFilepath, setEditorCurrentFilepath] = useState<string | null>(null);
-    const editorCurrentFilepathRef = useRef<string | null>(null);
+    //const editorCurrentFilepathRef = useRef<string | null>(null);
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 
 
@@ -226,6 +235,23 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         return () => clearTimeout(timer);
     }, [])
 
+
+
+    useEffect(() => {
+        const _run = async () => {
+            const contentDefault = await assemblyEditorHook.fetchFile(defaultCodeFilepath)
+            assemblyEditorHook.openFile(defaultCodeFilepath, contentDefault)
+
+            const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
+            assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, false)
+
+            const contentOs = await assemblyEditorHook.fetchFile(osCodeFilepath)
+            assemblyEditorHook.openFile(osCodeFilepath, contentOs, undefined, false)
+        }
+
+        const timer = setTimeout(_run, 10);
+        return () => clearTimeout(timer);
+    }, [])
 
 
     const handleResetComputer = async () => {
@@ -423,26 +449,28 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }
 
 
-    const openAssemblyFileInEditor = async (filePath: string, selectedLine?: number) => {
-        if (editorCurrentFilepathRef.current === 'main.asm' && !filePath.startsWith('main.asm')) {
-            return;
-        }
+    const openAssemblyFileInEditor = async (filepath: string, selectedLine?: number) => {
+        //if (editorCurrentFilepathRef.current === 'main.asm' && !filePath.startsWith('main.asm')) {
+        //    return;
+        //}
 
-        if (filePath !== editorCurrentFilepathRef.current) {
-            if (filePath.startsWith('main.asm')) {
+        //if (filepath !== editorCurrentFilepathRef.current) {
+            if (filepath.startsWith('main.asm')) {
 
             } else {
-                const response = await fetch(`/asm/${filePath}`);
-                const value = await response.text();
-                setEditorInitialContent(value)
+                const response = await fetch(`/asm/${filepath}`);
+                const content = await response.text();
+                //setEditorInitialContent(content)
+
+                assemblyEditorHook.openFile(filepath, content, selectedLine)
             }
 
             //setEditorCurrentFilepath(filePath)
-            editorCurrentFilepathRef.current = filePath;
-        }
+            //editorCurrentFilepathRef.current = filepath;
+        //}
 
         if (selectedLine) {
-            setEditorHightLine(selectedLine)
+            //setEditorHightLine(selectedLine)
         }
     }
 
@@ -479,6 +507,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         panelEmulatorHidden={panelEmulatorHidden}
                         panelEditorHidden={panelEditorHidden}
                         codeMapping={codeMapping}
+                        assemblyEditorHook={assemblyEditorHook}
                         dumpMemory={dumpMemory}
                         dumpRam={dumpRam}
                         dumpDisk={dumpDisk}
@@ -494,15 +523,16 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         emulator={emulator}
                         logs={logs}
                         panelEmulatorHidden={panelEmulatorHidden}
-                        editorHightLine={editorHightLine}
+                        //editorHightLine={editorHightLine}
                         codeMapping={codeMapping}
+                        assemblyEditorHook={assemblyEditorHook}
                         addLog={addLog}
                         togglePanelEmulator={togglePanelEmulator}
-                        editorInitialContent={editorInitialContent}
+                        //editorInitialContent={editorInitialContent}
                         //editorCurrentFilepath={editorCurrentFilepath}
-                        editorCurrentFilepathRef={editorCurrentFilepathRef}
-                        setEditorInitialContent={setEditorInitialContent}
-                        setEditorHightLine={setEditorHightLine}
+                        //editorCurrentFilepathRef={editorCurrentFilepathRef}
+                        //setEditorInitialContent={setEditorInitialContent}
+                        //setEditorHightLine={setEditorHightLine}
                         openAssemblyFileInEditor={openAssemblyFileInEditor}
                         updateCodeMapping={updateCodeMapping}
                         setEditorBreakpointsForCpu={emulator.setEditorBreakpointsForCpu}

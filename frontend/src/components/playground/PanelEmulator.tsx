@@ -17,6 +17,7 @@ import { Lcd, LcdDevice } from "../devices/lcd";
 import type { EmulatorHook } from "@/hooks/useEmulator";
 import type { u16, u8, u32 } from "@/types/computer.types";
 import type { Token } from "@/compiler/compiler_lexer";
+import type { AssemblyEditorHook } from "@/hooks/useAssemblyEditor";
 
 
 export type PanelEmulatorProps = {
@@ -29,6 +30,7 @@ export type PanelEmulatorProps = {
     panelEditorHidden: boolean;
     modifiedRegisters: string[];
     codeMapping: Record<string, Token | undefined>;
+    assemblyEditorHook: AssemblyEditorHook;
     dumpRam: () => void;
     dumpMemory: () => void;
     dumpDisk: (diskDevice: DiskDevice | null) => void;
@@ -39,7 +41,7 @@ export type PanelEmulatorProps = {
 
 
 export const PanelEmulator: React.FC<PanelEmulatorProps> = (props) => {
-    const { emulator, cyclesCount, registers8, registers16, modifiedRegisters, memory, panelEmulatorHidden, panelEditorHidden, codeMapping } = props;
+    const { emulator, cyclesCount, registers8, registers16, modifiedRegisters, memory, panelEmulatorHidden, panelEditorHidden, codeMapping, assemblyEditorHook } = props;
     const { dumpRam, dumpMemory, dumpDisk, togglePanelEmulator, togglePanelEditor, openAssemblyFileInEditor } = props;
 
     const [preferHdScreen, setPreferHdScreen] = useState(false);

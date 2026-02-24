@@ -224,13 +224,16 @@ export function computerResetComputer(computer: Computer): void {
     const ioManager = computer.ioManager;
     if (ioManager) {
         ioManager.resetDevices()
-
     }
 
     // Reset Cpu
     for (let i = 0; i < computer.cpus.length; i++) {
         const cpu = computer.cpus[i];
         cpu.resetCpu();
+    }
+
+    if (ioManager) {
+        ioManager.reloadDevices()
     }
 }
 

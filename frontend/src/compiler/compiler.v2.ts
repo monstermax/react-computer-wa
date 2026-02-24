@@ -161,10 +161,10 @@ export class CompilerV2 {
         // Reset for pass 2
         this.dispatchTokens();
 
-        console.log('.NONE', this.sections.get(''))
-        console.log('.data', this.sections.get('.data'))
-        console.log('.text', this.sections.get('.text'))
-        console.log('tokens:', this.tokens)
+        //console.log('.NONE', this.sections.get(''))
+        //console.log('.data', this.sections.get('.data'))
+        //console.log('.text', this.sections.get('.text'))
+        //console.log('tokens:', this.tokens)
         //throw new Error('DEBUG')
 
         // Pass 2: generate actual machine code
@@ -172,9 +172,9 @@ export class CompilerV2 {
         const currentAddressAfterPass2 = this.currentAddress;
         //console.log('currentAddress after pass2:', currentAddressAfterPass2)
 
-        console.log('.NONE', this.sections.get(''))
-        console.log('.data', this.sections.get('.data'))
-        console.log('.text', this.sections.get('.text'))
+        //console.log('.NONE', this.sections.get(''))
+        //console.log('.data', this.sections.get('.data'))
+        //console.log('.text', this.sections.get('.text'))
 
         if (currentAddressAfterPass1 !== currentAddressAfterPass2) {
             console.warn(`addresses count mismatch (step1 = ${toHex(currentAddressAfterPass1, 4)} (${currentAddressAfterPass1}) vs step2 = ${toHex(currentAddressAfterPass2, 4)} (${currentAddressAfterPass2})).`);
@@ -193,7 +193,7 @@ export class CompilerV2 {
 
         if (syncLines && this.startLine !== this.startAddress) {
             const offset = this.startAddress - this.startLine
-            console.log(`Applying addresses offset: ${offset}`)
+            //console.log(`Applying addresses offset: ${offset}`)
 
             this.sections.forEach(s => {
                 if (s.startAddress) {
@@ -1728,7 +1728,7 @@ export class CompilerV2 {
     private resolveLabels(): void {
         for (const section of Array.from(this.sections.values())) {
             const sectionName = section.name;
-            console.log('resolve labels of section:', sectionName, section)
+            //console.log('resolve labels of section:', sectionName, section)
 
             section.data.forEach(d => {
                 if (typeof d.value !== 'number') {
