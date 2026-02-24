@@ -128,6 +128,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     //  I/O callbacks 
     // ═══════════════
 
+    // Le CPU lit des données depuis un IO Device de reset [External function for webassembly]
     const jsIoRead = (deviceIdx: u8, port: u8): u8 => {
         if (!devicesManager.devicesRef.current) throw new Error("missing devices ref");
         const device = devicesManager.devicesRef.current.get(deviceIdx);
@@ -136,6 +137,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     };
 
 
+    // Le CPU écrit des données sur un IO Device de reset [External function for webassembly]
     const jsIoWrite = (deviceIdx: u8, port: u8, value: u8): void => {
         if (!devicesManager.devicesRef.current) throw new Error("missing devices ref");
         const device = devicesManager.devicesRef.current.get(deviceIdx);
@@ -144,6 +146,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     };
 
 
+    // Le CPU indique à un IO Device de reset [External function for webassembly]
     const jsIoReset = (deviceIdx: u8): void => {
         if (!devicesManager.devicesRef.current) throw new Error("missing devices ref");
         const device = devicesManager.devicesRef.current.get(deviceIdx);
@@ -152,6 +155,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     }
 
 
+    // Le CPU indique être arrêté [External function for webassembly]
     const jsCpuHalted = (): void => {
         clock.stop();
         setClockStatus(false)
@@ -160,6 +164,8 @@ export const useEmulator = (params: useEmulatorParams) => {
         addLog('CPU halted');
     };
 
+
+    // Le CPU indique traiter un breakpoint [External function for webassembly]
     const jsCpuBreakpoint = (): void => {
         clock.stop();
         setClockStatus(false)
@@ -213,7 +219,7 @@ export const useEmulator = (params: useEmulatorParams) => {
                         : devicesManager.devicesRef.current.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
 
                     if (timer) {
-                        timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer
+                        timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer (à chaque tick de clock)
                     }
 
                 } catch (err: any) {
@@ -237,6 +243,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     }, [clockFrequency])
 
 
+    // Démarre la clock
     const startClock = () => {
         addLog('Clock started')
         clock.start();
@@ -244,6 +251,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     }
 
 
+    // Arrête la clock
     const stopClock = () => {
         clock.stop();
         setClockStatus(false)
@@ -252,6 +260,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     }
 
 
+    // Execute N cycles
     const runCycles = (cyclesCount=1) => {
         if (!wasmExports || computerPointer === null) return;
 
@@ -265,6 +274,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     };
 
 
+    // Reset l'ordinateur
     const resetComputer = () => {
         if (!wasmExports || computerPointer === null) return;
 
@@ -281,6 +291,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     }
 
 
+    // Déclare la liste de breakpoints au CPU
     const setEditorBreakpointsForCpu = (breakpoints: Breakpoint[]) => {
         if (!wasmExports || computerPointer === null) return;
 
@@ -308,6 +319,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     }
 
 
+    // Read all CPU Control Registers
     const readControlRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
         try {
             return {
@@ -323,6 +335,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     };
 
 
+    // Read all CPU Data Registers
     const readDataRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
         try {
             return {
@@ -341,7 +354,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     };
 
 
-    // RAM Read
+    // MemoryBus Read (ROM/RAM/IO) - Quick Memory Access for the GUI
     const readRam = (address: u16): u8 => {
         if (!wasmExports || computerPointer === null) return 0 as u8;
 
@@ -355,7 +368,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     };
 
 
-    // RAM Write
+    // MemoryBus Write (ROM/RAM/IO) - Quick Memory Access for the GUI (used by DmaDevice)
     const writeRam = (address: u16, value: u8) => {
         if (!wasmExports || computerPointer === null) return;
         //console.log(`write ram @ ${toHex(address, 4)} : ${toHex(value)} (${value})`)

@@ -79,7 +79,6 @@ export async function compileFileV2(filePath: string, options: Partial<CompilerO
 
 
 export async function compileCodeV2(sourceCode: string, filepath="main.asm", options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
-    //const bootloaderFilepath = "bootloader/bootloader_v2.asm";
     const caseSensitive = options.caseSensitive || false;
     const architecture = options.architecture || CUSTOM_CPU;
 

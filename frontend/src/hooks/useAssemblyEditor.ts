@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { DebuggerHook } from "./useDebugger";
 
 
@@ -27,7 +27,7 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
     const [markerLine, setMarkerLine] = useState<number | null>(null); // marker bleu (highlight line)
 
 
-    const openFile = (filepath: string, content='', _markerLine?: number, debugLine?: number, active=true) => {
+    const openFile = useCallback((filepath: string, content='', _markerLine?: number, debugLine?: number, active=true) => {
         const file: AssemblyEditorFile = {
             filepath,
             content,
@@ -37,55 +37,52 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
             loading: false,
         }
 
-        setOpenFiles(old => {
-            const _new = new Map(old);
+        const _new = new Map(openFiles);
 
-            if (! _new.has(filepath)) {
-                _new.set(filepath, file);
-            }
+        if (! _new.has(filepath)) {
+            _new.set(filepath, file);
+        }
 
-            return _new
-        })
+        setOpenFiles(_new);
 
         if (active) {
             switchToFile(filepath, _markerLine, debugLine)
         }
-    }
+    }, [openFiles])
 
-    const closeFile = (filepath: string) => {
-        setOpenFiles(old => {
-            const _new = new Map(old);
 
-            if (_new.has(filepath)) {
-                _new.delete(filepath)
-            }
-
-            return _new
-        })
-    }
-
-    const switchToFile = (filepath: string, _markerLine?: number, debugLine?: number) => {
-        console.log('switchToFile:', filepath, _markerLine, debugLine)
+    const switchToFile = (filepath: string, markerLineNew?: number, debugLine?: number) => {
+        //console.log('switchToFile:', filepath, markerLineNew, debugLine)
         setActiveFile(filepath)
-
-        setMarkerLine(_markerLine ?? null)
+        setMarkerLine(markerLineNew ?? null)
 
         if (debuggerHook) {
             debuggerHook.setDebugLine(debugLine ?? null);
         }
     }
 
-    const switchToNextFile = () => {
-        // TODO: a utiliser quand on close un file
-    }
 
-    const newFile = () => {
-        openFile('draft.asm')
-    }
+    const newFile = useCallback(() => {
+        const allKeys = Array.from(openFiles.keys());
+        //console.log(allKeys)
+        let filepath = 'draft.asm';
+
+        if (allKeys.includes(filepath)) {
+            let num = 1;
+            while (allKeys.includes(filepath)) {
+                filepath = `draft_${num}.asm`;
+                num++;
+            }
+        }
+
+        openFile(filepath, `; new file ${filepath}`)
+    }, [openFiles])
+
 
     const updateFileContent = (filepath: string, content: string) => {
         updateFile(filepath, { content })
     }
+
 
     const updateFile = (filepath: string, file: Partial<AssemblyEditorFile>) => {
         setOpenFiles(old => {
@@ -99,6 +96,36 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
             return _new;
         })
     }
+
+
+    const closeFile = useCallback((filepath: string) => {
+        const _new = new Map(openFiles);
+
+        const allKeysBefore = Array.from(_new.keys());
+        const itemIdx = allKeysBefore.findIndex(k => k === filepath);
+
+        if (_new.has(filepath)) {
+            _new.delete(filepath)
+        }
+
+        // Si c'etait le dernier onglet ouvert, on ouvre un nouveau fichier
+        if (_new.size === 0) {
+            _new.set('draft.asm', { filepath: 'draft.asm', content: '', debugLine: null, markerLine: null, breakpointsLines: [], loading: false })
+        }
+
+        // Si c'etait l'onglet courant, on switch au prochain onglet
+        if (filepath === activeFile) {
+            const allKeysAfter = Array.from(_new.keys());
+            const suggestedKey = allKeysAfter[itemIdx] ?? allKeysAfter[itemIdx+1] ?? allKeysAfter[itemIdx-1] ?? allKeysAfter[0];
+
+            if (suggestedKey) {
+                setActiveFile(suggestedKey);
+            }
+        }
+
+        setOpenFiles(_new);
+    }, [openFiles, activeFile])
+
 
     const fetchFile = async (filepath: string) => {
         const response = await fetch(`${asmPrefixUrl}/asm/${filepath}`);

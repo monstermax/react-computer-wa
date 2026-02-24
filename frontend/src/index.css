@@ -88,3 +88,116 @@ html, body, #root, #root>div {
     margin-left: 0px !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
 }
+
+
+
+
+
+/* À ajouter dans votre fichier CSS global ou dans un module CSS */
+
+.-file-tabs {
+  display: flex;
+  gap: 1px;
+  background-color: #0c0c13;
+  border-bottom: 1px solid rgba(39, 39, 51, 0.5);
+  height: 36px;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent);
+}
+
+.-file-tabs:hover {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.-file-tabs:hover::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.-file-tabs > div {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 12px 0 16px;
+  font-size: 12px;
+  color: #9696a0;
+  background-color: #0c0c13;
+  border-right: 1px solid rgba(39, 39, 51, 0.5);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  cursor: pointer;
+}
+
+/* Onglet actif */
+.-file-tabs > div[class*="bg-background-light-2xl"] {
+  color: #e4e4e7;
+  background-color: #1a1a24;
+  border-bottom: 2px solid #6366f1;
+}
+
+/* Hover sur les onglets */
+.-file-tabs > div:hover:not([class*="bg-background-light-2xl"]) {
+  color: #e4e4e7;
+  background-color: #15151e;
+}
+
+/* Bouton de fermeture */
+.-file-tabs > div {
+  position: relative;
+  padding-right: 28px; /* Espace pour le bouton close */
+}
+
+.-file-tabs > div .close-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+  color: #9696a0;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.-file-tabs > div:hover .close-btn {
+  opacity: 1;
+}
+
+.-file-tabs > div .close-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #e4e4e7;
+}
+
+/* Style spécial pour le bouton "+" */
+.-file-tabs > div:last-child {
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #6366f1;
+  border-right: none;
+  min-width: 32px;
+  justify-content: center;
+}
+
+.-file-tabs > div:last-child:hover {
+  background-color: #1e1e2a;
+  color: #8183f5;
+}
+
+/* Animation de défilement fluide */
+.-file-tabs {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}

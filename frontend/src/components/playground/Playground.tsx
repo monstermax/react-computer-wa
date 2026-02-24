@@ -3,11 +3,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
+
 import { compileCode, compileCodeV2, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";
+import { toHex } from "@/lib/lib_numbers";
 
 import { useEmulator, type EmulatorHook } from "@/hooks/useEmulator";
 import { useDevice } from "@/hooks/useDevice";
+import { useAssemblyEditor } from "@/hooks/useAssemblyEditor";
+import { useDebugger } from "@/hooks/useDebugger";
+import { useCompiler } from "@/hooks/useCompiler";
 
 import { ScreenCanvasDevice } from "../devices/screen_canvas";
 import { InterruptDevice } from "../devices/interrupt";
@@ -18,10 +23,8 @@ import { RtcDevice } from "../devices/rtc";
 import { SwitchsDevice } from "../devices/switchs";
 import { SpeakerDevice } from "../devices/speaker";
 import { LcdDevice } from "../devices/lcd";
-import { Navbar } from "./Navbar";
-import { toHex } from "@/lib/lib_numbers";
-import { useAssemblyEditor } from "@/hooks/useAssemblyEditor";
 
+import { Navbar } from "./Navbar";
 import { PanelEmulator } from "./PanelEmulator";
 import { PanelEditor } from "./PanelEditor";
 import { KeyboardDevice } from "@/components/devices/keyboard";
@@ -31,11 +34,8 @@ import { LedsDevice } from "@/components/devices/leds";
 import { DiskDevice } from "@/components/devices/disk";
 import { DmaDevice } from "@/components/devices/dma";
 
-
 import type { u16, u8, u32 } from "@/types/computer.types";
 import type { Token } from "@/compiler/compiler_lexer";
-import { useDebugger } from "@/hooks/useDebugger";
-
 
 
 export type RegistersDump = {
@@ -153,6 +153,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     const debuggerHook = useDebugger(emulator);
     const assemblyEditorHook = useAssemblyEditor({ debuggerHook, asmPrefixUrl })
+    const compilerHook = useCompiler();
 
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 
@@ -203,19 +204,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // Load bootloader
     const loadBootloader = async (bootloaderFileUrl: string) => {
-        if (!emulator.wasmExports || !emulator.computerPointer || !emulator.devicesManager.devicesRef.current) return;
-
-        const sourceCode = await loadSourceCodeFromFile(bootloaderFileUrl);
-
-        //const compiled = await compileCode(sourceCode, { startAddress: MEMORY_MAP.ROM_START, architecture: CUSTOM_CPU });
-        const compiled = await compileCodeV2(sourceCode, bootloaderFileUrl, { startAddress: MEMORY_MAP.ROM_START });
-        //console.log("Bootloader compiled:", compiled)
-
-        if (compiled.errors.length > 0) {
-            const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');
-            console.warn(`Bootloader Compilation errors:`, errMsg)
-            throw new Error();
-        }
+        const compiled = await compilerHook.compileBootloader()
 
         const newCodeMapping = getAssemblyCodeMapping(compiled);
         updateCodeMapping(newCodeMapping)
@@ -244,11 +233,13 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             const contentDefault = await assemblyEditorHook.fetchFile(defaultCodeFilepath)
             assemblyEditorHook.openFile(defaultCodeFilepath, contentDefault)
 
-            const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
-            assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, undefined, false)
+            //const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
+            //assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, undefined, false)
 
-            const contentOs = await assemblyEditorHook.fetchFile(osCodeFilepath)
-            assemblyEditorHook.openFile(osCodeFilepath, contentOs, undefined, undefined, false)
+            //const contentOs = await assemblyEditorHook.fetchFile(osCodeFilepath)
+            //assemblyEditorHook.openFile(osCodeFilepath, contentOs, undefined, undefined, false)
+
+            // BUG ici. les fichiers n'ecrasent les un-les autres. seul le dernier reste ouvert. pb references react
         }
 
         const timer = setTimeout(_run, 10);
@@ -274,20 +265,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // Compile OS Code
     const compileAndLoadOsCode = async () => {
-        const sourceFilepath = 'os/os_v3.asm';
-
-        const startAddress = MEMORY_MAP.OS_START;
-        const sourceCode = await loadSourceCodeFromFile(sourceFilepath);
-
-        //const compiled = await compileCode(sourceCode, { startAddress, architecture: CUSTOM_CPU });
-        const compiled = await compileCodeV2(sourceCode, sourceFilepath, { startAddress, architecture: CUSTOM_CPU });
-        //console.log("OS compiled:", compiled)
-
-        if (compiled.errors.length > 0) {
-            const errMsg = compiled.errors.map(e => `Line ${e.line}: ${e.message}`).join('\n');
-            console.warn(`OS Compilation errors:`, errMsg)
-            throw new Error();
-        }
+        const compiled = await compilerHook.compileOs()
 
         const newCodeMapping = getAssemblyCodeMapping(compiled);
         updateCodeMapping(newCodeMapping)
@@ -303,18 +281,6 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const updateCodeMapping = (newCodeMapping: Record<string, Token | undefined>) => {
         setCodeMapping(old => ({ ...old, ...newCodeMapping }));
     }
-
-
-//    useEffect(() => {
-//        const _debug = () => {
-//            const codeMappingFormattedList = Object.entries(codeMapping)
-//            codeMappingFormattedList.sort(([a], [b]) => Number(a) - Number(b))
-//            console.log('codeMapping:', Object.keys(codeMapping).length, codeMappingFormattedList)
-//        }
-//
-//        const timer = setTimeout(_debug, 100);
-//        return () => clearTimeout(timer);
-//    }, [codeMapping])
 
 
     //  Load devices when computer is instanciated
@@ -510,20 +476,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                         emulator={emulator}
                         logs={logs}
                         panelEmulatorHidden={panelEmulatorHidden}
-                        //editorHightLine={editorHightLine}
                         codeMapping={codeMapping}
                         assemblyEditorHook={assemblyEditorHook}
                         debuggerHook={debuggerHook}
+                        compilerHook={compilerHook}
                         addLog={addLog}
                         togglePanelEmulator={togglePanelEmulator}
-                        //editorInitialContent={editorInitialContent}
-                        //editorCurrentFilepath={editorCurrentFilepath}
-                        //editorCurrentFilepathRef={editorCurrentFilepathRef}
-                        //setEditorInitialContent={setEditorInitialContent}
-                        //setEditorHightLine={setEditorHightLine}
                         openAssemblyFileInEditor={openAssemblyFileInEditor}
                         updateCodeMapping={updateCodeMapping}
-                        setEditorBreakpointsForCpu={emulator.setEditorBreakpointsForCpu}
                         />
                 </div>
 
