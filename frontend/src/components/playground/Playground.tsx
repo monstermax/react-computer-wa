@@ -151,8 +151,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
 
 
-    const assemblyEditorHook = useAssemblyEditor({ asmPrefixUrl })
     const debuggerHook = useDebugger(emulator);
+    const assemblyEditorHook = useAssemblyEditor({ debuggerHook, asmPrefixUrl })
 
     const [codeMapping, setCodeMapping] = useState<Record<string, Token | undefined>>({})
 
@@ -245,10 +245,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
             assemblyEditorHook.openFile(defaultCodeFilepath, contentDefault)
 
             const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
-            assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, false)
+            assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, undefined, false)
 
             const contentOs = await assemblyEditorHook.fetchFile(osCodeFilepath)
-            assemblyEditorHook.openFile(osCodeFilepath, contentOs, undefined, false)
+            assemblyEditorHook.openFile(osCodeFilepath, contentOs, undefined, undefined, false)
         }
 
         const timer = setTimeout(_run, 10);
@@ -417,7 +417,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 const currentCodeMapped = codeMapping[PC]
 
                 if (currentCodeMapped) {
-                    openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)
+                    openAssemblyFileInEditor(currentCodeMapped.file, undefined, currentCodeMapped.line)
                 }
             })
 
@@ -425,7 +425,11 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     useEffect(() => {
-        if (emulator.clockStatus) return;
+        if (emulator.clockStatus) {
+            //assemblyEditorHook.setMarkerLine(null);
+            debuggerHook.setDebugLine(null);
+            return;
+        }
 
         dumpRegisters()
             .then(registers => {
@@ -435,7 +439,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 const currentCodeMapped = codeMapping[PC]
 
                 if (currentCodeMapped) {
-                    openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)
+                    openAssemblyFileInEditor(currentCodeMapped.file, undefined, currentCodeMapped.line)
                 }
             })
 
@@ -451,9 +455,9 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     }
 
 
-    const openAssemblyFileInEditor = async (filepath: string, selectedLine?: number) => {
+    const openAssemblyFileInEditor = async (filepath: string, markerLine?: number, debugLine?: number) => {
         const content = await assemblyEditorHook.fetchFile(filepath);
-        assemblyEditorHook.openFile(filepath, content, selectedLine)
+        assemblyEditorHook.openFile(filepath, content, markerLine, debugLine)
     }
 
 

@@ -13,7 +13,7 @@ export type RegistersProps = {
     registers16: Record<string, u8 | u16 | bigint>;
     modifiedRegisters: string[];
     codeMapping: Record<string, Token | undefined>;
-    openAssemblyFileInEditor: (filePath: string, selectedLine?: number | undefined) => Promise<void>
+    openAssemblyFileInEditor: (filepath: string, markerLine?: number | undefined, debugLine?: number | undefined) => Promise<void>;
 };
 
 export const Registers: React.FC<RegistersProps> = (props) => {
@@ -47,7 +47,7 @@ export const Registers: React.FC<RegistersProps> = (props) => {
                     {currentCodeMapped && (
                         <div
                             className="cursor-pointer"
-                            onClick={() => openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line)}
+                            onClick={() => openAssemblyFileInEditor(currentCodeMapped.file, currentCodeMapped.line, undefined)}
                             title={currentCodeMapped.file}
                         >
                             {basename(currentCodeMapped.file)}:{currentCodeMapped.line} [{currentCodeMapped.value}]

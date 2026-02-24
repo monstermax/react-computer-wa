@@ -1,11 +1,13 @@
 
 import { useState } from "react";
+import type { DebuggerHook } from "./useDebugger";
 
 
 export type AssemblyEditorFile = {
     filepath: string;
     content: string;
-    highlightedLine: number | null;
+    markerLine: number | null;
+    debugLine: number | null;
     breakpointsLines: number[];
     loading: boolean;
 }
@@ -13,22 +15,24 @@ export type AssemblyEditorFile = {
 
 export type AssemblyEditorParams = {
     asmPrefixUrl?: string;
+    debuggerHook?: DebuggerHook;
 }
 
 
 export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditorHook => {
-    const { asmPrefixUrl='' } = params ?? {};
+    const { asmPrefixUrl='', debuggerHook } = params ?? {};
 
     const [openFiles, setOpenFiles] = useState<Map<string, AssemblyEditorFile>>(new Map);
     const [activeFile, setActiveFile] = useState<string | null>(null);
-    const [activeLine, setActiveLine] = useState<number | null>(null);
+    const [markerLine, setMarkerLine] = useState<number | null>(null); // marker bleu (highlight line)
 
 
-    const openFile = (filepath: string, content='', highlightedLine?: number, active=true) => {
+    const openFile = (filepath: string, content='', _markerLine?: number, debugLine?: number, active=true) => {
         const file: AssemblyEditorFile = {
             filepath,
             content,
-            highlightedLine: highlightedLine ?? null,
+            markerLine: _markerLine ?? null,
+            debugLine: debugLine ?? null,
             breakpointsLines: [],
             loading: false,
         }
@@ -44,7 +48,7 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
         })
 
         if (active) {
-            switchToFile(filepath, highlightedLine)
+            switchToFile(filepath, _markerLine, debugLine)
         }
     }
 
@@ -60,10 +64,15 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
         })
     }
 
-    const switchToFile = (filepath: string, highlightedLine?: number) => {
-        console.log('switchToFile:', filepath, highlightedLine)
+    const switchToFile = (filepath: string, _markerLine?: number, debugLine?: number) => {
+        console.log('switchToFile:', filepath, _markerLine, debugLine)
         setActiveFile(filepath)
-        setActiveLine(highlightedLine ?? null)
+
+        setMarkerLine(_markerLine ?? null)
+
+        if (debuggerHook) {
+            debuggerHook.setDebugLine(debugLine ?? null);
+        }
     }
 
     const switchToNextFile = () => {
@@ -83,7 +92,7 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
             const _new = new Map(old);
 
             if (_new.has(filepath)) {
-                const fileOld = _new.get(filepath) ?? { filepath, content: '', breakpointsLines: [], highlightedLine: null, loading: false };
+                const fileOld = _new.get(filepath) ?? { filepath, content: '', breakpointsLines: [], markerLine: null, debugLine: null, loading: false };
                 _new.set(filepath, { ...fileOld, ...file })
             }
 
@@ -97,12 +106,13 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
         return value;
     }
 
-    const hook = {
+    const hook: AssemblyEditorHook = {
         openFiles,
         activeFile,
-        activeLine,
+        markerLine,
         setOpenFiles,
         setActiveFile,
+        setMarkerLine,
         fetchFile,
         openFile,
         closeFile,
@@ -119,13 +129,14 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
 export type AssemblyEditorHook = {
     openFiles: Map<string, AssemblyEditorFile>;
     activeFile: string | null;
-    activeLine: number | null;
+    markerLine: number | null;
     setOpenFiles: React.Dispatch<React.SetStateAction<Map<string, AssemblyEditorFile>>>;
     setActiveFile: React.Dispatch<React.SetStateAction<string | null>>;
+    setMarkerLine: React.Dispatch<React.SetStateAction<number | null>>;
     fetchFile: (filepath: string) => Promise<string>;
-    openFile: (filepath: string, content?: string, highlightedLine?: number | undefined, active?: boolean) => void;
+    openFile: (filepath: string, content?: string, _markerLine?: number, debugLine?: number, active?: boolean) => void;
     closeFile: (filepath: string) => void;
-    switchToFile: (filepath: string, highlightedLine?: number) => void;
+    switchToFile: (filepath: string, _markerLine?: number, debugLine?: number) => void;
     newFile: () => void;
     updateFile: (filepath: string, file: Partial<AssemblyEditorFile>) => void;
     updateFileContent: (filepath: string, content: string) => void;

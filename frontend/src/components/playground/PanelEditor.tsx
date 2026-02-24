@@ -90,7 +90,8 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
     const [codeLoaded, setCodeLoaded] = useState(false);
 
     // ── Marker & Breakpoints ──
-    const [currentHighlight, setCurrentHighlight] = useState<any[]>([]); // Marker decoration (blue)
+    const [currentHighlightMarker, setCurrentHighlightMarker] = useState<any[]>([]); // Marker decoration (blue)
+    const [currentHighlightDebugger, setCurrentHighlightDebugger] = useState<any[]>([]); // Marker decoration (jaune)
     const decorationsRef = useRef([]); // Breakpoints decortions
     //const breakpointsRef = useRef<Map<string, { address: u16, file: string, line: u16 }>>(new Map());
 
@@ -414,36 +415,84 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
 
 
 
-    // Met à jour le marker (bleu) quand la ligne active change
+    // Met à jour les marker quand la ligne marker ou debugger change
     useEffect(() => {
-        if (assemblyEditorHook.activeLine !== null) {
-            //console.log('editorHightLine:', editorHightLine)
-            highlightLine(assemblyEditorHook.activeLine);
+        const _activate = () => {
+            const debugLine = debuggerHook.debugLine;
+
+            const markerLine = debugLine === null
+                ? assemblyEditorHook.markerLine
+                : null;
+
+            highlightLineDebugger(debugLine);
+            highlightLineMarker(markerLine);
         }
-    }, [assemblyEditorHook.activeLine])
+
+        _activate()
+    }, [assemblyEditorHook.markerLine, debuggerHook.debugLine]);
 
 
-    // Ajoute un marker (bleu) sur la ligne active
-    const highlightLine = (lineNumber: number) => {
+
+    // Ajoute un marker (jaune) sur la ligne debugger
+    const highlightLineDebugger = (lineNumber: number | null) => {
         const editor = editorRef.current;
         const monaco = monacoRef.current;
         if (!monaco) return;
 
         // Créer la nouvelle décoration
-        const decorations = [{
-            range: new monaco.Range(lineNumber, 1, lineNumber, 1),
-            options: {
-                isWholeLine: true,
-                className: 'border-l-4 border-blue-500 bg-blue-50/30',
-                //className: 'bg-yellow-500/30',
-            }
-        }];
+        const decorations = (lineNumber === null)
+            ? []
+            : [
+                {
+                    range: new monaco.Range(lineNumber, 1, lineNumber, 1),
+                    options: {
+                        isWholeLine: true,
+                        className: 'border border-yellow-500',
+                    }
+                }
+            ];
 
-        const newDecorationIds = editor.deltaDecorations(currentHighlight, decorations);
-        setCurrentHighlight(newDecorationIds);
+        //console.log('decorations:', decorations)
 
-        //editor.revealLine(lines[0], monaco.editor.ScrollType.Smooth);
-        editor.revealLineInCenter(lineNumber, monaco.editor.ScrollType.Smooth);
+        const newDecorationIds = editor.deltaDecorations(currentHighlightDebugger, decorations);
+        setCurrentHighlightDebugger(newDecorationIds);
+
+        if (lineNumber !== null) {
+            //editor.revealLine(lines[0], monaco.editor.ScrollType.Smooth);
+            editor.revealLineInCenter(lineNumber, monaco.editor.ScrollType.Smooth);
+        }
+    }
+
+
+
+    // Ajoute un marker (cadre jaune) sur la ligne active
+    const highlightLineMarker = (lineNumber: number | null) => {
+        const editor = editorRef.current;
+        const monaco = monacoRef.current;
+        if (!monaco) return;
+
+        // Créer la nouvelle décoration
+        const decorations = (lineNumber === null)
+            ? []
+            : [
+                {
+                    range: new monaco.Range(lineNumber, 1, lineNumber, 1),
+                    options: {
+                        isWholeLine: true,
+                        className: 'border-l-4 border-blue-500 bg-blue-50/30',
+                    }
+                }
+            ];
+
+        //console.log('decorations:', decorations)
+
+        const newDecorationIds = editor.deltaDecorations(currentHighlightMarker, decorations);
+        setCurrentHighlightMarker(newDecorationIds);
+
+        if (lineNumber !== null) {
+            //editor.revealLine(lines[0], monaco.editor.ScrollType.Smooth);
+            editor.revealLineInCenter(lineNumber, monaco.editor.ScrollType.Smooth);
+        }
     };
 
 
