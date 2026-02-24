@@ -1,6 +1,6 @@
 
 import { Opcode } from "./cpu_instructions";
-import { Computer } from "./Computer";
+import { BreakpointType, Computer } from "./Computer";
 import { toHex } from "./lib/lib_numbers";
 import { console, jsCpu } from "./external_functions";
 
@@ -20,7 +20,7 @@ export class CpuRegisters {
 
 
 export class Cpu {
-    private computer: Computer;
+    public computer: Computer;
     public registers: CpuRegisters;
     public halted: boolean = false;
     public cycles: u64 = 0;
@@ -211,34 +211,52 @@ export class Cpu {
             return;
         }
 
+
+        // Unblock current INT3 breakpoint (go to PC + 1)
+        if (this.computer.pendingBreakpointType === BreakpointType.INT3) {
+            this.computer.pendingBreakpointType = BreakpointType.NONE;
+            this.registers.PC++;
+        }
+
+
+        // Read Program Counter (PC)
         const PC = this.registers.PC as u16;
-        //const xx = this.computer.breakpoints.findIndex(b => b.address as u16 === PC)
 
+
+        // Check for IDE breakpoint at current PC
         const breakpoints = this.computer.breakpoints;
-        //console.log(`cpu exec breakpoints: ${breakpoints.length}`)
 
-        for (let i=0; i<breakpoints.length; i++) {
-            const breakpoint = breakpoints[i];
-            //console.log(`addy: ${breakpoint.address} VS ${PC}`)
+        if (breakpoints.has(PC)) {
+            // Trigger or Skip breakpoint
 
-            if (breakpoint.address as u16 === PC) {
-                if (breakpoint.address === this.computer.pendingBreakpoint) {
-                    this.computer.pendingBreakpoint = 0xFFFF;
+            const breakpoint = breakpoints.get(PC);
+            if (!breakpoint) throw new Error('missing breakpoint');
+            //console.log(`Checking BP at ${breakpoint.address} VS ${PC} (pending=${this.computer.pendingBreakpointType})`)
 
-                } else {
-                    console.log(`CPU editor Breakpoint at address ${PcHex}`)
-                    this.computer.pendingBreakpoint = PC;
-                    this.isOnBreakpoint = true;
-                    jsCpu.breakpoint()
-                    //this.registers.PC++
-                    return;
-                }
+            if (this.computer.pendingBreakpointType === BreakpointType.NONE) {
+                // Trigger breakpoint
+                console.log(`CPU editor Breakpoint at address ${PcHex}`)
+                this.computer.pendingBreakpointType = BreakpointType.IDE;
+                this.isOnBreakpoint = true; // empeche de traiter d'autres cycles au cours de ce tick. (en attendant l'arret de la clock)
+                jsCpu.breakpoint()
+                return;
+
+            } else {
+                // Skip (Unblock) IDE breakpoint
+                this.computer.pendingBreakpointType = BreakpointType.NONE;
             }
+
+        } else if (this.computer.pendingBreakpointType === BreakpointType.IDE) {
+            // Skip IDE Breakpoint (cas où le breakpoint a été retiré avant de relancer)
+            //console.log('DEBUG pendingBreakpointType IDE ??')
+            //throw new Error("debug me");
+            this.computer.pendingBreakpointType = BreakpointType.NONE;
         }
 
 
         // TODO: gérer les Interrupts
 
+        // Fetch instructions actions (fetch & execute)
         const actions: InstructionActions = fetchInstructionActions(opcode);
 
         if (actions.fetch && actions.execute) {
@@ -307,13 +325,13 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
 
 
         case <u8>Opcode.NOP:
-            run = (cpu: Cpu) => {
+            execute = (cpu: Cpu) => {
                 cpu.registers.PC++;
             };
             break;
 
         case <u8>Opcode.HALT:
-            run = (cpu: Cpu) => {
+            execute = (cpu: Cpu) => {
                 cpu.halted = true;
                 console.log(`CPU Halted`)
                 jsCpu.halted()
@@ -354,9 +372,9 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             run = (cpu: Cpu) => {
                 const PcHex = toHex(cpu.registers.PC, 4);
                 console.log(`CPU Breakpoint (int3) at address ${PcHex}`)
-                cpu.isOnBreakpoint = true;
-                jsCpu.breakpoint()
-                cpu.registers.PC += 1;
+                cpu.isOnBreakpoint = true; // empeche de traiter d'autres cycles au cours de ce tick. (en attendant l'arret de la clock)
+                jsCpu.breakpoint();
+                cpu.computer.pendingBreakpointType = BreakpointType.INT3; // permet de skipper le breakpoint lors du restart
             };
             break;
 

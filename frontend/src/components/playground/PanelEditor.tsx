@@ -5,8 +5,7 @@ import { shikiToMonaco } from '@shikijs/monaco'
 import { createHighlighter } from 'shiki'
 
 import { toHex } from "@/lib/lib_numbers";
-import { compileCode, compileCodeV2, formatBytecode, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
-import { CUSTOM_CPU } from "@/compiler/arch_custom";
+import { formatBytecode, getAssemblyCodeMapping, getBytecodeArray } from "@/compiler/compiler_utils";
 import { basename } from "@/lib/lib_strings";
 
 import { FileModal } from "./FileModal";
@@ -22,16 +21,19 @@ import type { CompilerError } from "@/types/compiler.types";
 
 const defaultLoadAddress = '0xA000';
 
-//const defaultCodeFilepath = "user/examples/draw_fractal_on_screen.asm";
-//const defaultCodeFilepath = "user/tests/lcd_test.asm";
-const defaultCodeFilepath = "user/examples/sokoban_game.asm";
-//const defaultCodeFilepath = "bootloader/bootloader_v2.asm";
-//const defaultCodeFilepath = "os/os_v3.asm";
 
-const defaultCodePrefix = `; == User Program (Loaded @ 0xA000) ==
-; Type "custom" in the shell to run it.
-; IMPORTANT: end with "ret" !
-; ==                                ==
+const defaultCodePrefix = `; 1) Write your own Program (IMPORTANT: end with "ret" instruction !)
+; 2) Compite and load it (loadable at 0xA000)
+; 3) Type "custom" in the shell to run it.
+
+section .text
+
+_start:
+    int3
+
+    ; your code here
+
+    ret
 `;
 
 
@@ -311,7 +313,10 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
         try {
             addLog(`Compiling user code... (target @ ${toHex(startAddress, 4)})`);
 
-            const compiled = await compilerHook.compileCode(editorContent, undefined, startAddress)
+            const filepath = assemblyEditorHook.activeFile ?? 'main.asm';
+
+            const editorContent = assemblyEditorHook.openFiles.get(assemblyEditorHook.activeFile ?? '')?.content ?? ''
+            const compiled = await compilerHook.compileCode(editorContent, filepath, startAddress)
 
             // Build Machine Code content (Javascript human-readable values)
             const machineCodeRaw: string = formatBytecode(compiled);
@@ -631,7 +636,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
                         })}
                         <div
                             className="bg-background-light"
-                            onClick={() => assemblyEditorHook.newFile()}
+                            onClick={() => assemblyEditorHook.newFile(defaultCodePrefix)}
                             title="New file"
                         >
                             +

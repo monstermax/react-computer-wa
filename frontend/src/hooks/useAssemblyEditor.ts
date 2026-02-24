@@ -62,7 +62,7 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
     }
 
 
-    const newFile = useCallback(() => {
+    const newFile = useCallback((content?: string) => {
         const allKeys = Array.from(openFiles.keys());
         //console.log(allKeys)
         let filepath = 'draft.asm';
@@ -75,7 +75,7 @@ export const useAssemblyEditor = (params?: AssemblyEditorParams): AssemblyEditor
             }
         }
 
-        openFile(filepath, `; new file ${filepath}`)
+        openFile(filepath, content ?? `; new file ${filepath}`)
     }, [openFiles])
 
 
@@ -164,7 +164,7 @@ export type AssemblyEditorHook = {
     openFile: (filepath: string, content?: string, _markerLine?: number, debugLine?: number, active?: boolean) => void;
     closeFile: (filepath: string) => void;
     switchToFile: (filepath: string, _markerLine?: number, debugLine?: number) => void;
-    newFile: () => void;
+    newFile: (content?: string) => void;
     updateFile: (filepath: string, file: Partial<AssemblyEditorFile>) => void;
     updateFileContent: (filepath: string, content: string) => void;
 }

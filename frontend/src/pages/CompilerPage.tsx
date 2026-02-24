@@ -5,6 +5,30 @@ import { compileCodeV2, compileFileV2, formatBytecode, getAssemblyCodeMapping } 
 import { toHex } from "@/lib/lib_numbers";
 
 
+const demoCode = `
+section .text
+
+_start:
+    nop
+    nop
+
+    int3
+
+    ; your code here
+    nop
+    nop
+    nop
+    nop
+
+    int3
+
+    nop
+    nop
+    nop
+
+    ret
+`;
+
 
 export const CompilerPage: React.FC = () => {
     //const [logs, setLogs] = useState('')
@@ -24,7 +48,8 @@ export const CompilerPage: React.FC = () => {
         const bootloaderFilepath = "os/os_v3.asm";
 
         const startAddress = 0xA000;
-        const compiled = await compileFileV2(bootloaderFilepath, { startAddress })
+        //const compiled = await compileFileV2(bootloaderFilepath, { startAddress })
+        const compiled = await compileCodeV2(demoCode, 'custom.asm', { startAddress })
 
         console.log("labels:", compiled.labels)
         console.log("sections:", compiled.sections)

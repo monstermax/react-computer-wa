@@ -5,14 +5,21 @@ import { MemoryBus, Ram, Rom } from "./Memory";
 //import { console } from "./external_functions";
 
 
+export enum BreakpointType {
+    NONE = 0,
+    INT3 = 1,
+    IDE = 2,
+}
+
+
 export class Computer {
     public memoryBus: MemoryBus | null = null;
     public rom: Rom | null = null;
     public ram: Ram | null = null;
     public ioManager: IoManager | null = null;
     public cpus: Cpu[] = [];
-    public breakpoints: Breakpoint[] = [];
-    public pendingBreakpoint: u16 = 0xFFFF;
+    public breakpoints: Map<u16, Breakpoint> = new Map;
+    public pendingBreakpointType: BreakpointType = BreakpointType.NONE;
 
 
     constructor() {
@@ -45,19 +52,19 @@ export class Computer {
     }
 
     setBreakpoints(addresses: u16[], files: string[], lines: u16[]): void {
-        this.breakpoints = [];
+        this.breakpoints = new Map;
 
         for (let i=0; i<addresses.length; i++) {
             const address = addresses[i];
             const file = files[i];
             const line = lines[i];
             const breakpoint = new Breakpoint(address, file, line)
-            this.breakpoints.push(breakpoint);
+            this.breakpoints.set(address, breakpoint);
 
             //console.log(`breakpoint: ${this.breakpoints.length} (${address}, ${file}, ${line})`)
         }
 
-        console.log(`breakpoints: ${this.breakpoints.length}`)
+        console.log(`breakpoints: ${this.breakpoints.size}`)
     }
 }
 
