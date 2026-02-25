@@ -50,7 +50,9 @@ export function computerloadCode(
 }
 
 
-export function computerRunCycles(computer: Computer, cycles: u32, skipBreakpoints: boolean=false): void {
+export function computerRunCycles(computer: Computer, cycles: u32, skipBreakpoints: boolean=false): boolean {
+    let canContinue = true;
+
     if (computer.cpus.length > 0) {
 
         // remove breakpoints bypass
@@ -64,12 +66,19 @@ export function computerRunCycles(computer: Computer, cycles: u32, skipBreakpoin
             for (let i = 0; i < computer.cpus.length; i++) {
                 const cpu = computer.cpus[i];
 
-                if (cpu && !cpu.isOnBreakpoint) {
+                if (!cpu) throw new Error(`Missing CPU #${i}`);
+
+                if (cpu.isOnBreakpoint) {
+                    canContinue = false;
+
+                } else {
                     cpu.runCpuCycle(skipBreakpoints);
                 }
             }
         }
     }
+
+    return canContinue;
 }
 
 

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import EventEmitter from "eventemitter3";
 
 
-import { getBytecodeArray } from "@/compiler/compiler_utils";
+import { getBytecodeArray, getBytecodeUint8Array } from "@/compiler/compiler_utils";
 import { deviceTypeFromString, useDevicesManager, type DeviceHook, type DevicesManagerHook } from "./useDevice";
 import { Clock } from "@/components/devices/clock";
 import { delayer } from "@/lib/lib_delayer";
@@ -185,7 +185,9 @@ export const useEmulator = (params: useEmulatorParams) => {
             if (wasmExports && computerPointer) {
                 try {
                     // Run cycles
-                    wasmExports.computerRunCycles(computerPointer, speedMultiplier, false);
+                    const canContinue = wasmExports.computerRunCycles(computerPointer, speedMultiplier, false);
+
+                    if (!canContinue) clock.stop();
 
                     // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
                     delayer('dump-registers', dumpRegisters, 100, 200, []);
@@ -261,12 +263,13 @@ export const useEmulator = (params: useEmulatorParams) => {
 
 
     // Execute N cycles
-    const runCycles = (cyclesCount=1) => {
-        if (!wasmExports || computerPointer === null) return;
+    const runCycles = (cyclesCount=1): boolean => {
+        if (!wasmExports || computerPointer === null) return false;
 
         try {
             const skipBreakpoints = (cyclesCount === 1);
-            wasmExports.computerRunCycles(computerPointer, cyclesCount, skipBreakpoints);
+            const canContinue = wasmExports.computerRunCycles(computerPointer, cyclesCount, skipBreakpoints);
+            return canContinue;
 
         } catch (err: any) {
             wasmError(err);
@@ -403,16 +406,14 @@ export const useEmulator = (params: useEmulatorParams) => {
     const loadBootloader = (compiled: CompiledProgram): number => {
         if (!wasmExports || !computerPointer || !devicesManager.devicesRef.current) return 0;
 
-        const byteCodeMap: MapIterator<[u16, u8]> = getBytecodeArray(compiled).entries();
-        const byteCodeArr = Array.from(byteCodeMap);
-        const values = new Uint8Array(byteCodeArr.map(r => r[1]));
+        const uint8Arr: Uint8Array = getBytecodeUint8Array(compiled);
 
-        const valPtr = wasmExports.allocate(values.length);
-        new Uint8Array(wasmExports.memory.buffer).set(values, valPtr);
+        const valPtr = wasmExports.allocate(uint8Arr.length);
+        new Uint8Array(wasmExports.memory.buffer).set(uint8Arr, valPtr);
 
         try {
-            wasmExports.computerloadCode(computerPointer, valPtr, values.length);
-            return values.length;
+            wasmExports.computerloadCode(computerPointer, valPtr, uint8Arr.length);
+            return uint8Arr.length;
 
         } catch (err: any) {
             wasmError(err);

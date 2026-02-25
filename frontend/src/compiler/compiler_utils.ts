@@ -1,12 +1,10 @@
 
-import { Compiler } from "./compiler";
-import { resolveIncludes } from "./compiler_preprocessor";
 import { CUSTOM_CPU } from "./arch_custom";
-import { assembleSourceCode, parseSourceCode, parseSourceCodeFile, type ParsedFile } from "./precompiler";
+import { assembleSourceCode, parseSourceCode, type ParsedFile } from "./precompiler";
 import { CompilerV2 } from "./compiler.v2";
 import { toHex } from "@/lib/lib_numbers";
 
-import type { CompiledProgram, CompilerOptions, CPUArchitecture } from "@/types/compiler.types";
+import type { CompiledProgram, CompilerOptions } from "@/types/compiler.types";
 import type { u16, u8 } from "@/types/computer.types";
 import type { Token } from "./compiler_lexer";
 
@@ -16,58 +14,6 @@ export let compilationAsmBaseUrl = '';
 export function setCompilationAsmBaseUrl(newBaseUrl: string) {
     compilationAsmBaseUrl = newBaseUrl;
 }
-
-
-export async function loadSourceCodeFromFile(filePath: string): Promise<string> {
-    const response = await fetch(`${compilationAsmBaseUrl}/asm/${filePath}`);
-    if (!response.ok) return '';
-
-    const content = await response.text();
-    return content;
-}
-
-
-export async function compileFile(filePath: string, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
-    const source = await loadSourceCodeFromFile(filePath);
-
-    const result = await compileCode(source, options);
-    return result;
-}
-
-
-export async function compileCode(source: string, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
-    const { source: resolvedSource, stats } = await resolveIncludes(source);
-
-    // Log des stats si besoin
-    if (stats.size > 0) {
-        console.log('Include stats:');
-        stats.forEach((stat, file) => {
-            console.log(`  ${stat.file}: ${stat.references} references from [${stat.includedBy.join(', ')}]`);
-        });
-    }
-
-    const architecture = options.architecture || CUSTOM_CPU;
-
-    const compiler = new Compiler({
-        architecture,
-        startAddress: options.startAddress || 0,
-        startLine: options.startLine || 0,
-        caseSensitive: options.caseSensitive || false
-    });
-
-    const compiled = await compiler.compile(resolvedSource);
-
-    if (compiled.errors.length > 0) {
-        compiled.errors.forEach(error => {
-            console.warn(JSON.stringify(error));
-        })
-        //throw new Error(`Compilation completed with errors`)
-    }
-
-    return compiled
-}
-
-
 
 
 export async function compileFileV2(filePath: string, options: Partial<CompilerOptions> = {}): Promise<CompiledProgram> {
@@ -99,12 +45,52 @@ export async function compileCodeV2(sourceCode: string, filepath="main.asm", opt
         caseSensitive,
     });
 
-    const compiled = await compiler.compile('', allTokens);
+    const compiled = await compiler.compile(allTokens);
     //console.log('compiled:', compiled)
 
     return compiled;
 }
 
+
+export async function loadSourceCodeFromFile(filePath: string): Promise<string> {
+    const response = await fetch(`${compilationAsmBaseUrl}/asm/${filePath}`);
+    if (!response.ok) return '';
+
+    const content = await response.text();
+    return content;
+}
+
+
+export function getBytecodeArray(program: CompiledProgram, sectionName?: string): Map<u16, u8> {
+    const code: Map<u16, u8> = new Map;
+
+    for (const section of program.sections) {
+        if (sectionName && section.name !== sectionName) continue;
+
+        for (const entry of section.data) {
+            code.set(entry.address as u16, entry.value as u8);
+        }
+    }
+
+    return code;
+}
+
+
+export function getBytecodeUint8Array(program: CompiledProgram, sectionName?: string): Uint8Array {
+    const codeMap: Map<u16, u8> = new Map;
+
+    for (const section of program.sections) {
+        if (sectionName && section.name !== sectionName) continue;
+
+        for (const entry of section.data) {
+            codeMap.set(entry.address as u16, entry.value as u8);
+        }
+    }
+
+    const code: Uint8Array = new Uint8Array(codeMap.values());
+
+    return code;
+}
 
 
 export function formatBytecode(program: CompiledProgram): string {
@@ -156,18 +142,4 @@ export function getAssemblyCodeMapping(program: CompiledProgram): Record<string,
 }
 
 
-
-export function getBytecodeArray(program: CompiledProgram, sectionName?: string): Map<u16, u8> {
-    const code: Map<u16, u8> = new Map;
-
-    for (const section of program.sections) {
-        if (sectionName && section.name !== sectionName) continue;
-
-        for (const entry of section.data) {
-            code.set(entry.address as u16, entry.value as u8);
-        }
-    }
-
-    return code;
-}
 

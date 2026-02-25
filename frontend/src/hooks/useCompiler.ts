@@ -22,6 +22,8 @@ export const useCompiler = (): CompilerHook => {
             throw error;
         }
 
+        console.log(`Compiled code of ${filepath} :`, compiled)
+
         return compiled
     }
 

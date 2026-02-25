@@ -24,8 +24,9 @@ declare namespace __AdaptedExports {
    * @param computer `src/Computer/Computer`
    * @param cycles `u32`
    * @param skipBreakpoints `bool`
+   * @returns `bool`
    */
-  export function computerRunCycles(computer: __Internref4, cycles: number, skipBreakpoints?: boolean): void;
+  export function computerRunCycles(computer: __Internref4, cycles: number, skipBreakpoints?: boolean): boolean;
   /**
    * src/index/computerGetCycles
    * @param computer `src/Computer/Computer`

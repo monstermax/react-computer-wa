@@ -5,7 +5,7 @@ import { shikiToMonaco } from '@shikijs/monaco'
 import { createHighlighter } from 'shiki'
 
 import { toHex } from "@/lib/lib_numbers";
-import { formatBytecode, getAssemblyCodeMapping, getBytecodeArray } from "@/compiler/compiler_utils";
+import { formatBytecode, getAssemblyCodeMapping, getBytecodeArray, getBytecodeUint8Array } from "@/compiler/compiler_utils";
 import { basename } from "@/lib/lib_strings";
 
 import { FileModal } from "./FileModal";
@@ -338,6 +338,7 @@ export const PanelEditor: React.FC<PanelEditorProps> = (props) => {
             setMachineCodeLabels(_machineCodeLabels)
 
             // Build Bytecode content (Machine Bytecode, ready to load in RAM)
+            //const uint8Arr: Uint8Array = getBytecodeUint8Array(compiled);
             const _bytecode: Map<u16, u8> = getBytecodeArray(compiled);
             setBytecode(_bytecode)
             setCodeLoaded(false)

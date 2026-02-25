@@ -5,7 +5,7 @@ import { loadSourceCodeFromFile } from "./compiler_utils";
 import type { CPUArchitecture, InstructionDef } from "@/types/compiler.types";
 
 
-// Used by CompierV2 (only)
+// Used by compileCodeV2
 
 
 export type ParsedFiles = {

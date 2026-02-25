@@ -6,6 +6,9 @@ import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEn
 import type { u16 } from '@/types/computer.types';
 
 
+throw new Error("CompilerV1 is Deprecated");
+
+
 const compilerVersion = '0.1';
 
 

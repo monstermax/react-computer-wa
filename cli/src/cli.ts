@@ -19,6 +19,7 @@ import { RtcDevice } from './frontend_dependencies/devices/rtc';
 import { RngDevice } from './frontend_dependencies/devices/rng';
 import { toHex } from './lib/lib_numbers';
 import { SwitchsDevice } from './frontend_dependencies/devices/switchs';
+import { NetworkTcpDevice } from './frontend_dependencies/devices/network_tcp';
 
 
 export type WasmExports = typeof releaseModule.__AdaptedExports;
@@ -33,9 +34,10 @@ async function main() {
     let cyclesCount = 0 as number;
 
     let clockFrequency = 1 as u32;
-    let speedMultiplier = 10 as u32;
+    let speedMultiplier = 100 as u32;
     let osDiskData = null as [u16, u8][] | null;
 
+    let codeMapping: any = {};
 
     const dumpRegisters = async (): Promise<RegistersDump | null> => {
         if (!emulator.wasmExports || !emulator.computerPointer) return null;
@@ -68,13 +70,30 @@ async function main() {
     };
 
 
+    const showState = () => {
+        if (!emulator.wasmExports || !emulator.computerPointer) return null;
+
+        const controlRegisters = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
+        const dataRegisters = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
+
+        const PC = controlRegisters.PC;
+        const currentRaw = codeMapping[toHex(PC, 4)]
+        const current = currentRaw
+            ? `${currentRaw.file}:${currentRaw.line} [${currentRaw.value}]`
+            : null;
+
+        console.log({controlRegisters, dataRegisters, current})
+
+        if (!current) {
+            process.exit();
+        }
+    }
+
+
 
     const emulator = await useEmulator({ clockFrequency, speedMultiplier, addLog, dumpRegisters })
 
     if (emulator.wasmExports && emulator.computerPointer) {
-
-
-        let codeMapping: any = {};
 
         if (true) {
             // Load bootloader
@@ -133,6 +152,7 @@ async function main() {
         //const buzzerDeviceHook = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {});
         //const speakerDeviceHook = useDevice<SpeakerDevice>(emulator.devicesManager, 'speaker', SpeakerDevice, { pollsPerMs: 20 });
         //const lcdDeviceHook = useDevice<LcdDevice>(emulator.devicesManager, 'lcd', LcdDevice, {});
+        const networkTcpHook = useDevice<NetworkTcpDevice>(emulator.devicesManager, 'network_tcp', NetworkTcpDevice, {});
 
 
         emulator.addDevicesToComputer([
@@ -152,6 +172,7 @@ async function main() {
             //screenHdDeviceHook,
             //speakerDeviceHook,
             //lcdDeviceHook,
+            networkTcpHook,
         ]);
 
         console.log({controlRegisters: emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer), dataRegisters: emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer)})
@@ -159,20 +180,24 @@ async function main() {
         //emulator.clock.start()
         //if (1) return;
 
+        let error: any | null = null;
 
-        for (let i=0; i<10_000; i++) {
-            emulator.runCycles(speedMultiplier);
+        for (let i=0; i<50_000; i++) {
+            try {
+                const canContinue = emulator.runCycles(speedMultiplier);
+                //if (!canContinue) error = true;
 
-            const controlRegisters = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
-            const dataRegisters = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
+            } catch (err: any) {
+                error = err;
+            }
 
-            const PC = controlRegisters.PC;
-            const currentRaw = codeMapping[toHex(PC, 4)]
-            const current = `${currentRaw.file}:${currentRaw.line} [${currentRaw.value}]`;
+            showState()
 
-            console.log({controlRegisters, dataRegisters, current})
+            if (error) {
+                process.exit();
+            }
 
-            await sleep(10);
+            await sleep(100);
         }
 
     }

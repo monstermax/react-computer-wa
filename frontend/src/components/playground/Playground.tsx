@@ -4,8 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
 
-import { compileCode, compileCodeV2, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
-import { CUSTOM_CPU } from "@/compiler/arch_custom";
+import { getAssemblyCodeMapping, getBytecodeArray, getBytecodeUint8Array } from "@/compiler/compiler_utils";
 import { toHex } from "@/lib/lib_numbers";
 
 import { useEmulator, type EmulatorHook } from "@/hooks/useEmulator";
@@ -270,9 +269,10 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const newCodeMapping = getAssemblyCodeMapping(compiled);
         updateCodeMapping(newCodeMapping)
 
+        //const uint8Arr: Uint8Array = getBytecodeUint8Array(compiled);
         const byteCodeMap: MapIterator<[u16, u8]> = getBytecodeArray(compiled).entries();
         const byteCodeArr = Array.from(byteCodeMap);
-        const data = byteCodeArr ?? [];
+        const data: [u16, u8][] = byteCodeArr ?? [];
 
         return data;
     }
@@ -369,7 +369,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         //const dataBefore = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
         //console.log('BEFORE', controlBefore, dataBefore);
 
-        emulator.runCycles(1);
+        const canContinue = emulator.runCycles(1);
 
         //const controlAfter = emulator.readControlRegisters(emulator.wasmExports, emulator.computerPointer);
         //const dataAfter = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);

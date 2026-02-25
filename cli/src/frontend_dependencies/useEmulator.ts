@@ -107,8 +107,8 @@ export const useEmulator = async (params: useEmulatorParams) => {
                 jsIoReset,
                 jsCpuHalted,
                 jsCpuBreakpoint,
-                //console.log is mapped on window.wasmConsoleLog
-                //console.warn is mapped on window.wasmConsoleWarn
+                'console.log': window.wasmConsoleLog, //console.log is mapped on window.wasmConsoleLog
+                'console.warn': window.wasmConsoleWarn, //console.warn is mapped on window.wasmConsoleWarn
             },
         };
 
@@ -183,7 +183,8 @@ export const useEmulator = async (params: useEmulatorParams) => {
         if (wasmExports && computerPointer) {
             try {
                 // Run cycles
-                wasmExports.computerRunCycles(computerPointer, speedMultiplier);
+                const canContinue = wasmExports.computerRunCycles(computerPointer, speedMultiplier);
+                if (!canContinue) clock.stop();
 
                 // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
                 delayer('dump-registers', dumpRegisters, 100, 200, []);
@@ -250,11 +251,12 @@ export const useEmulator = async (params: useEmulatorParams) => {
     }
 
 
-    const runCycles = (cyclesCount=1) => {
-        if (!wasmExports || computerPointer === null) return;
+    const runCycles = (cyclesCount=1): boolean => {
+        if (!wasmExports || computerPointer === null) return false;
 
         try {
-            wasmExports.computerRunCycles(computerPointer, cyclesCount);
+            const canContinue = wasmExports.computerRunCycles(computerPointer, cyclesCount, cyclesCount === 1);
+            return canContinue;
 
         } catch (err: any) {
             wasmError(err);
@@ -429,7 +431,7 @@ export type EmulatorHook = {
     devicesManager: DevicesManagerHook;
     cpuHalted: boolean;
     addDevicesToComputer: (deviceHooks: DeviceHook<IoDevice>[]) => void;
-    runCycles: (cyclesCount?: number) => void;
+    runCycles: (cyclesCount?: number) => boolean;
     startClock: () => void;
     stopClock: () => void;
     getCyclesCount: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => bigint;
@@ -479,7 +481,6 @@ const wasmConsoleWarn = (message: string) => {
 
 const window = globalThis as unknown as Window;
 window.wasmConsoleLog = wasmConsoleLog; // used by wasmImports "console.log" callback as an external function of wasm
-
 window.wasmConsoleWarn = wasmConsoleWarn; // used by wasmImports "console.warn" callback as an external function of wasm
 
 

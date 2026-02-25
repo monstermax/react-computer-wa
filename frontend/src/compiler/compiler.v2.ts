@@ -6,6 +6,9 @@ import type { CPUArchitecture, CompilerOptions, CompiledProgram, Section, ByteEn
 import type { u16 } from '@/types/computer.types';
 
 
+// Used by compileCodeV2
+
+
 const compilerVersion = '0.2';
 
 
@@ -125,29 +128,10 @@ export class CompilerV2 {
 
 
     // Main compilation entry point - performs two-pass compilation
-    public async compile(source: string, initialTokens?: Token[]): Promise<CompiledProgram> {
+    public async compile(initialTokens: Token[]): Promise<CompiledProgram> {
         // should be called externally
 
-        if (initialTokens) {
-            this.tokens = initialTokens;
-
-        } else {
-            // Define all recognized token types for lexer
-            const instructions = Array.from(this.instructionMap.keys());
-            const registers = Array.from(this.registerMap.keys());
-            const directives = [
-                'DB', 'DW', 'DD', 'DQ',
-                'SECTION', 'GLOBAL', 'EXTERN',
-                '.DATA', '.CODE', '.TEXT', '.BSS', '.ORG', '.INCLUDE',
-                'RESB', 'RESW', 'RESD', 'RESQ',
-                'EQU', 'TIMES',
-            ];
-
-            // Tokenize source code
-            const lexer = new Lexer(source, instructions, registers, directives, this.caseSensitive);
-            this.tokens = lexer.tokenize() //.filter(t => t.type !== 'COMMENT' && t.type !== 'NEWLINE');
-            //console.log('lexer tokens:', this.tokens)
-        }
+        this.tokens = initialTokens;
 
 
         // Pass 1: collect all symbols and calculate addresses
