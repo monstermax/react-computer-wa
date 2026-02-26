@@ -82,6 +82,19 @@ _exit:
 
 
 run_shell:
+    mov al, 1
+    int3
+    mov al, 2
+    mov al, 3
+    mov al, 4
+    int3
+    mov al, 5
+    mov al, 6
+    mov al, 7
+    int3
+    mov al, 8
+    mov al, 9
+
     ; run_shell_print_info:
     lea cl, dl, [STR_WELCOME_LINE_1]
     call console_print_string

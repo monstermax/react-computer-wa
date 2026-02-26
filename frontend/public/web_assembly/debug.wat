@@ -3860,6 +3860,10 @@
   local.get $this
   i32.load offset=24
  )
+ (func $src/Cpu/Cpu#get:cycles (param $this i32) (result i64)
+  local.get $this
+  i64.load offset=16
+ )
  (func $src/Cpu/Cpu#get:registers (param $this i32) (result i32)
   local.get $this
   i32.load offset=4
@@ -3867,10 +3871,6 @@
  (func $src/Cpu/CpuRegisters#get:PC (param $this i32) (result i32)
   local.get $this
   i32.load16_u offset=6
- )
- (func $src/Cpu/Cpu#get:cycles (param $this i32) (result i64)
-  local.get $this
-  i64.load offset=16
  )
  (func $src/Cpu/CpuRegisters#get:IR (param $this i32) (result i32)
   local.get $this
@@ -8477,7 +8477,7 @@
   if
    i32.const 4320
    i32.const 4384
-   i32.const 106
+   i32.const 186
    i32.const 25
    call $~lib/builtins/abort
    unreachable
@@ -8896,7 +8896,7 @@
   if
    i32.const 4320
    i32.const 4384
-   i32.const 84
+   i32.const 164
    i32.const 25
    call $~lib/builtins/abort
    unreachable
@@ -9642,7 +9642,7 @@
   i32.const 2672
   call $~lib/staticarray/StaticArray<~lib/string/String>#join
   i32.const 4384
-  i32.const 156
+  i32.const 236
   i32.const 9
   call $~lib/builtins/abort
   unreachable
@@ -9887,7 +9887,7 @@
   i32.const 2672
   call $~lib/staticarray/StaticArray<~lib/string/String>#join
   i32.const 4384
-  i32.const 169
+  i32.const 249
   i32.const 9
   call $~lib/builtins/abort
   unreachable
@@ -10140,7 +10140,7 @@
   if
    i32.const 4320
    i32.const 4384
-   i32.const 93
+   i32.const 173
    i32.const 25
    call $~lib/builtins/abort
    unreachable
@@ -10386,7 +10386,7 @@
   (local $PcHex i32)
   (local $2 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 12
+  i32.const 16
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
@@ -10394,8 +10394,8 @@
   i64.const 0
   i64.store
   global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
+  i64.const 0
+  i64.store offset=8
   global.get $~lib/memory/__stack_pointer
   local.get $cpu
   local.set $2
@@ -10452,9 +10452,37 @@
   local.get $2
   global.get $src/Computer/BreakpointType.INT3
   call $src/Computer/Computer#set:pendingBreakpointType
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  call $src/Cpu/Cpu#get:registers
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store offset=12
+  local.get $2
+  call $src/Cpu/Cpu#get:registers
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 1
+  i32.add
+  call $src/Cpu/CpuRegisters#set:PC
   call $src/external_functions/jsCpu.breakpoint
   global.get $~lib/memory/__stack_pointer
-  i32.const 12
+  i32.const 16
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
@@ -10575,7 +10603,7 @@
   if
    i32.const 4320
    i32.const 4384
-   i32.const 115
+   i32.const 195
    i32.const 25
    call $~lib/builtins/abort
    unreachable
@@ -12312,7 +12340,7 @@
   i32.const 2672
   call $~lib/staticarray/StaticArray<~lib/string/String>#join
   i32.const 4384
-  i32.const 203
+  i32.const 283
   i32.const 9
   call $~lib/builtins/abort
   unreachable
@@ -12991,7 +13019,7 @@
   if
    i32.const 4320
    i32.const 4384
-   i32.const 123
+   i32.const 203
    i32.const 25
    call $~lib/builtins/abort
    unreachable
@@ -13174,7 +13202,7 @@
   if
    i32.const 4320
    i32.const 4384
-   i32.const 135
+   i32.const 215
    i32.const 25
    call $~lib/builtins/abort
    unreachable
@@ -25163,7 +25191,7 @@
    if
     i32.const 5440
     i32.const 4384
-    i32.const 235
+    i32.const 93
     i32.const 30
     call $~lib/builtins/abort
     unreachable
@@ -25473,7 +25501,7 @@
   i32.const 2672
   call $~lib/staticarray/StaticArray<~lib/string/String>#join
   i32.const 4384
-  i32.const 282
+  i32.const 140
   i32.const 9
   call $~lib/builtins/abort
   unreachable
@@ -25535,34 +25563,6 @@
    local.get $2
    global.get $src/Computer/BreakpointType.NONE
    call $src/Computer/Computer#set:pendingBreakpointType
-   local.get $this
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $this
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 1
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
   end
   local.get $this
   local.set $2
