@@ -31,7 +31,8 @@ export function asmDirectoryPlugin(): Plugin {
                     .split('\n')
                     .filter(Boolean)
                     .map(file => file.replace(`${asmPath}/`, ''))
-                    .filter(file => file.length > 0);
+                    .filter(file => file.length > 0)
+                    .sort();
 
                 // Écrit le JSON
                 const result = {
