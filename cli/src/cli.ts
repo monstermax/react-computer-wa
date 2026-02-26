@@ -140,8 +140,8 @@ async function main() {
         if (true) {
             // Load Program
 
-            //const programName = "network_tcp_client_test";
-            const programName = "network_tcp_server_test";
+            const programName = "network_tcp_client_test";
+            //const programName = "network_tcp_server_test";
 
             const compiled = JSON.parse(fs.readFileSync(`${__dirname}/../compiled/${programName}.bin.json`).toString()) as CompiledProgram;
 

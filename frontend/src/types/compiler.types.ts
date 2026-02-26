@@ -125,6 +125,10 @@ export interface ByteEntry {
     opcodeToken?: Token;
 }
 
+
+export type CompiledProgramObj = CompiledProgram; // TODO
+export type CompiledProgramBin = Uint8Array; // TODO
+
 export interface CompiledProgram {
     sections: Section[];
     labels: Map<string, Label>;

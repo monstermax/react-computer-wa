@@ -172,6 +172,7 @@ export const useEmulator = async (params: useEmulatorParams) => {
         clockStatus = false
         cyclesPerSecondRef = 0
         addLog('CPU Breakpoint');
+        throw new Error("Breakpoint");
     };
 
 

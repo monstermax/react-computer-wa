@@ -32,12 +32,12 @@ section .data
     NET_RX_COUNT         equ 0x03
     NET_TX_COUNT         equ 0x04
     NET_LAST_ERROR       equ 0x05
-    NET_HOST0            equ 0x06
-    NET_HOST1            equ 0x07
-    NET_HOST2            equ 0x08
-    NET_HOST3            equ 0x09
-    NET_PORT_LOW         equ 0x0A
-    NET_PORT_HIGH        equ 0x0B
+    NET_HOST0            equ 0x06 ; 127
+    NET_HOST1            equ 0x07 ; 0
+    NET_HOST2            equ 0x08 ; 0
+    NET_HOST3            equ 0x09 ; 1
+    NET_PORT_LOW         equ 0x0A ; 4000 (low)
+    NET_PORT_HIGH        equ 0x0B ; 4000 (high)
 
     ; Commands
     CMD_CONNECT          equ 0x01
