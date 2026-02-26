@@ -1,7 +1,7 @@
 
 import { Opcode } from "./cpu_instructions";
 import { BreakpointType, Computer } from "./Computer";
-import { toHex } from "./lib/lib_numbers";
+import { high16, low16, toHex } from "./lib/lib_numbers";
 import { console, jsCpu } from "./external_functions";
 
 
@@ -385,10 +385,34 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             };
             break;
 
-        case <u8>Opcode.SET_SP:
+        case <u8>Opcode.SET_SP_IMM:
             run = (cpu: Cpu) => {
                 const imm16 = cpu.readMem16(cpu.registers.PC);
                 cpu.registers.SP = imm16
+                cpu.registers.PC += 3;
+            };
+            break;
+
+        case <u8>Opcode.SET_SP_REG_REG:
+            run = (cpu: Cpu) => {
+                const regLowIdx = cpu.readMem8(cpu.registers.PC);
+                const regHighIdx = cpu.readMem8(cpu.registers.PC + 1);
+                const regLowValue: u8 = cpu.getRegisterValueByIdx(regLowIdx);
+                const regHighValue: u8 = cpu.getRegisterValueByIdx(regHighIdx);
+                const spValue = ((regHighValue * 256) + regLowValue) as u16;
+                cpu.registers.SP = spValue
+                cpu.registers.PC += 3;
+            };
+            break;
+
+        case <u8>Opcode.GET_SP_REG_REG:
+            run = (cpu: Cpu) => {
+                const regLowIdx = cpu.readMem8(cpu.registers.PC);
+                const regHighIdx = cpu.readMem8(cpu.registers.PC + 1);
+                const regLowValue: u8 = low16(cpu.registers.SP);
+                const regHighValue: u8 = high16(cpu.registers.SP);
+                cpu.setRegisterValueByIdx(regLowIdx, regLowValue);
+                cpu.setRegisterValueByIdx(regHighIdx, regHighValue);
                 cpu.registers.PC += 3;
             };
             break;

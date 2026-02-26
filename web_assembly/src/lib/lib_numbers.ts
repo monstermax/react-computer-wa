@@ -39,10 +39,10 @@ export function toHex(intValue: i32, padleft: i32 = 0): string {
 
 
 export function high16(value: u16): u8 {
-    return value >> 8;
+    return (value >> 8) as u8;
 }
 
 
 export function low16(value: u16): u8 {
-    return value & 0xFF;
+    return (value & 0xFF) as u8;
 }

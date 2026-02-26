@@ -57,7 +57,9 @@
  (global $src/cpu_instructions/Opcode.XCHG i32 (i32.const 37))
  (global $src/cpu_instructions/Opcode.PUSH_REG i32 (i32.const 38))
  (global $src/cpu_instructions/Opcode.POP_REG i32 (i32.const 39))
- (global $src/cpu_instructions/Opcode.SET_SP i32 (i32.const 40))
+ (global $src/cpu_instructions/Opcode.SET_SP_IMM i32 (i32.const 40))
+ (global $src/cpu_instructions/Opcode.SET_SP_REG_REG i32 (i32.const 41))
+ (global $src/cpu_instructions/Opcode.GET_SP_REG_REG i32 (i32.const 42))
  (global $src/cpu_instructions/Opcode.INC_REG i32 (i32.const 48))
  (global $src/cpu_instructions/Opcode.INC_MEM i32 (i32.const 49))
  (global $src/cpu_instructions/Opcode.DEC_REG i32 (i32.const 50))
@@ -178,10 +180,10 @@
  (global $~lib/native/ASC_RUNTIME i32 (i32.const 2))
  (global $~lib/native/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $~argumentsLength (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 10784))
- (global $~lib/memory/__data_end i32 (i32.const 10916))
- (global $~lib/memory/__stack_pointer (mut i32) (i32.const 43684))
- (global $~lib/memory/__heap_base i32 (i32.const 43684))
+ (global $~lib/rt/__rtti_base i32 (i32.const 10848))
+ (global $~lib/memory/__data_end i32 (i32.const 10980))
+ (global $~lib/memory/__stack_pointer (mut i32) (i32.const 43748))
+ (global $~lib/memory/__heap_base i32 (i32.const 43748))
  (memory $0 1)
  (data $0 (i32.const 12) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00A\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00\00\00\00\00")
  (data $1 (i32.const 76) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00~\00l\00i\00b\00/\00r\00t\00/\00i\00t\00c\00m\00s\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
@@ -282,23 +284,23 @@
  (data $96 (i32.const 6940) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\t\00\00\00\00\00\00\00\00\00\00\00")
  (data $97 (i32.const 6972) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\n\00\00\00\00\00\00\00\00\00\00\00")
  (data $98 (i32.const 7004) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\0b\00\00\00\00\00\00\00\00\00\00\00")
- (data $99 (i32.const 7036) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\0c\00\00\00\00\00\00\00\00\00\00\00")
- (data $100 (i32.const 7068) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\r\00\00\00\00\00\00\00\00\00\00\00")
- (data $101 (i32.const 7100) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\n\00\00\00c\00a\00r\00r\00y\00\00\00")
- (data $102 (i32.const 7132) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\08\00\00\00z\00e\00r\00o\00\00\00\00\00")
- (data $103 (i32.const 7164) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\0e\00\00\00\00\00\00\00\00\00\00\00")
- (data $104 (i32.const 7196) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\0f\00\00\00\00\00\00\00\00\00\00\00")
- (data $105 (i32.const 7228) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\10\00\00\00\00\00\00\00\00\00\00\00")
- (data $106 (i32.const 7260) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\11\00\00\00\00\00\00\00\00\00\00\00")
- (data $107 (i32.const 7292) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\12\00\00\00\00\00\00\00\00\00\00\00")
- (data $108 (i32.const 7324) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\13\00\00\00\00\00\00\00\00\00\00\00")
- (data $109 (i32.const 7356) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\14\00\00\00\00\00\00\00\00\00\00\00")
- (data $110 (i32.const 7388) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\15\00\00\00\00\00\00\00\00\00\00\00")
- (data $111 (i32.const 7420) "\1c\00\00\00\00\00\00\00\00\00\00\00\18\00\00\00\08\00\00\00\16\00\00\00\00\00\00\00\00\00\00\00")
- (data $112 (i32.const 7452) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\10\00\00\00\80\18\00\00\00\00\00\00\b0\18\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $113 (i32.const 7500) "\1c\00\00\00\00\00\00\00\00\00\00\00\19\00\00\00\08\00\00\00\17\00\00\00\00\00\00\00\00\00\00\00")
- (data $114 (i32.const 7532) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\18\00\00\00\00\00\00\00\00\00\00\00")
- (data $115 (i32.const 7564) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\19\00\00\00\00\00\00\00\00\00\00\00")
+ (data $99 (i32.const 7036) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\10\00\00\00\80\18\00\00\00\00\00\00\b0\18\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $100 (i32.const 7084) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\0c\00\00\00\00\00\00\00\00\00\00\00")
+ (data $101 (i32.const 7116) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\r\00\00\00\00\00\00\00\00\00\00\00")
+ (data $102 (i32.const 7148) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\0e\00\00\00\00\00\00\00\00\00\00\00")
+ (data $103 (i32.const 7180) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\0f\00\00\00\00\00\00\00\00\00\00\00")
+ (data $104 (i32.const 7212) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\n\00\00\00c\00a\00r\00r\00y\00\00\00")
+ (data $105 (i32.const 7244) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\08\00\00\00z\00e\00r\00o\00\00\00\00\00")
+ (data $106 (i32.const 7276) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\10\00\00\00\00\00\00\00\00\00\00\00")
+ (data $107 (i32.const 7308) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\11\00\00\00\00\00\00\00\00\00\00\00")
+ (data $108 (i32.const 7340) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\12\00\00\00\00\00\00\00\00\00\00\00")
+ (data $109 (i32.const 7372) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\13\00\00\00\00\00\00\00\00\00\00\00")
+ (data $110 (i32.const 7404) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\14\00\00\00\00\00\00\00\00\00\00\00")
+ (data $111 (i32.const 7436) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\15\00\00\00\00\00\00\00\00\00\00\00")
+ (data $112 (i32.const 7468) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\16\00\00\00\00\00\00\00\00\00\00\00")
+ (data $113 (i32.const 7500) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\17\00\00\00\00\00\00\00\00\00\00\00")
+ (data $114 (i32.const 7532) "\1c\00\00\00\00\00\00\00\00\00\00\00\18\00\00\00\08\00\00\00\18\00\00\00\00\00\00\00\00\00\00\00")
+ (data $115 (i32.const 7564) "\1c\00\00\00\00\00\00\00\00\00\00\00\19\00\00\00\08\00\00\00\19\00\00\00\00\00\00\00\00\00\00\00")
  (data $116 (i32.const 7596) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\1a\00\00\00\00\00\00\00\00\00\00\00")
  (data $117 (i32.const 7628) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\1b\00\00\00\00\00\00\00\00\00\00\00")
  (data $118 (i32.const 7660) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00\1c\00\00\00\00\00\00\00\00\00\00\00")
@@ -358,32 +360,34 @@
  (data $172 (i32.const 9388) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00R\00\00\00\00\00\00\00\00\00\00\00")
  (data $173 (i32.const 9420) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00S\00\00\00\00\00\00\00\00\00\00\00")
  (data $174 (i32.const 9452) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00T\00\00\00\00\00\00\00\00\00\00\00")
- (data $175 (i32.const 9484) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00.\00\00\00I\00n\00s\00t\00r\00u\00c\00t\00i\00o\00n\00 \00n\00o\00t\00 \00f\00o\00u\00n\00d\00:\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $176 (i32.const 9564) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00)\00 \00a\00t\00 \00a\00d\00d\00r\00e\00s\00s\00 \00\00\00")
- (data $177 (i32.const 9612) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\18\00\00\00 %\00\00\00\00\00\00\a0\0c\00\00\00\00\00\00p%\00\00\00\00\00\00\00\00\00\00")
- (data $178 (i32.const 9660) "\1c\00\00\00\00\00\00\00\00\00\00\00\1d\00\00\00\08\00\00\00U\00\00\00\00\00\00\00\00\00\00\00")
- (data $179 (i32.const 9692) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00I\00o\00M\00a\00n\00a\00g\00e\00r\00 \00n\00o\00t\00 \00f\00o\00u\00n\00d\00\00\00\00\00\00\00")
- (data $180 (i32.const 9756) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00T\00o\00o\00 \00m\00a\00n\00y\00 \00I\00O\00 \00d\00e\00v\00i\00c\00e\00s\00\00\00\00\00\00\00")
- (data $181 (i32.const 9820) "\\\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00H\00\00\00D\00e\00v\00i\00c\00e\00 \00s\00t\00r\00i\00n\00g\00s\00 \00m\00e\00m\00o\00r\00y\00 \00o\00v\00e\00r\00f\00l\00o\00w\00 \00(\00p\00t\00r\00=\00\00\00\00\00")
- (data $182 (i32.const 9916) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\14\00\00\00 \00|\00 \00s\00t\00r\00l\00e\00n\00=\00\00\00\00\00\00\00\00\00")
- (data $183 (i32.const 9964) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00)\00 \00|\00 \00S\00T\00R\00I\00N\00G\00S\00_\00E\00N\00D\00=\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $184 (i32.const 10028) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\18\00\00\00p&\00\00\00\00\00\00\d0&\00\00\00\00\00\00\00\'\00\00\00\00\00\00\00\00\00\00")
- (data $185 (i32.const 10076) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00D\00e\00v\00i\00c\00e\00 \00#\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $186 (i32.const 10124) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\04\00\00\00 \00\"\00\00\00\00\00\00\00\00\00")
- (data $187 (i32.const 10156) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\002\00\00\00\"\00 \00e\00n\00t\00r\00y\00 \00a\00d\00d\00e\00d\00 \00a\00t\00 \00a\00d\00d\00r\00e\00s\00s\00 \00\00\00\00\00\00\00\00\00\00\00")
- (data $188 (i32.const 10236) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00 \00(\00i\00o\00B\00a\00s\00e\00 \00=\00 \00\00\00\00\00\00\00")
- (data $189 (i32.const 10284) "<\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00$\00\00\00p\'\00\00\00\00\00\00\a0\'\00\00\00\00\00\00\c0\'\00\00\00\00\00\00\10(\00\00\00\00\00\00\90\16\00\00\00\00\00\00\00\00\00\00")
- (data $190 (i32.const 10348) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1e\00\00\00R\00e\00l\00o\00a\00d\00 \00D\00e\00v\00i\00c\00e\00 \00#\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $191 (i32.const 10412) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00 \00n\00a\00m\00e\00d\00 \00\"\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $192 (i32.const 10460) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00\"\00 \00(\00t\00y\00p\00e\00 \00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $193 (i32.const 10508) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\1c\00\00\00\80(\00\00\00\00\00\00\c0(\00\00\00\00\00\00\f0(\00\00\00\00\00\00\90\16\00\00")
- (data $194 (i32.const 10556) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00m\00a\00i\00n\00.\00a\00s\00m\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $195 (i32.const 10604) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00b\00r\00e\00a\00k\00p\00o\00i\00n\00t\00s\00:\00 \00\00\00")
- (data $196 (i32.const 10652) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
- (data $197 (i32.const 10716) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
- (data $198 (i32.const 10784) " \00\00\00 \00\00\00 \00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00d\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00 \00\00\00 \00\00\00\02A\00\00\00\00\00\00\10A\01\00\02\t\00\00\04A\00\00\00\00\00\00\00\00\00\00A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\82\00\00\00\02A\00\00")
- (table $0 86 86 funcref)
- (elem $0 (i32.const 1) $src/Memory/Memory#read $src/Cpu/fetchInstructionActions~anonymous|0 $src/Cpu/fetchInstructionActions~anonymous|1 $src/Cpu/fetchInstructionActions~anonymous|2 $src/Cpu/fetchInstructionActions~anonymous|3 $src/Cpu/fetchInstructionActions~anonymous|4 $src/Cpu/fetchInstructionActions~anonymous|5 $src/Cpu/fetchInstructionActions~anonymous|6 $src/Cpu/fetchInstructionActions~anonymous|7 $src/Cpu/fetchInstructionActions~anonymous|8 $src/Cpu/fetchInstructionActions~anonymous|9 $src/Cpu/fetchInstructionActions~anonymous|10 $src/Cpu/fetchInstructionActions~anonymous|11 $src/Cpu/fetchInstructionActions~anonymous|12 $src/Cpu/fetchInstructionActions~anonymous|13 $src/Cpu/fetchInstructionActions~anonymous|14 $src/Cpu/fetchInstructionActions~anonymous|15 $src/Cpu/fetchInstructionActions~anonymous|16 $src/Cpu/fetchInstructionActions~anonymous|17 $src/Cpu/fetchInstructionActions~anonymous|18 $src/Cpu/fetchInstructionActions~anonymous|19 $src/Cpu/fetchInstructionActions~anonymous|20 $src/Cpu/fetchInstructionActions~anonymous|21 $src/Cpu/fetchInstructionActions~anonymous|22 $src/Cpu/fetchInstructionActions~anonymous|23 $src/Cpu/fetchInstructionActions~anonymous|24 $src/Cpu/fetchInstructionActions~anonymous|25 $src/Cpu/fetchInstructionActions~anonymous|26 $src/Cpu/fetchInstructionActions~anonymous|27 $src/Cpu/fetchInstructionActions~anonymous|28 $src/Cpu/fetchInstructionActions~anonymous|29 $src/Cpu/fetchInstructionActions~anonymous|30 $src/Cpu/fetchInstructionActions~anonymous|31 $src/Cpu/fetchInstructionActions~anonymous|32 $src/Cpu/fetchInstructionActions~anonymous|33 $src/Cpu/fetchInstructionActions~anonymous|34 $src/Cpu/fetchInstructionActions~anonymous|35 $src/Cpu/fetchInstructionActions~anonymous|36 $src/Cpu/fetchInstructionActions~anonymous|37 $src/Cpu/fetchInstructionActions~anonymous|38 $src/Cpu/fetchInstructionActions~anonymous|39 $src/Cpu/fetchInstructionActions~anonymous|40 $src/Cpu/fetchInstructionActions~anonymous|41 $src/Cpu/fetchInstructionActions~anonymous|42 $src/Cpu/fetchInstructionActions~anonymous|43 $src/Cpu/fetchInstructionActions~anonymous|44 $src/Cpu/fetchInstructionActions~anonymous|45 $src/Cpu/fetchInstructionActions~anonymous|46 $src/Cpu/fetchInstructionActions~anonymous|47 $src/Cpu/fetchInstructionActions~anonymous|48 $src/Cpu/fetchInstructionActions~anonymous|49 $src/Cpu/fetchInstructionActions~anonymous|50 $src/Cpu/fetchInstructionActions~anonymous|51 $src/Cpu/fetchInstructionActions~anonymous|52 $src/Cpu/fetchInstructionActions~anonymous|53 $src/Cpu/fetchInstructionActions~anonymous|54 $src/Cpu/fetchInstructionActions~anonymous|55 $src/Cpu/fetchInstructionActions~anonymous|56 $src/Cpu/fetchInstructionActions~anonymous|57 $src/Cpu/fetchInstructionActions~anonymous|58 $src/Cpu/fetchInstructionActions~anonymous|59 $src/Cpu/fetchInstructionActions~anonymous|60 $src/Cpu/fetchInstructionActions~anonymous|61 $src/Cpu/fetchInstructionActions~anonymous|62 $src/Cpu/fetchInstructionActions~anonymous|63 $src/Cpu/fetchInstructionActions~anonymous|64 $src/Cpu/fetchInstructionActions~anonymous|65 $src/Cpu/fetchInstructionActions~anonymous|66 $src/Cpu/fetchInstructionActions~anonymous|67 $src/Cpu/fetchInstructionActions~anonymous|68 $src/Cpu/fetchInstructionActions~anonymous|69 $src/Cpu/fetchInstructionActions~anonymous|70 $src/Cpu/fetchInstructionActions~anonymous|71 $src/Cpu/fetchInstructionActions~anonymous|72 $src/Cpu/fetchInstructionActions~anonymous|73 $src/Cpu/fetchInstructionActions~anonymous|74 $src/Cpu/fetchInstructionActions~anonymous|75 $src/Cpu/fetchInstructionActions~anonymous|76 $src/Cpu/fetchInstructionActions~anonymous|77 $src/Cpu/fetchInstructionActions~anonymous|78 $src/Cpu/fetchInstructionActions~anonymous|79 $src/Cpu/fetchInstructionActions~anonymous|80 $src/Cpu/fetchInstructionActions~anonymous|81 $src/Cpu/fetchInstructionActions~anonymous|82 $src/Memory/MemoryBus#read)
+ (data $175 (i32.const 9484) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00U\00\00\00\00\00\00\00\00\00\00\00")
+ (data $176 (i32.const 9516) "\1c\00\00\00\00\00\00\00\00\00\00\00\1a\00\00\00\08\00\00\00V\00\00\00\00\00\00\00\00\00\00\00")
+ (data $177 (i32.const 9548) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00.\00\00\00I\00n\00s\00t\00r\00u\00c\00t\00i\00o\00n\00 \00n\00o\00t\00 \00f\00o\00u\00n\00d\00:\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $178 (i32.const 9628) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00)\00 \00a\00t\00 \00a\00d\00d\00r\00e\00s\00s\00 \00\00\00")
+ (data $179 (i32.const 9676) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\18\00\00\00`%\00\00\00\00\00\00\a0\0c\00\00\00\00\00\00\b0%\00\00\00\00\00\00\00\00\00\00")
+ (data $180 (i32.const 9724) "\1c\00\00\00\00\00\00\00\00\00\00\00\1d\00\00\00\08\00\00\00W\00\00\00\00\00\00\00\00\00\00\00")
+ (data $181 (i32.const 9756) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00I\00o\00M\00a\00n\00a\00g\00e\00r\00 \00n\00o\00t\00 \00f\00o\00u\00n\00d\00\00\00\00\00\00\00")
+ (data $182 (i32.const 9820) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00T\00o\00o\00 \00m\00a\00n\00y\00 \00I\00O\00 \00d\00e\00v\00i\00c\00e\00s\00\00\00\00\00\00\00")
+ (data $183 (i32.const 9884) "\\\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00H\00\00\00D\00e\00v\00i\00c\00e\00 \00s\00t\00r\00i\00n\00g\00s\00 \00m\00e\00m\00o\00r\00y\00 \00o\00v\00e\00r\00f\00l\00o\00w\00 \00(\00p\00t\00r\00=\00\00\00\00\00")
+ (data $184 (i32.const 9980) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\14\00\00\00 \00|\00 \00s\00t\00r\00l\00e\00n\00=\00\00\00\00\00\00\00\00\00")
+ (data $185 (i32.const 10028) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00)\00 \00|\00 \00S\00T\00R\00I\00N\00G\00S\00_\00E\00N\00D\00=\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $186 (i32.const 10092) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\18\00\00\00\b0&\00\00\00\00\00\00\10\'\00\00\00\00\00\00@\'\00\00\00\00\00\00\00\00\00\00")
+ (data $187 (i32.const 10140) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00D\00e\00v\00i\00c\00e\00 \00#\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $188 (i32.const 10188) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\04\00\00\00 \00\"\00\00\00\00\00\00\00\00\00")
+ (data $189 (i32.const 10220) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\002\00\00\00\"\00 \00e\00n\00t\00r\00y\00 \00a\00d\00d\00e\00d\00 \00a\00t\00 \00a\00d\00d\00r\00e\00s\00s\00 \00\00\00\00\00\00\00\00\00\00\00")
+ (data $190 (i32.const 10300) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00 \00(\00i\00o\00B\00a\00s\00e\00 \00=\00 \00\00\00\00\00\00\00")
+ (data $191 (i32.const 10348) "<\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00$\00\00\00\b0\'\00\00\00\00\00\00\e0\'\00\00\00\00\00\00\00(\00\00\00\00\00\00P(\00\00\00\00\00\00\90\16\00\00\00\00\00\00\00\00\00\00")
+ (data $192 (i32.const 10412) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1e\00\00\00R\00e\00l\00o\00a\00d\00 \00D\00e\00v\00i\00c\00e\00 \00#\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $193 (i32.const 10476) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00 \00n\00a\00m\00e\00d\00 \00\"\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $194 (i32.const 10524) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00\"\00 \00(\00t\00y\00p\00e\00 \00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $195 (i32.const 10572) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\1c\00\00\00\c0(\00\00\00\00\00\00\00)\00\00\00\00\00\000)\00\00\00\00\00\00\90\16\00\00")
+ (data $196 (i32.const 10620) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00m\00a\00i\00n\00.\00a\00s\00m\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $197 (i32.const 10668) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00b\00r\00e\00a\00k\00p\00o\00i\00n\00t\00s\00:\00 \00\00\00")
+ (data $198 (i32.const 10716) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
+ (data $199 (i32.const 10780) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
+ (data $200 (i32.const 10848) " \00\00\00 \00\00\00 \00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00d\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00 \00\00\00 \00\00\00\02A\00\00\00\00\00\00\10A\01\00\02\t\00\00\04A\00\00\00\00\00\00\00\00\00\00A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\82\00\00\00\02A\00\00")
+ (table $0 88 88 funcref)
+ (elem $0 (i32.const 1) $src/Memory/Memory#read $src/Cpu/fetchInstructionActions~anonymous|0 $src/Cpu/fetchInstructionActions~anonymous|1 $src/Cpu/fetchInstructionActions~anonymous|2 $src/Cpu/fetchInstructionActions~anonymous|3 $src/Cpu/fetchInstructionActions~anonymous|4 $src/Cpu/fetchInstructionActions~anonymous|5 $src/Cpu/fetchInstructionActions~anonymous|6 $src/Cpu/fetchInstructionActions~anonymous|7 $src/Cpu/fetchInstructionActions~anonymous|8 $src/Cpu/fetchInstructionActions~anonymous|9 $src/Cpu/fetchInstructionActions~anonymous|10 $src/Cpu/fetchInstructionActions~anonymous|11 $src/Cpu/fetchInstructionActions~anonymous|12 $src/Cpu/fetchInstructionActions~anonymous|13 $src/Cpu/fetchInstructionActions~anonymous|14 $src/Cpu/fetchInstructionActions~anonymous|15 $src/Cpu/fetchInstructionActions~anonymous|16 $src/Cpu/fetchInstructionActions~anonymous|17 $src/Cpu/fetchInstructionActions~anonymous|18 $src/Cpu/fetchInstructionActions~anonymous|19 $src/Cpu/fetchInstructionActions~anonymous|20 $src/Cpu/fetchInstructionActions~anonymous|21 $src/Cpu/fetchInstructionActions~anonymous|22 $src/Cpu/fetchInstructionActions~anonymous|23 $src/Cpu/fetchInstructionActions~anonymous|24 $src/Cpu/fetchInstructionActions~anonymous|25 $src/Cpu/fetchInstructionActions~anonymous|26 $src/Cpu/fetchInstructionActions~anonymous|27 $src/Cpu/fetchInstructionActions~anonymous|28 $src/Cpu/fetchInstructionActions~anonymous|29 $src/Cpu/fetchInstructionActions~anonymous|30 $src/Cpu/fetchInstructionActions~anonymous|31 $src/Cpu/fetchInstructionActions~anonymous|32 $src/Cpu/fetchInstructionActions~anonymous|33 $src/Cpu/fetchInstructionActions~anonymous|34 $src/Cpu/fetchInstructionActions~anonymous|35 $src/Cpu/fetchInstructionActions~anonymous|36 $src/Cpu/fetchInstructionActions~anonymous|37 $src/Cpu/fetchInstructionActions~anonymous|38 $src/Cpu/fetchInstructionActions~anonymous|39 $src/Cpu/fetchInstructionActions~anonymous|40 $src/Cpu/fetchInstructionActions~anonymous|41 $src/Cpu/fetchInstructionActions~anonymous|42 $src/Cpu/fetchInstructionActions~anonymous|43 $src/Cpu/fetchInstructionActions~anonymous|44 $src/Cpu/fetchInstructionActions~anonymous|45 $src/Cpu/fetchInstructionActions~anonymous|46 $src/Cpu/fetchInstructionActions~anonymous|47 $src/Cpu/fetchInstructionActions~anonymous|48 $src/Cpu/fetchInstructionActions~anonymous|49 $src/Cpu/fetchInstructionActions~anonymous|50 $src/Cpu/fetchInstructionActions~anonymous|51 $src/Cpu/fetchInstructionActions~anonymous|52 $src/Cpu/fetchInstructionActions~anonymous|53 $src/Cpu/fetchInstructionActions~anonymous|54 $src/Cpu/fetchInstructionActions~anonymous|55 $src/Cpu/fetchInstructionActions~anonymous|56 $src/Cpu/fetchInstructionActions~anonymous|57 $src/Cpu/fetchInstructionActions~anonymous|58 $src/Cpu/fetchInstructionActions~anonymous|59 $src/Cpu/fetchInstructionActions~anonymous|60 $src/Cpu/fetchInstructionActions~anonymous|61 $src/Cpu/fetchInstructionActions~anonymous|62 $src/Cpu/fetchInstructionActions~anonymous|63 $src/Cpu/fetchInstructionActions~anonymous|64 $src/Cpu/fetchInstructionActions~anonymous|65 $src/Cpu/fetchInstructionActions~anonymous|66 $src/Cpu/fetchInstructionActions~anonymous|67 $src/Cpu/fetchInstructionActions~anonymous|68 $src/Cpu/fetchInstructionActions~anonymous|69 $src/Cpu/fetchInstructionActions~anonymous|70 $src/Cpu/fetchInstructionActions~anonymous|71 $src/Cpu/fetchInstructionActions~anonymous|72 $src/Cpu/fetchInstructionActions~anonymous|73 $src/Cpu/fetchInstructionActions~anonymous|74 $src/Cpu/fetchInstructionActions~anonymous|75 $src/Cpu/fetchInstructionActions~anonymous|76 $src/Cpu/fetchInstructionActions~anonymous|77 $src/Cpu/fetchInstructionActions~anonymous|78 $src/Cpu/fetchInstructionActions~anonymous|79 $src/Cpu/fetchInstructionActions~anonymous|80 $src/Cpu/fetchInstructionActions~anonymous|81 $src/Cpu/fetchInstructionActions~anonymous|82 $src/Cpu/fetchInstructionActions~anonymous|83 $src/Cpu/fetchInstructionActions~anonymous|84 $src/Memory/MemoryBus#read)
  (export "instanciateComputer" (func $src/index/instanciateComputer))
  (export "allocate" (func $src/index/allocate))
  (export "__new" (func $~lib/rt/itcms/__new))
@@ -4028,6 +4032,22 @@
   local.get $this
   i32.load16_u offset=10
  )
+ (func $src/lib/lib_numbers/low16 (param $value i32) (result i32)
+  local.get $value
+  i32.const 255
+  i32.and
+  return
+ )
+ (func $src/lib/lib_numbers/high16 (param $value i32) (result i32)
+  local.get $value
+  i32.const 65535
+  i32.and
+  i32.const 8
+  i32.const 15
+  i32.and
+  i32.shr_u
+  return
+ )
  (func $~lib/util/string/compareImpl (param $str1 i32) (param $index1 i32) (param $str2 i32) (param $index2 i32) (param $len i32) (result i32)
   (local $ptr1 i32)
   (local $ptr2 i32)
@@ -4360,7 +4380,7 @@
    i32.const 3
    i32.eq
    if
-    i32.const 10672
+    i32.const 10736
     i32.const 96
     i32.const 338
     i32.const 7
@@ -4393,7 +4413,7 @@
   i32.const 3
   i32.ne
   if
-   i32.const 10736
+   i32.const 10800
    i32.const 96
    i32.const 352
    i32.const 5
@@ -4478,10 +4498,10 @@
   i32.const 32
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 10672
+  i32.const 10736
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 10736
+  i32.const 10800
   local.get $0
   call $~lib/rt/itcms/__visit
   i32.const 1440
@@ -5040,8 +5060,8 @@
   global.get $~lib/memory/__data_end
   i32.lt_s
   if
-   i32.const 43712
-   i32.const 43760
+   i32.const 43776
+   i32.const 43824
    i32.const 1
    i32.const 1
    call $~lib/builtins/abort
@@ -10584,64 +10604,13 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/Cpu#writeMemory (param $this i32) (param $address i32) (param $value i32)
-  (local $memoryBus i32)
-  (local $4 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  global.get $~lib/memory/__stack_pointer
-  local.get $this
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/Cpu#get:computer
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store
-  local.get $4
-  call $src/Computer/Computer#get:memoryBus
-  local.tee $memoryBus
-  i32.store offset=8
-  local.get $memoryBus
-  i32.eqz
-  if
-   i32.const 4320
-   i32.const 4384
-   i32.const 195
-   i32.const 25
-   call $~lib/builtins/abort
-   unreachable
-  end
-  local.get $memoryBus
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store
-  local.get $4
-  local.get $address
-  local.get $value
-  call $src/Memory/MemoryBus#write
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
  (func $src/Cpu/fetchInstructionActions~anonymous|9 (param $cpu i32)
-  (local $returnAddr i32)
-  (local $callAddr i32)
-  (local $3 i32)
+  (local $regLowIdx i32)
+  (local $regHighIdx i32)
+  (local $regLowValue i32)
+  (local $regHighValue i32)
+  (local $spValue i32)
+  (local $6 i32)
   global.get $~lib/memory/__stack_pointer
   i32.const 12
   i32.sub
@@ -10654,1473 +10623,123 @@
   i32.const 0
   i32.store offset=8
   local.get $cpu
-  local.set $3
+  local.set $6
   global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
+  local.get $6
   i32.store
-  local.get $3
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 3
-  i32.add
-  local.set $returnAddr
+  local.get $6
   local.get $cpu
-  local.set $3
+  local.set $6
   global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
+  local.get $6
   i32.store offset=8
-  local.get $3
+  local.get $6
   call $src/Cpu/Cpu#get:registers
-  local.set $3
+  local.set $6
   global.get $~lib/memory/__stack_pointer
-  local.get $3
+  local.get $6
   i32.store offset=4
-  local.get $3
-  call $src/Cpu/CpuRegisters#get:SP
-  local.get $returnAddr
-  i32.const 65535
-  i32.and
-  i32.const 8
-  i32.const 15
-  i32.and
-  i32.shr_u
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem8
+  local.set $regLowIdx
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 1
+  i32.add
+  call $src/Cpu/Cpu#readMem8
+  local.set $regHighIdx
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $regLowIdx
+  call $src/Cpu/Cpu#getRegisterValueByIdx
+  local.set $regLowValue
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $regHighIdx
+  call $src/Cpu/Cpu#getRegisterValueByIdx
+  local.set $regHighValue
+  local.get $regHighValue
   i32.const 255
   i32.and
-  call $src/Cpu/Cpu#writeMemory
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=8
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/CpuRegisters#get:SP
-  i32.const 1
-  i32.sub
-  call $src/Cpu/CpuRegisters#set:SP
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=8
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/CpuRegisters#get:SP
-  local.get $returnAddr
-  i32.const 255
-  i32.and
-  call $src/Cpu/Cpu#writeMemory
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=8
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/CpuRegisters#get:SP
-  i32.const 1
-  i32.sub
-  call $src/Cpu/CpuRegisters#set:SP
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=8
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/CpuRegisters#get:PC
-  call $src/Cpu/Cpu#readMem16
-  local.set $callAddr
-  local.get $cpu
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  call $src/Cpu/Cpu#get:registers
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  local.get $callAddr
-  call $src/Cpu/CpuRegisters#set:PC
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|10 (param $cpu i32)
-  (local $low i32)
-  (local $high i32)
-  (local $retAddr i32)
-  (local $4 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/Cpu#get:registers
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store
-  local.get $4
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=8
-  local.get $4
-  call $src/Cpu/Cpu#get:registers
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/CpuRegisters#get:SP
-  i32.const 1
-  i32.add
-  call $src/Cpu/CpuRegisters#set:SP
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store
-  local.get $4
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=8
-  local.get $4
-  call $src/Cpu/Cpu#get:registers
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/CpuRegisters#get:SP
-  call $src/Cpu/Cpu#readMemory
-  local.set $low
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/Cpu#get:registers
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store
-  local.get $4
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=8
-  local.get $4
-  call $src/Cpu/Cpu#get:registers
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/CpuRegisters#get:SP
-  i32.const 1
-  i32.add
-  call $src/Cpu/CpuRegisters#set:SP
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store
-  local.get $4
-  local.get $cpu
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=8
-  local.get $4
-  call $src/Cpu/Cpu#get:registers
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/CpuRegisters#get:SP
-  call $src/Cpu/Cpu#readMemory
-  local.set $high
-  local.get $high
   i32.const 256
   i32.mul
-  local.get $low
+  local.get $regLowValue
+  i32.const 255
+  i32.and
   i32.add
-  local.set $retAddr
+  local.set $spValue
   local.get $cpu
-  local.set $4
+  local.set $6
   global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
-  call $src/Cpu/Cpu#get:registers
-  local.set $4
-  global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store
-  local.get $4
-  local.get $retAddr
-  call $src/Cpu/CpuRegisters#set:PC
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|11 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store offset=8
-  local.get $2
-  call $src/Cpu/Cpu#get:registers
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store offset=4
-  local.get $2
-  call $src/Cpu/CpuRegisters#get:PC
-  call $src/Cpu/Cpu#readMem16
-  local.set $memAddress
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store offset=4
-  local.get $2
-  call $src/Cpu/Cpu#get:registers
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  local.get $memAddress
-  call $src/Cpu/CpuRegisters#set:PC
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $~lib/string/String.__eq (param $left i32) (param $right i32) (result i32)
-  (local $leftLength i32)
-  (local $3 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  local.get $left
-  local.get $right
-  i32.eq
-  if
-   i32.const 1
-   local.set $3
-   global.get $~lib/memory/__stack_pointer
-   i32.const 8
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $3
-   return
-  end
-  local.get $left
-  i32.const 0
-  i32.eq
-  if (result i32)
-   i32.const 1
-  else
-   local.get $right
-   i32.const 0
-   i32.eq
-  end
-  if
-   i32.const 0
-   local.set $3
-   global.get $~lib/memory/__stack_pointer
-   i32.const 8
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $3
-   return
-  end
-  local.get $left
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  call $~lib/string/String#get:length
-  local.set $leftLength
-  local.get $leftLength
-  local.get $right
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  call $~lib/string/String#get:length
-  i32.ne
-  if
-   i32.const 0
-   local.set $3
-   global.get $~lib/memory/__stack_pointer
-   i32.const 8
-   i32.add
-   global.set $~lib/memory/__stack_pointer
-   local.get $3
-   return
-  end
-  local.get $left
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store
-  local.get $3
-  i32.const 0
-  local.get $right
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  local.get $3
-  i32.store offset=4
-  local.get $3
-  i32.const 0
-  local.get $leftLength
-  call $~lib/util/string/compareImpl
-  i32.eqz
-  local.set $3
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $3
-  return
- )
- (func $src/Cpu/Cpu#getFlag (param $this i32) (param $flag i32) (result i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  local.get $flag
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7152
-  call $~lib/string/String.__eq
-  if (result i32)
-   local.get $this
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:FLAGS
-   i32.const 2
-   i32.and
-   i32.eqz
-   i32.eqz
-  else
-   local.get $this
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:FLAGS
-   i32.const 1
-   i32.and
-   i32.eqz
-   i32.eqz
-  end
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  i32.const 8
-  i32.add
-  global.set $~lib/memory/__stack_pointer
-  local.get $2
-  return
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|12 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7120
-  call $src/Cpu/Cpu#getFlag
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|13 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7120
-  call $src/Cpu/Cpu#getFlag
-  i32.eqz
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|14 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7152
-  call $src/Cpu/Cpu#getFlag
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|15 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7152
-  call $src/Cpu/Cpu#getFlag
-  i32.eqz
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|16 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7152
-  call $src/Cpu/Cpu#getFlag
-  i32.eqz
-  if (result i32)
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   i32.const 7120
-   call $src/Cpu/Cpu#getFlag
-  else
-   i32.const 0
-  end
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|17 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7152
-  call $src/Cpu/Cpu#getFlag
-  if (result i32)
-   i32.const 1
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   i32.const 7120
-   call $src/Cpu/Cpu#getFlag
-  end
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|18 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7152
-  call $src/Cpu/Cpu#getFlag
-  i32.eqz
-  if (result i32)
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   i32.const 7120
-   call $src/Cpu/Cpu#getFlag
-   i32.eqz
-  else
-   i32.const 0
-  end
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|19 (param $cpu i32)
-  (local $memAddress i32)
-  (local $2 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.store offset=8
-  local.get $cpu
-  local.set $2
-  global.get $~lib/memory/__stack_pointer
-  local.get $2
-  i32.store
-  local.get $2
-  i32.const 7152
-  call $src/Cpu/Cpu#getFlag
-  if (result i32)
-   i32.const 1
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   i32.const 7120
-   call $src/Cpu/Cpu#getFlag
-   i32.eqz
-  end
-  if
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   call $src/Cpu/Cpu#readMem16
-   local.set $memAddress
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $memAddress
-   call $src/Cpu/CpuRegisters#set:PC
-  else
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store
-   local.get $2
-   local.get $cpu
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=8
-   local.get $2
-   call $src/Cpu/Cpu#get:registers
-   local.set $2
-   global.get $~lib/memory/__stack_pointer
-   local.get $2
-   i32.store offset=4
-   local.get $2
-   call $src/Cpu/CpuRegisters#get:PC
-   i32.const 3
-   i32.add
-   call $src/Cpu/CpuRegisters#set:PC
-  end
-  global.get $~lib/memory/__stack_pointer
-  i32.const 12
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|20 (param $cpu i32) (result i32)
-  (local $data i32)
-  (local $2 i32)
-  (local $3 i32)
-  (local $reg1Idx i32)
-  (local $5 i32)
-  (local $6 i32)
-  (local $reg2Idx i32)
-  (local $8 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 28
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 28
-  memory.fill
-  global.get $~lib/memory/__stack_pointer
-  i32.const 0
-  i32.const 4
-  call $~lib/typedarray/Uint8Array#constructor
-  local.tee $data
-  i32.store
-  global.get $~lib/memory/__stack_pointer
-  local.get $data
-  local.tee $2
-  i32.store offset=8
-  local.get $2
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=4
-  local.get $8
-  i32.const 0
-  local.tee $3
-  local.get $cpu
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=12
-  local.get $8
-  local.get $cpu
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=20
-  local.get $8
-  call $src/Cpu/Cpu#get:registers
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=16
-  local.get $8
-  call $src/Cpu/CpuRegisters#get:PC
-  call $src/Cpu/Cpu#readMem8
-  call $~lib/typedarray/Uint8Array#__set
-  local.get $2
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=4
-  local.get $8
-  local.get $3
-  call $~lib/typedarray/Uint8Array#__get
-  local.set $reg1Idx
-  global.get $~lib/memory/__stack_pointer
-  local.get $data
-  local.tee $5
-  i32.store offset=24
-  local.get $5
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=4
-  local.get $8
-  i32.const 1
-  local.tee $6
-  local.get $cpu
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=12
-  local.get $8
-  local.get $cpu
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=20
-  local.get $8
-  call $src/Cpu/Cpu#get:registers
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=16
-  local.get $8
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 1
-  i32.add
-  call $src/Cpu/Cpu#readMem8
-  call $~lib/typedarray/Uint8Array#__set
-  local.get $5
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=4
-  local.get $8
   local.get $6
-  call $~lib/typedarray/Uint8Array#__get
-  local.set $reg2Idx
-  local.get $data
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
   i32.store offset=4
-  local.get $8
-  i32.const 2
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $spValue
+  call $src/Cpu/CpuRegisters#set:SP
   local.get $cpu
-  local.set $8
+  local.set $6
   global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=12
-  local.get $8
-  local.get $reg1Idx
-  call $src/Cpu/Cpu#getRegisterValueByIdx
-  i32.const 255
-  i32.and
-  call $~lib/typedarray/Uint8Array#__set
-  local.get $data
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  local.get $8
+  local.get $6
   i32.store offset=4
-  local.get $8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
   i32.const 3
-  local.get $cpu
-  local.set $8
+  i32.add
+  call $src/Cpu/CpuRegisters#set:PC
   global.get $~lib/memory/__stack_pointer
-  local.get $8
-  i32.store offset=12
-  local.get $8
-  local.get $reg2Idx
-  call $src/Cpu/Cpu#getRegisterValueByIdx
-  i32.const 255
-  i32.and
-  call $~lib/typedarray/Uint8Array#__set
-  local.get $data
-  local.set $8
-  global.get $~lib/memory/__stack_pointer
-  i32.const 28
+  i32.const 12
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $8
-  return
  )
  (func $src/Cpu/Cpu#setRegisterValueByIdx (param $this i32) (param $regIdx i32) (param $value i32)
   (local $3 i32)
@@ -12319,7 +10938,7 @@
   call $src/lib/lib_numbers/toHex
   local.tee $4
   i32.store offset=12
-  i32.const 7472
+  i32.const 7056
   local.set $5
   global.get $~lib/memory/__stack_pointer
   local.get $5
@@ -12333,7 +10952,7 @@
   i32.store offset=4
   local.get $5
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 7472
+  i32.const 7056
   local.set $5
   global.get $~lib/memory/__stack_pointer
   local.get $5
@@ -12347,7 +10966,7 @@
   i32.store offset=4
   local.get $5
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 7472
+  i32.const 7056
   local.set $5
   global.get $~lib/memory/__stack_pointer
   local.get $5
@@ -12361,7 +10980,1687 @@
   call $~lib/builtins/abort
   unreachable
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|21 (param $cpu i32) (param $data i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|10 (param $cpu i32)
+  (local $regLowIdx i32)
+  (local $regHighIdx i32)
+  (local $regLowValue i32)
+  (local $regHighValue i32)
+  (local $5 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem8
+  local.set $regLowIdx
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 1
+  i32.add
+  call $src/Cpu/Cpu#readMem8
+  local.set $regHighIdx
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:SP
+  call $src/lib/lib_numbers/low16
+  local.set $regLowValue
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:SP
+  call $src/lib/lib_numbers/high16
+  local.set $regHighValue
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $regLowIdx
+  local.get $regLowValue
+  call $src/Cpu/Cpu#setRegisterValueByIdx
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $regHighIdx
+  local.get $regHighValue
+  call $src/Cpu/Cpu#setRegisterValueByIdx
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 3
+  i32.add
+  call $src/Cpu/CpuRegisters#set:PC
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/Cpu#writeMemory (param $this i32) (param $address i32) (param $value i32)
+  (local $memoryBus i32)
+  (local $4 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  global.get $~lib/memory/__stack_pointer
+  local.get $this
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/Cpu#get:computer
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store
+  local.get $4
+  call $src/Computer/Computer#get:memoryBus
+  local.tee $memoryBus
+  i32.store offset=8
+  local.get $memoryBus
+  i32.eqz
+  if
+   i32.const 4320
+   i32.const 4384
+   i32.const 195
+   i32.const 25
+   call $~lib/builtins/abort
+   unreachable
+  end
+  local.get $memoryBus
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store
+  local.get $4
+  local.get $address
+  local.get $value
+  call $src/Memory/MemoryBus#write
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|11 (param $cpu i32)
+  (local $returnAddr i32)
+  (local $callAddr i32)
+  (local $3 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 3
+  i32.add
+  local.set $returnAddr
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=8
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/CpuRegisters#get:SP
+  local.get $returnAddr
+  i32.const 65535
+  i32.and
+  i32.const 8
+  i32.const 15
+  i32.and
+  i32.shr_u
+  i32.const 255
+  i32.and
+  call $src/Cpu/Cpu#writeMemory
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=8
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/CpuRegisters#get:SP
+  i32.const 1
+  i32.sub
+  call $src/Cpu/CpuRegisters#set:SP
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=8
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/CpuRegisters#get:SP
+  local.get $returnAddr
+  i32.const 255
+  i32.and
+  call $src/Cpu/Cpu#writeMemory
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=8
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/CpuRegisters#get:SP
+  i32.const 1
+  i32.sub
+  call $src/Cpu/CpuRegisters#set:SP
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=8
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem16
+  local.set $callAddr
+  local.get $cpu
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  call $src/Cpu/Cpu#get:registers
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  local.get $callAddr
+  call $src/Cpu/CpuRegisters#set:PC
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|12 (param $cpu i32)
+  (local $low i32)
+  (local $high i32)
+  (local $retAddr i32)
+  (local $4 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/Cpu#get:registers
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store
+  local.get $4
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=8
+  local.get $4
+  call $src/Cpu/Cpu#get:registers
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/CpuRegisters#get:SP
+  i32.const 1
+  i32.add
+  call $src/Cpu/CpuRegisters#set:SP
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store
+  local.get $4
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=8
+  local.get $4
+  call $src/Cpu/Cpu#get:registers
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/CpuRegisters#get:SP
+  call $src/Cpu/Cpu#readMemory
+  local.set $low
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/Cpu#get:registers
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store
+  local.get $4
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=8
+  local.get $4
+  call $src/Cpu/Cpu#get:registers
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/CpuRegisters#get:SP
+  i32.const 1
+  i32.add
+  call $src/Cpu/CpuRegisters#set:SP
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store
+  local.get $4
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=8
+  local.get $4
+  call $src/Cpu/Cpu#get:registers
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/CpuRegisters#get:SP
+  call $src/Cpu/Cpu#readMemory
+  local.set $high
+  local.get $high
+  i32.const 256
+  i32.mul
+  local.get $low
+  i32.add
+  local.set $retAddr
+  local.get $cpu
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store offset=4
+  local.get $4
+  call $src/Cpu/Cpu#get:registers
+  local.set $4
+  global.get $~lib/memory/__stack_pointer
+  local.get $4
+  i32.store
+  local.get $4
+  local.get $retAddr
+  call $src/Cpu/CpuRegisters#set:PC
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|13 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store offset=8
+  local.get $2
+  call $src/Cpu/Cpu#get:registers
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem16
+  local.set $memAddress
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store offset=4
+  local.get $2
+  call $src/Cpu/Cpu#get:registers
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  local.get $memAddress
+  call $src/Cpu/CpuRegisters#set:PC
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $~lib/string/String.__eq (param $left i32) (param $right i32) (result i32)
+  (local $leftLength i32)
+  (local $3 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  local.get $left
+  local.get $right
+  i32.eq
+  if
+   i32.const 1
+   local.set $3
+   global.get $~lib/memory/__stack_pointer
+   i32.const 8
+   i32.add
+   global.set $~lib/memory/__stack_pointer
+   local.get $3
+   return
+  end
+  local.get $left
+  i32.const 0
+  i32.eq
+  if (result i32)
+   i32.const 1
+  else
+   local.get $right
+   i32.const 0
+   i32.eq
+  end
+  if
+   i32.const 0
+   local.set $3
+   global.get $~lib/memory/__stack_pointer
+   i32.const 8
+   i32.add
+   global.set $~lib/memory/__stack_pointer
+   local.get $3
+   return
+  end
+  local.get $left
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  call $~lib/string/String#get:length
+  local.set $leftLength
+  local.get $leftLength
+  local.get $right
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  call $~lib/string/String#get:length
+  i32.ne
+  if
+   i32.const 0
+   local.set $3
+   global.get $~lib/memory/__stack_pointer
+   i32.const 8
+   i32.add
+   global.set $~lib/memory/__stack_pointer
+   local.get $3
+   return
+  end
+  local.get $left
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store
+  local.get $3
+  i32.const 0
+  local.get $right
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  local.get $3
+  i32.store offset=4
+  local.get $3
+  i32.const 0
+  local.get $leftLength
+  call $~lib/util/string/compareImpl
+  i32.eqz
+  local.set $3
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $3
+  return
+ )
+ (func $src/Cpu/Cpu#getFlag (param $this i32) (param $flag i32) (result i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  local.get $flag
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7264
+  call $~lib/string/String.__eq
+  if (result i32)
+   local.get $this
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:FLAGS
+   i32.const 2
+   i32.and
+   i32.eqz
+   i32.eqz
+  else
+   local.get $this
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:FLAGS
+   i32.const 1
+   i32.and
+   i32.eqz
+   i32.eqz
+  end
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  i32.const 8
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $2
+  return
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|14 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7232
+  call $src/Cpu/Cpu#getFlag
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|15 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7232
+  call $src/Cpu/Cpu#getFlag
+  i32.eqz
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|16 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7264
+  call $src/Cpu/Cpu#getFlag
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|17 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7264
+  call $src/Cpu/Cpu#getFlag
+  i32.eqz
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|18 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7264
+  call $src/Cpu/Cpu#getFlag
+  i32.eqz
+  if (result i32)
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   i32.const 7232
+   call $src/Cpu/Cpu#getFlag
+  else
+   i32.const 0
+  end
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|19 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7264
+  call $src/Cpu/Cpu#getFlag
+  if (result i32)
+   i32.const 1
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   i32.const 7232
+   call $src/Cpu/Cpu#getFlag
+  end
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|20 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7264
+  call $src/Cpu/Cpu#getFlag
+  i32.eqz
+  if (result i32)
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   i32.const 7232
+   call $src/Cpu/Cpu#getFlag
+   i32.eqz
+  else
+   i32.const 0
+  end
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|21 (param $cpu i32)
+  (local $memAddress i32)
+  (local $2 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.store offset=8
+  local.get $cpu
+  local.set $2
+  global.get $~lib/memory/__stack_pointer
+  local.get $2
+  i32.store
+  local.get $2
+  i32.const 7264
+  call $src/Cpu/Cpu#getFlag
+  if (result i32)
+   i32.const 1
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   i32.const 7232
+   call $src/Cpu/Cpu#getFlag
+   i32.eqz
+  end
+  if
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   call $src/Cpu/Cpu#readMem16
+   local.set $memAddress
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $memAddress
+   call $src/Cpu/CpuRegisters#set:PC
+  else
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store
+   local.get $2
+   local.get $cpu
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=8
+   local.get $2
+   call $src/Cpu/Cpu#get:registers
+   local.set $2
+   global.get $~lib/memory/__stack_pointer
+   local.get $2
+   i32.store offset=4
+   local.get $2
+   call $src/Cpu/CpuRegisters#get:PC
+   i32.const 3
+   i32.add
+   call $src/Cpu/CpuRegisters#set:PC
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 12
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|22 (param $cpu i32) (result i32)
+  (local $data i32)
+  (local $2 i32)
+  (local $3 i32)
+  (local $reg1Idx i32)
+  (local $5 i32)
+  (local $6 i32)
+  (local $reg2Idx i32)
+  (local $8 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 28
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 28
+  memory.fill
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 4
+  call $~lib/typedarray/Uint8Array#constructor
+  local.tee $data
+  i32.store
+  global.get $~lib/memory/__stack_pointer
+  local.get $data
+  local.tee $2
+  i32.store offset=8
+  local.get $2
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=4
+  local.get $8
+  i32.const 0
+  local.tee $3
+  local.get $cpu
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=12
+  local.get $8
+  local.get $cpu
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=20
+  local.get $8
+  call $src/Cpu/Cpu#get:registers
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=16
+  local.get $8
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem8
+  call $~lib/typedarray/Uint8Array#__set
+  local.get $2
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=4
+  local.get $8
+  local.get $3
+  call $~lib/typedarray/Uint8Array#__get
+  local.set $reg1Idx
+  global.get $~lib/memory/__stack_pointer
+  local.get $data
+  local.tee $5
+  i32.store offset=24
+  local.get $5
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=4
+  local.get $8
+  i32.const 1
+  local.tee $6
+  local.get $cpu
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=12
+  local.get $8
+  local.get $cpu
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=20
+  local.get $8
+  call $src/Cpu/Cpu#get:registers
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=16
+  local.get $8
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 1
+  i32.add
+  call $src/Cpu/Cpu#readMem8
+  call $~lib/typedarray/Uint8Array#__set
+  local.get $5
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=4
+  local.get $8
+  local.get $6
+  call $~lib/typedarray/Uint8Array#__get
+  local.set $reg2Idx
+  local.get $data
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=4
+  local.get $8
+  i32.const 2
+  local.get $cpu
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=12
+  local.get $8
+  local.get $reg1Idx
+  call $src/Cpu/Cpu#getRegisterValueByIdx
+  i32.const 255
+  i32.and
+  call $~lib/typedarray/Uint8Array#__set
+  local.get $data
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=4
+  local.get $8
+  i32.const 3
+  local.get $cpu
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  local.get $8
+  i32.store offset=12
+  local.get $8
+  local.get $reg2Idx
+  call $src/Cpu/Cpu#getRegisterValueByIdx
+  i32.const 255
+  i32.and
+  call $~lib/typedarray/Uint8Array#__set
+  local.get $data
+  local.set $8
+  global.get $~lib/memory/__stack_pointer
+  i32.const 28
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+  local.get $8
+  return
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|23 (param $cpu i32) (param $data i32)
   (local $reg1Idx i32)
   (local $reg2Idx i32)
   (local $reg1OldValue i32)
@@ -12465,7 +12764,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|22 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|24 (param $cpu i32)
   (local $memAddress i32)
   (local $immValue i32)
   (local $3 i32)
@@ -12566,7 +12865,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|23 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|25 (param $cpu i32)
   (local $regIdx i32)
   (local $immValue i32)
   (local $3 i32)
@@ -12667,7 +12966,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|24 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|26 (param $cpu i32)
   (local $targetRegIdx i32)
   (local $sourceRegIdx i32)
   (local $sourceRegValue i32)
@@ -12778,7 +13077,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|25 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|27 (param $cpu i32)
   (local $regIdx i32)
   (local $memAddress i32)
   (local $memValue i32)
@@ -12889,7 +13188,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|26 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|28 (param $cpu i32)
   (local $memAddress i32)
   (local $regIdx i32)
   (local $regValue i32)
@@ -13096,7 +13395,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|27 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|29 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $3 i32)
@@ -13283,7 +13582,7 @@
   local.get $3
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|28 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|30 (param $cpu i32)
   (local $regIdx i32)
   (local $popValue i32)
   (local $3 i32)
@@ -13633,7 +13932,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|29 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|31 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $aluResult i32)
@@ -13777,7 +14076,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|30 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|32 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $aluResult i32)
@@ -14008,7 +14307,7 @@
   local.get $6
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|31 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|33 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $aluResult i32)
@@ -14152,7 +14451,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|32 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|34 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $aluResult i32)
@@ -14391,7 +14690,7 @@
   local.get $8
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|33 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|35 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $aluResult i32)
@@ -14535,7 +14834,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|34 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|36 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $aluResult i32)
@@ -14772,7 +15071,7 @@
   local.get $9
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|35 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|37 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $immValue i32)
@@ -14941,7 +15240,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|36 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|38 (param $cpu i32)
   (local $targetRegIdx i32)
   (local $targetRegValue i32)
   (local $sourceRegIdx i32)
@@ -15120,7 +15419,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|37 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|39 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -15299,7 +15598,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|38 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|40 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $immValue i32)
@@ -15468,7 +15767,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|39 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|41 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $regIdx i32)
@@ -15742,7 +16041,7 @@
   local.get $9
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|40 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|42 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $immValue i32)
@@ -15911,7 +16210,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|41 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|43 (param $cpu i32)
   (local $targetRegIdx i32)
   (local $targetRegValue i32)
   (local $sourceRegIdx i32)
@@ -16090,7 +16389,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|42 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|44 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -16269,7 +16568,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|43 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|45 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $immValue i32)
@@ -16438,7 +16737,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|44 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|46 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $regIdx i32)
@@ -16700,7 +16999,7 @@
   local.get $7
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|45 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|47 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $immValue i32)
@@ -16869,7 +17168,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|46 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|48 (param $cpu i32)
   (local $targetRegIdx i32)
   (local $targetRegValue i32)
   (local $sourceRegIdx i32)
@@ -17048,7 +17347,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|47 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|49 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -17227,7 +17526,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|48 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|50 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $immValue i32)
@@ -17396,7 +17695,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|49 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|51 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $regIdx i32)
@@ -17658,7 +17957,7 @@
   local.get $7
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|50 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|52 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $immValue i32)
@@ -17827,7 +18126,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|51 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|53 (param $cpu i32)
   (local $targetRegIdx i32)
   (local $targetRegValue i32)
   (local $sourceRegIdx i32)
@@ -18006,7 +18305,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|52 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|54 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -18185,7 +18484,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|53 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|55 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $immValue i32)
@@ -18354,7 +18653,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|54 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|56 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $regIdx i32)
@@ -18616,7 +18915,7 @@
   local.get $7
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|55 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|57 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $immValue i32)
@@ -18785,7 +19084,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|56 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|58 (param $cpu i32)
   (local $targetRegIdx i32)
   (local $targetRegValue i32)
   (local $sourceRegIdx i32)
@@ -18964,7 +19263,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|57 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|59 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -19143,7 +19442,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|58 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|60 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $immValue i32)
@@ -19312,7 +19611,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|59 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|61 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $regIdx i32)
@@ -19586,7 +19885,7 @@
   local.get $9
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|60 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|62 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $immValue i32)
@@ -19740,7 +20039,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|61 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|63 (param $cpu i32)
   (local $reg1Idx i32)
   (local $reg1Value i32)
   (local $reg2Idx i32)
@@ -19904,7 +20203,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|62 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|64 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -20068,7 +20367,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|63 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|65 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $immValue i32)
@@ -20305,7 +20604,7 @@
   local.get $7
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|64 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|66 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $immValue i32)
@@ -20459,7 +20758,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|65 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|67 (param $cpu i32)
   (local $reg1Idx i32)
   (local $reg1Value i32)
   (local $reg2Idx i32)
@@ -20623,7 +20922,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|66 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|68 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -20787,7 +21086,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|67 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|69 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $immValue i32)
@@ -21054,7 +21353,7 @@
   local.get $9
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|68 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|70 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $imm i32)
@@ -21223,7 +21522,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|69 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|71 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $countRegIdx i32)
@@ -21402,7 +21701,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|70 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|72 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $memAddress i32)
@@ -21581,7 +21880,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|71 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|73 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $imm i32)
@@ -21750,7 +22049,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|72 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|74 (param $cpu i32)
   (local $memAddress i32)
   (local $memValue i32)
   (local $countRegIdx i32)
@@ -22044,7 +22343,7 @@
   local.get $9
   return
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|73 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|75 (param $cpu i32)
   (local $regIdx i32)
   (local $regValue i32)
   (local $imm i32)
@@ -22206,364 +22505,6 @@
   local.get $5
   call $src/Cpu/CpuRegisters#get:PC
   i32.const 3
-  i32.add
-  call $src/Cpu/CpuRegisters#set:PC
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|74 (param $cpu i32)
-  (local $regIdx i32)
-  (local $regValue i32)
-  (local $countRegIdx i32)
-  (local $count i32)
-  (local $aluResult i32)
-  (local $6 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=8
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/CpuRegisters#get:PC
-  call $src/Cpu/Cpu#readMem8
-  local.set $regIdx
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $regIdx
-  call $src/Cpu/Cpu#getRegisterValueByIdx
-  local.set $regValue
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 1
-  i32.add
-  call $src/Cpu/Cpu#readMem8
-  local.set $countRegIdx
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $countRegIdx
-  call $src/Cpu/Cpu#getRegisterValueByIdx
-  local.set $count
-  global.get $~lib/memory/__stack_pointer
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Cpu#get:alu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $regValue
-  local.get $count
-  call $src/Cpu/ALU#shr
-  local.tee $aluResult
-  i32.store offset=12
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $aluResult
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/AluResult#get:flags
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Flags#get:zero
-  local.get $aluResult
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/AluResult#get:flags
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Flags#get:carry
-  call $src/Cpu/Cpu#setFlags
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $regIdx
-  local.get $aluResult
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/AluResult#get:result
-  call $src/Cpu/Cpu#setRegisterValueByIdx
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 3
-  i32.add
-  call $src/Cpu/CpuRegisters#set:PC
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|75 (param $cpu i32)
-  (local $regIdx i32)
-  (local $regValue i32)
-  (local $memAddress i32)
-  (local $count i32)
-  (local $aluResult i32)
-  (local $6 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=8
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/CpuRegisters#get:PC
-  call $src/Cpu/Cpu#readMem8
-  local.set $regIdx
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $regIdx
-  call $src/Cpu/Cpu#getRegisterValueByIdx
-  local.set $regValue
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 1
-  i32.add
-  call $src/Cpu/Cpu#readMem16
-  local.set $memAddress
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $memAddress
-  call $src/Cpu/Cpu#readMemory
-  local.set $count
-  global.get $~lib/memory/__stack_pointer
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Cpu#get:alu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $regValue
-  local.get $count
-  call $src/Cpu/ALU#shr
-  local.tee $aluResult
-  i32.store offset=12
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $aluResult
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/AluResult#get:flags
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Flags#get:zero
-  local.get $aluResult
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/AluResult#get:flags
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Flags#get:carry
-  call $src/Cpu/Cpu#setFlags
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $regIdx
-  local.get $aluResult
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/AluResult#get:result
-  call $src/Cpu/Cpu#setRegisterValueByIdx
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store
-  local.get $6
-  local.get $cpu
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=8
-  local.get $6
-  call $src/Cpu/Cpu#get:registers
-  local.set $6
-  global.get $~lib/memory/__stack_pointer
-  local.get $6
-  i32.store offset=4
-  local.get $6
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 4
   i32.add
   call $src/Cpu/CpuRegisters#set:PC
   global.get $~lib/memory/__stack_pointer
@@ -22572,177 +22513,8 @@
   global.set $~lib/memory/__stack_pointer
  )
  (func $src/Cpu/fetchInstructionActions~anonymous|76 (param $cpu i32)
-  (local $memAddress i32)
-  (local $memValue i32)
-  (local $imm i32)
-  (local $aluResult i32)
-  (local $5 i32)
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.sub
-  global.set $~lib/memory/__stack_pointer
-  call $~stack_check
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
-  global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store offset=8
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $src/Cpu/Cpu#get:registers
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/CpuRegisters#get:PC
-  call $src/Cpu/Cpu#readMem16
-  local.set $memAddress
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $memAddress
-  call $src/Cpu/Cpu#readMemory
-  local.set $memValue
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $src/Cpu/Cpu#get:registers
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 2
-  i32.add
-  call $src/Cpu/Cpu#readMem8
-  local.set $imm
-  global.get $~lib/memory/__stack_pointer
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/Cpu#get:alu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $memValue
-  local.get $imm
-  call $src/Cpu/ALU#shr
-  local.tee $aluResult
-  i32.store offset=12
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $aluResult
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $src/Cpu/AluResult#get:flags
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/Flags#get:zero
-  local.get $aluResult
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $src/Cpu/AluResult#get:flags
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/Flags#get:carry
-  call $src/Cpu/Cpu#setFlags
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $memAddress
-  local.get $aluResult
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/AluResult#get:result
-  call $src/Cpu/Cpu#writeMemory
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/Cpu#get:registers
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store
-  local.get $5
-  local.get $cpu
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=8
-  local.get $5
-  call $src/Cpu/Cpu#get:registers
-  local.set $5
-  global.get $~lib/memory/__stack_pointer
-  local.get $5
-  i32.store offset=4
-  local.get $5
-  call $src/Cpu/CpuRegisters#get:PC
-  i32.const 4
-  i32.add
-  call $src/Cpu/CpuRegisters#set:PC
-  global.get $~lib/memory/__stack_pointer
-  i32.const 16
-  i32.add
-  global.set $~lib/memory/__stack_pointer
- )
- (func $src/Cpu/fetchInstructionActions~anonymous|77 (param $cpu i32)
-  (local $memAddress i32)
-  (local $memValue i32)
+  (local $regIdx i32)
+  (local $regValue i32)
   (local $countRegIdx i32)
   (local $count i32)
   (local $aluResult i32)
@@ -22777,17 +22549,17 @@
   i32.store offset=4
   local.get $6
   call $src/Cpu/CpuRegisters#get:PC
-  call $src/Cpu/Cpu#readMem16
-  local.set $memAddress
+  call $src/Cpu/Cpu#readMem8
+  local.set $regIdx
   local.get $cpu
   local.set $6
   global.get $~lib/memory/__stack_pointer
   local.get $6
   i32.store
   local.get $6
-  local.get $memAddress
-  call $src/Cpu/Cpu#readMemory
-  local.set $memValue
+  local.get $regIdx
+  call $src/Cpu/Cpu#getRegisterValueByIdx
+  local.set $regValue
   local.get $cpu
   local.set $6
   global.get $~lib/memory/__stack_pointer
@@ -22807,7 +22579,7 @@
   i32.store offset=4
   local.get $6
   call $src/Cpu/CpuRegisters#get:PC
-  i32.const 2
+  i32.const 1
   i32.add
   call $src/Cpu/Cpu#readMem8
   local.set $countRegIdx
@@ -22833,7 +22605,7 @@
   local.get $6
   i32.store
   local.get $6
-  local.get $memValue
+  local.get $regValue
   local.get $count
   call $src/Cpu/ALU#shr
   local.tee $aluResult
@@ -22877,7 +22649,7 @@
   local.get $6
   i32.store
   local.get $6
-  local.get $memAddress
+  local.get $regIdx
   local.get $aluResult
   local.set $6
   global.get $~lib/memory/__stack_pointer
@@ -22885,7 +22657,186 @@
   i32.store offset=4
   local.get $6
   call $src/Cpu/AluResult#get:result
-  call $src/Cpu/Cpu#writeMemory
+  call $src/Cpu/Cpu#setRegisterValueByIdx
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 3
+  i32.add
+  call $src/Cpu/CpuRegisters#set:PC
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|77 (param $cpu i32)
+  (local $regIdx i32)
+  (local $regValue i32)
+  (local $memAddress i32)
+  (local $count i32)
+  (local $aluResult i32)
+  (local $6 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=8
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem8
+  local.set $regIdx
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $regIdx
+  call $src/Cpu/Cpu#getRegisterValueByIdx
+  local.set $regValue
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 1
+  i32.add
+  call $src/Cpu/Cpu#readMem16
+  local.set $memAddress
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $memAddress
+  call $src/Cpu/Cpu#readMemory
+  local.set $count
+  global.get $~lib/memory/__stack_pointer
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Cpu#get:alu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $regValue
+  local.get $count
+  call $src/Cpu/ALU#shr
+  local.tee $aluResult
+  i32.store offset=12
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $aluResult
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/AluResult#get:flags
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Flags#get:zero
+  local.get $aluResult
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/AluResult#get:flags
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Flags#get:carry
+  call $src/Cpu/Cpu#setFlags
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $regIdx
+  local.get $aluResult
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/AluResult#get:result
+  call $src/Cpu/Cpu#setRegisterValueByIdx
   local.get $cpu
   local.set $6
   global.get $~lib/memory/__stack_pointer
@@ -22920,6 +22871,354 @@
   global.set $~lib/memory/__stack_pointer
  )
  (func $src/Cpu/fetchInstructionActions~anonymous|78 (param $cpu i32)
+  (local $memAddress i32)
+  (local $memValue i32)
+  (local $imm i32)
+  (local $aluResult i32)
+  (local $5 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=8
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem16
+  local.set $memAddress
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $memAddress
+  call $src/Cpu/Cpu#readMemory
+  local.set $memValue
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 2
+  i32.add
+  call $src/Cpu/Cpu#readMem8
+  local.set $imm
+  global.get $~lib/memory/__stack_pointer
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/Cpu#get:alu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $memValue
+  local.get $imm
+  call $src/Cpu/ALU#shr
+  local.tee $aluResult
+  i32.store offset=12
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $aluResult
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/AluResult#get:flags
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/Flags#get:zero
+  local.get $aluResult
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/AluResult#get:flags
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/Flags#get:carry
+  call $src/Cpu/Cpu#setFlags
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $memAddress
+  local.get $aluResult
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/AluResult#get:result
+  call $src/Cpu/Cpu#writeMemory
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store
+  local.get $5
+  local.get $cpu
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=8
+  local.get $5
+  call $src/Cpu/Cpu#get:registers
+  local.set $5
+  global.get $~lib/memory/__stack_pointer
+  local.get $5
+  i32.store offset=4
+  local.get $5
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 4
+  i32.add
+  call $src/Cpu/CpuRegisters#set:PC
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|79 (param $cpu i32)
+  (local $memAddress i32)
+  (local $memValue i32)
+  (local $countRegIdx i32)
+  (local $count i32)
+  (local $aluResult i32)
+  (local $6 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store
+  global.get $~lib/memory/__stack_pointer
+  i64.const 0
+  i64.store offset=8
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  call $src/Cpu/Cpu#readMem16
+  local.set $memAddress
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $memAddress
+  call $src/Cpu/Cpu#readMemory
+  local.set $memValue
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 2
+  i32.add
+  call $src/Cpu/Cpu#readMem8
+  local.set $countRegIdx
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $countRegIdx
+  call $src/Cpu/Cpu#getRegisterValueByIdx
+  local.set $count
+  global.get $~lib/memory/__stack_pointer
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Cpu#get:alu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $memValue
+  local.get $count
+  call $src/Cpu/ALU#shr
+  local.tee $aluResult
+  i32.store offset=12
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $aluResult
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/AluResult#get:flags
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Flags#get:zero
+  local.get $aluResult
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/AluResult#get:flags
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Flags#get:carry
+  call $src/Cpu/Cpu#setFlags
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $memAddress
+  local.get $aluResult
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/AluResult#get:result
+  call $src/Cpu/Cpu#writeMemory
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  local.get $cpu
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=8
+  local.get $6
+  call $src/Cpu/Cpu#get:registers
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store offset=4
+  local.get $6
+  call $src/Cpu/CpuRegisters#get:PC
+  i32.const 4
+  i32.add
+  call $src/Cpu/CpuRegisters#set:PC
+  global.get $~lib/memory/__stack_pointer
+  i32.const 16
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
+ (func $src/Cpu/fetchInstructionActions~anonymous|80 (param $cpu i32)
   (local $regLowIdx i32)
   (local $regHighIdx i32)
   (local $imm16 i32)
@@ -23063,7 +23362,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|79 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|81 (param $cpu i32)
   (local $regLowIdx i32)
   (local $regHighIdx i32)
   (local $memAddress i32)
@@ -23213,7 +23512,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|80 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|82 (param $cpu i32)
   (local $destRegIdx i32)
   (local $regLowIdx i32)
   (local $regHighIdx i32)
@@ -23379,7 +23678,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|81 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|83 (param $cpu i32)
   (local $regLowIdx i32)
   (local $regHighIdx i32)
   (local $srcRegIdx i32)
@@ -23545,7 +23844,7 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
- (func $src/Cpu/fetchInstructionActions~anonymous|82 (param $cpu i32)
+ (func $src/Cpu/fetchInstructionActions~anonymous|84 (param $cpu i32)
   (local $regLowIdx i32)
   (local $regHighIdx i32)
   (local $immValue i32)
@@ -23817,1229 +24116,1259 @@
   i32.const 0
   local.set $execute
   block $break|0
-   block $case80|0
-    block $case79|0
-     block $case78|0
-      block $case77|0
-       block $case76|0
-        block $case75|0
-         block $case74|0
-          block $case73|0
-           block $case72|0
-            block $case71|0
-             block $case70|0
-              block $case69|0
-               block $case68|0
-                block $case67|0
-                 block $case66|0
-                  block $case65|0
-                   block $case64|0
-                    block $case63|0
-                     block $case62|0
-                      block $case61|0
-                       block $case60|0
-                        block $case59|0
-                         block $case58|0
-                          block $case57|0
-                           block $case56|0
-                            block $case55|0
-                             block $case54|0
-                              block $case53|0
-                               block $case52|0
-                                block $case51|0
-                                 block $case50|0
-                                  block $case49|0
-                                   block $case48|0
-                                    block $case47|0
-                                     block $case46|0
-                                      block $case45|0
-                                       block $case44|0
-                                        block $case43|0
-                                         block $case42|0
-                                          block $case41|0
-                                           block $case40|0
-                                            block $case39|0
-                                             block $case38|0
-                                              block $case37|0
-                                               block $case36|0
-                                                block $case35|0
-                                                 block $case34|0
-                                                  block $case33|0
-                                                   block $case32|0
-                                                    block $case31|0
-                                                     block $case30|0
-                                                      block $case29|0
-                                                       block $case28|0
-                                                        block $case27|0
-                                                         block $case26|0
-                                                          block $case25|0
-                                                           block $case24|0
-                                                            block $case23|0
-                                                             block $case22|0
-                                                              block $case21|0
-                                                               block $case20|0
-                                                                block $case19|0
-                                                                 block $case18|0
-                                                                  block $case17|0
-                                                                   block $case16|0
-                                                                    block $case15|0
-                                                                     block $case14|0
-                                                                      block $case13|0
-                                                                       block $case12|0
-                                                                        block $case11|0
-                                                                         block $case10|0
-                                                                          block $case9|0
-                                                                           block $case8|0
-                                                                            block $case7|0
-                                                                             block $case6|0
-                                                                              block $case5|0
-                                                                               block $case4|0
-                                                                                block $case3|0
-                                                                                 block $case2|0
-                                                                                  block $case1|0
-                                                                                   block $case0|0
-                                                                                    local.get $opcode
-                                                                                    local.set $4
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.DEBUG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case0|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.NOP
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case1|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.HALT
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case2|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.DEBUG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case3|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.DEBUG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case4|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.DEBUG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case5|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.INT3
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case6|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SET_SP
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case7|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.CALL
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case8|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.RET
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case9|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JMP
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case10|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JC
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case11|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JNC
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case12|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JZ
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case13|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JNZ
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case14|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JL
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case15|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JLE
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case16|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case17|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.JGE
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case18|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.XCHG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case19|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.MOV_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case20|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.MOV_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case21|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.MOV_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case22|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.MOV_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case23|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.MOV_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case24|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.PUSH_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case25|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.POP_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case26|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.INC_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case27|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.INC_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case28|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.DEC_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case29|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.DEC_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case30|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.NOT_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case31|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.NOT_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case32|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.ADD_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case33|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.ADD_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case34|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.ADD_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case35|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.ADD_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case36|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.ADD_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case37|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SUB_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case38|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SUB_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case39|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SUB_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case40|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SUB_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case41|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SUB_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case42|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.AND_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case43|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.AND_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case44|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.AND_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case45|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.AND_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case46|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.AND_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case47|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.OR_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case48|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.OR_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case49|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.OR_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case50|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.OR_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case51|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.OR_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case52|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.XOR_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case53|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.XOR_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case54|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.XOR_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case55|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.XOR_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case56|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.XOR_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case57|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.CMP_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case58|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.CMP_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case59|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.CMP_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case60|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.CMP_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case61|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.TEST_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case62|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.TEST_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case63|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.TEST_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case64|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.TEST_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case65|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHL_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case66|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHL_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case67|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHL_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case68|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHL_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case69|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHL_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case70|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHR_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case71|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHR_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case72|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHR_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case73|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHR_MEM_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case74|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.SHR_MEM_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case75|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.LEA_REG_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case76|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.LEA_REG_REG_MEM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case77|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.LDI_REG_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case78|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.STI_REG_REG_REG
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case79|0
-                                                                                    local.get $4
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    global.get $src/cpu_instructions/Opcode.STI_REG_REG_IMM
-                                                                                    i32.const 255
-                                                                                    i32.and
-                                                                                    i32.eq
-                                                                                    br_if $case80|0
+   block $case82|0
+    block $case81|0
+     block $case80|0
+      block $case79|0
+       block $case78|0
+        block $case77|0
+         block $case76|0
+          block $case75|0
+           block $case74|0
+            block $case73|0
+             block $case72|0
+              block $case71|0
+               block $case70|0
+                block $case69|0
+                 block $case68|0
+                  block $case67|0
+                   block $case66|0
+                    block $case65|0
+                     block $case64|0
+                      block $case63|0
+                       block $case62|0
+                        block $case61|0
+                         block $case60|0
+                          block $case59|0
+                           block $case58|0
+                            block $case57|0
+                             block $case56|0
+                              block $case55|0
+                               block $case54|0
+                                block $case53|0
+                                 block $case52|0
+                                  block $case51|0
+                                   block $case50|0
+                                    block $case49|0
+                                     block $case48|0
+                                      block $case47|0
+                                       block $case46|0
+                                        block $case45|0
+                                         block $case44|0
+                                          block $case43|0
+                                           block $case42|0
+                                            block $case41|0
+                                             block $case40|0
+                                              block $case39|0
+                                               block $case38|0
+                                                block $case37|0
+                                                 block $case36|0
+                                                  block $case35|0
+                                                   block $case34|0
+                                                    block $case33|0
+                                                     block $case32|0
+                                                      block $case31|0
+                                                       block $case30|0
+                                                        block $case29|0
+                                                         block $case28|0
+                                                          block $case27|0
+                                                           block $case26|0
+                                                            block $case25|0
+                                                             block $case24|0
+                                                              block $case23|0
+                                                               block $case22|0
+                                                                block $case21|0
+                                                                 block $case20|0
+                                                                  block $case19|0
+                                                                   block $case18|0
+                                                                    block $case17|0
+                                                                     block $case16|0
+                                                                      block $case15|0
+                                                                       block $case14|0
+                                                                        block $case13|0
+                                                                         block $case12|0
+                                                                          block $case11|0
+                                                                           block $case10|0
+                                                                            block $case9|0
+                                                                             block $case8|0
+                                                                              block $case7|0
+                                                                               block $case6|0
+                                                                                block $case5|0
+                                                                                 block $case4|0
+                                                                                  block $case3|0
+                                                                                   block $case2|0
+                                                                                    block $case1|0
+                                                                                     block $case0|0
+                                                                                      local.get $opcode
+                                                                                      local.set $4
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.DEBUG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case0|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.NOP
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case1|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.HALT
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case2|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.DEBUG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case3|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.DEBUG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case4|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.DEBUG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case5|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.INT3
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case6|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SET_SP_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case7|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SET_SP_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case8|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.GET_SP_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case9|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.CALL
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case10|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.RET
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case11|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JMP
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case12|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JC
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case13|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JNC
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case14|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JZ
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case15|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JNZ
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case16|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JL
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case17|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JLE
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case18|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case19|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.JGE
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case20|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.XCHG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case21|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.MOV_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case22|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.MOV_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case23|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.MOV_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case24|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.MOV_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case25|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.MOV_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case26|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.PUSH_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case27|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.POP_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case28|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.INC_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case29|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.INC_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case30|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.DEC_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case31|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.DEC_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case32|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.NOT_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case33|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.NOT_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case34|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.ADD_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case35|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.ADD_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case36|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.ADD_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case37|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.ADD_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case38|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.ADD_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case39|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SUB_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case40|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SUB_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case41|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SUB_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case42|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SUB_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case43|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SUB_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case44|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.AND_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case45|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.AND_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case46|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.AND_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case47|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.AND_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case48|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.AND_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case49|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.OR_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case50|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.OR_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case51|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.OR_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case52|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.OR_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case53|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.OR_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case54|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.XOR_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case55|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.XOR_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case56|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.XOR_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case57|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.XOR_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case58|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.XOR_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case59|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.CMP_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case60|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.CMP_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case61|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.CMP_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case62|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.CMP_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case63|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.TEST_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case64|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.TEST_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case65|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.TEST_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case66|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.TEST_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case67|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHL_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case68|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHL_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case69|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHL_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case70|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHL_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case71|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHL_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case72|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHR_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case73|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHR_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case74|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHR_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case75|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHR_MEM_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case76|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.SHR_MEM_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case77|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.LEA_REG_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case78|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.LEA_REG_REG_MEM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case79|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.LDI_REG_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case80|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.STI_REG_REG_REG
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case81|0
+                                                                                      local.get $4
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      global.get $src/cpu_instructions/Opcode.STI_REG_REG_IMM
+                                                                                      i32.const 255
+                                                                                      i32.and
+                                                                                      i32.eq
+                                                                                      br_if $case82|0
+                                                                                      br $break|0
+                                                                                     end
+                                                                                     global.get $~lib/memory/__stack_pointer
+                                                                                     i32.const 5664
+                                                                                     local.tee $fetch
+                                                                                     i32.store
+                                                                                     global.get $~lib/memory/__stack_pointer
+                                                                                     i32.const 5856
+                                                                                     local.tee $execute
+                                                                                     i32.store offset=4
+                                                                                     br $break|0
+                                                                                    end
+                                                                                    global.get $~lib/memory/__stack_pointer
+                                                                                    i32.const 5888
+                                                                                    local.tee $execute
+                                                                                    i32.store offset=4
                                                                                     br $break|0
                                                                                    end
                                                                                    global.get $~lib/memory/__stack_pointer
-                                                                                   i32.const 5664
-                                                                                   local.tee $fetch
-                                                                                   i32.store
-                                                                                   global.get $~lib/memory/__stack_pointer
-                                                                                   i32.const 5856
+                                                                                   i32.const 5968
                                                                                    local.tee $execute
                                                                                    i32.store offset=4
                                                                                    br $break|0
                                                                                   end
                                                                                   global.get $~lib/memory/__stack_pointer
-                                                                                  i32.const 5888
-                                                                                  local.tee $execute
-                                                                                  i32.store offset=4
+                                                                                  i32.const 6048
+                                                                                  local.tee $run
+                                                                                  i32.store offset=8
                                                                                   br $break|0
                                                                                  end
                                                                                  global.get $~lib/memory/__stack_pointer
-                                                                                 i32.const 5968
-                                                                                 local.tee $execute
-                                                                                 i32.store offset=4
+                                                                                 i32.const 6624
+                                                                                 local.tee $run
+                                                                                 i32.store offset=8
                                                                                  br $break|0
                                                                                 end
                                                                                 global.get $~lib/memory/__stack_pointer
-                                                                                i32.const 6048
+                                                                                i32.const 6832
                                                                                 local.tee $run
                                                                                 i32.store offset=8
                                                                                 br $break|0
                                                                                end
                                                                                global.get $~lib/memory/__stack_pointer
-                                                                               i32.const 6624
+                                                                               i32.const 6960
                                                                                local.tee $run
                                                                                i32.store offset=8
                                                                                br $break|0
                                                                               end
                                                                               global.get $~lib/memory/__stack_pointer
-                                                                              i32.const 6832
+                                                                              i32.const 6992
                                                                               local.tee $run
                                                                               i32.store offset=8
                                                                               br $break|0
                                                                              end
                                                                              global.get $~lib/memory/__stack_pointer
-                                                                             i32.const 6960
+                                                                             i32.const 7024
                                                                              local.tee $run
                                                                              i32.store offset=8
                                                                              br $break|0
                                                                             end
                                                                             global.get $~lib/memory/__stack_pointer
-                                                                            i32.const 6992
+                                                                            i32.const 7104
                                                                             local.tee $run
                                                                             i32.store offset=8
                                                                             br $break|0
                                                                            end
                                                                            global.get $~lib/memory/__stack_pointer
-                                                                           i32.const 7024
+                                                                           i32.const 7136
                                                                            local.tee $run
                                                                            i32.store offset=8
                                                                            br $break|0
                                                                           end
                                                                           global.get $~lib/memory/__stack_pointer
-                                                                          i32.const 7056
+                                                                          i32.const 7168
                                                                           local.tee $run
                                                                           i32.store offset=8
                                                                           br $break|0
                                                                          end
                                                                          global.get $~lib/memory/__stack_pointer
-                                                                         i32.const 7088
+                                                                         i32.const 7200
                                                                          local.tee $run
                                                                          i32.store offset=8
                                                                          br $break|0
                                                                         end
                                                                         global.get $~lib/memory/__stack_pointer
-                                                                        i32.const 7184
+                                                                        i32.const 7296
                                                                         local.tee $run
                                                                         i32.store offset=8
                                                                         br $break|0
                                                                        end
                                                                        global.get $~lib/memory/__stack_pointer
-                                                                       i32.const 7216
+                                                                       i32.const 7328
                                                                        local.tee $run
                                                                        i32.store offset=8
                                                                        br $break|0
                                                                       end
                                                                       global.get $~lib/memory/__stack_pointer
-                                                                      i32.const 7248
+                                                                      i32.const 7360
                                                                       local.tee $run
                                                                       i32.store offset=8
                                                                       br $break|0
                                                                      end
                                                                      global.get $~lib/memory/__stack_pointer
-                                                                     i32.const 7280
+                                                                     i32.const 7392
                                                                      local.tee $run
                                                                      i32.store offset=8
                                                                      br $break|0
                                                                     end
                                                                     global.get $~lib/memory/__stack_pointer
-                                                                    i32.const 7312
+                                                                    i32.const 7424
                                                                     local.tee $run
                                                                     i32.store offset=8
                                                                     br $break|0
                                                                    end
                                                                    global.get $~lib/memory/__stack_pointer
-                                                                   i32.const 7344
+                                                                   i32.const 7456
                                                                    local.tee $run
                                                                    i32.store offset=8
                                                                    br $break|0
                                                                   end
                                                                   global.get $~lib/memory/__stack_pointer
-                                                                  i32.const 7376
+                                                                  i32.const 7488
                                                                   local.tee $run
                                                                   i32.store offset=8
                                                                   br $break|0
                                                                  end
                                                                  global.get $~lib/memory/__stack_pointer
-                                                                 i32.const 7408
+                                                                 i32.const 7520
                                                                  local.tee $run
                                                                  i32.store offset=8
                                                                  br $break|0
                                                                 end
                                                                 global.get $~lib/memory/__stack_pointer
-                                                                i32.const 7440
+                                                                i32.const 7552
                                                                 local.tee $fetch
                                                                 i32.store
                                                                 global.get $~lib/memory/__stack_pointer
-                                                                i32.const 7520
+                                                                i32.const 7584
                                                                 local.tee $execute
                                                                 i32.store offset=4
                                                                 br $break|0
                                                                end
                                                                global.get $~lib/memory/__stack_pointer
-                                                               i32.const 7552
+                                                               i32.const 7616
                                                                local.tee $run
                                                                i32.store offset=8
                                                                br $break|0
                                                               end
                                                               global.get $~lib/memory/__stack_pointer
-                                                              i32.const 7584
+                                                              i32.const 7648
                                                               local.tee $run
                                                               i32.store offset=8
                                                               br $break|0
                                                              end
                                                              global.get $~lib/memory/__stack_pointer
-                                                             i32.const 7616
+                                                             i32.const 7680
                                                              local.tee $run
                                                              i32.store offset=8
                                                              br $break|0
                                                             end
                                                             global.get $~lib/memory/__stack_pointer
-                                                            i32.const 7648
+                                                            i32.const 7712
                                                             local.tee $run
                                                             i32.store offset=8
                                                             br $break|0
                                                            end
                                                            global.get $~lib/memory/__stack_pointer
-                                                           i32.const 7680
+                                                           i32.const 7744
                                                            local.tee $run
                                                            i32.store offset=8
                                                            br $break|0
                                                           end
                                                           global.get $~lib/memory/__stack_pointer
-                                                          i32.const 7712
+                                                          i32.const 7776
                                                           local.tee $run
                                                           i32.store offset=8
                                                           br $break|0
                                                          end
                                                          global.get $~lib/memory/__stack_pointer
-                                                         i32.const 7744
+                                                         i32.const 7808
                                                          local.tee $run
                                                          i32.store offset=8
                                                          br $break|0
                                                         end
                                                         global.get $~lib/memory/__stack_pointer
-                                                        i32.const 7776
+                                                        i32.const 7840
                                                         local.tee $run
                                                         i32.store offset=8
                                                         br $break|0
                                                        end
                                                        global.get $~lib/memory/__stack_pointer
-                                                       i32.const 7808
+                                                       i32.const 7872
                                                        local.tee $run
                                                        i32.store offset=8
                                                        br $break|0
                                                       end
                                                       global.get $~lib/memory/__stack_pointer
-                                                      i32.const 7840
+                                                      i32.const 7904
                                                       local.tee $run
                                                       i32.store offset=8
                                                       br $break|0
                                                      end
                                                      global.get $~lib/memory/__stack_pointer
-                                                     i32.const 7872
+                                                     i32.const 7936
                                                      local.tee $run
                                                      i32.store offset=8
                                                      br $break|0
                                                     end
                                                     global.get $~lib/memory/__stack_pointer
-                                                    i32.const 7904
+                                                    i32.const 7968
                                                     local.tee $run
                                                     i32.store offset=8
                                                     br $break|0
                                                    end
                                                    global.get $~lib/memory/__stack_pointer
-                                                   i32.const 7936
+                                                   i32.const 8000
                                                    local.tee $run
                                                    i32.store offset=8
                                                    br $break|0
                                                   end
                                                   global.get $~lib/memory/__stack_pointer
-                                                  i32.const 7968
+                                                  i32.const 8032
                                                   local.tee $run
                                                   i32.store offset=8
                                                   br $break|0
                                                  end
                                                  global.get $~lib/memory/__stack_pointer
-                                                 i32.const 8000
+                                                 i32.const 8064
                                                  local.tee $run
                                                  i32.store offset=8
                                                  br $break|0
                                                 end
                                                 global.get $~lib/memory/__stack_pointer
-                                                i32.const 8032
+                                                i32.const 8096
                                                 local.tee $run
                                                 i32.store offset=8
                                                 br $break|0
                                                end
                                                global.get $~lib/memory/__stack_pointer
-                                               i32.const 8064
+                                               i32.const 8128
                                                local.tee $run
                                                i32.store offset=8
                                                br $break|0
                                               end
                                               global.get $~lib/memory/__stack_pointer
-                                              i32.const 8096
+                                              i32.const 8160
                                               local.tee $run
                                               i32.store offset=8
                                               br $break|0
                                              end
                                              global.get $~lib/memory/__stack_pointer
-                                             i32.const 8128
+                                             i32.const 8192
                                              local.tee $run
                                              i32.store offset=8
                                              br $break|0
                                             end
                                             global.get $~lib/memory/__stack_pointer
-                                            i32.const 8160
+                                            i32.const 8224
                                             local.tee $run
                                             i32.store offset=8
                                             br $break|0
                                            end
                                            global.get $~lib/memory/__stack_pointer
-                                           i32.const 8192
+                                           i32.const 8256
                                            local.tee $run
                                            i32.store offset=8
                                            br $break|0
                                           end
                                           global.get $~lib/memory/__stack_pointer
-                                          i32.const 8224
+                                          i32.const 8288
                                           local.tee $run
                                           i32.store offset=8
                                           br $break|0
                                          end
                                          global.get $~lib/memory/__stack_pointer
-                                         i32.const 8256
+                                         i32.const 8320
                                          local.tee $run
                                          i32.store offset=8
                                          br $break|0
                                         end
                                         global.get $~lib/memory/__stack_pointer
-                                        i32.const 8288
+                                        i32.const 8352
                                         local.tee $run
                                         i32.store offset=8
                                         br $break|0
                                        end
                                        global.get $~lib/memory/__stack_pointer
-                                       i32.const 8320
+                                       i32.const 8384
                                        local.tee $run
                                        i32.store offset=8
                                        br $break|0
                                       end
                                       global.get $~lib/memory/__stack_pointer
-                                      i32.const 8352
+                                      i32.const 8416
                                       local.tee $run
                                       i32.store offset=8
                                       br $break|0
                                      end
                                      global.get $~lib/memory/__stack_pointer
-                                     i32.const 8384
+                                     i32.const 8448
                                      local.tee $run
                                      i32.store offset=8
                                      br $break|0
                                     end
                                     global.get $~lib/memory/__stack_pointer
-                                    i32.const 8416
+                                    i32.const 8480
                                     local.tee $run
                                     i32.store offset=8
                                     br $break|0
                                    end
                                    global.get $~lib/memory/__stack_pointer
-                                   i32.const 8448
+                                   i32.const 8512
                                    local.tee $run
                                    i32.store offset=8
                                    br $break|0
                                   end
                                   global.get $~lib/memory/__stack_pointer
-                                  i32.const 8480
+                                  i32.const 8544
                                   local.tee $run
                                   i32.store offset=8
                                   br $break|0
                                  end
                                  global.get $~lib/memory/__stack_pointer
-                                 i32.const 8512
+                                 i32.const 8576
                                  local.tee $run
                                  i32.store offset=8
                                  br $break|0
                                 end
                                 global.get $~lib/memory/__stack_pointer
-                                i32.const 8544
+                                i32.const 8608
                                 local.tee $run
                                 i32.store offset=8
                                 br $break|0
                                end
                                global.get $~lib/memory/__stack_pointer
-                               i32.const 8576
+                               i32.const 8640
                                local.tee $run
                                i32.store offset=8
                                br $break|0
                               end
                               global.get $~lib/memory/__stack_pointer
-                              i32.const 8608
+                              i32.const 8672
                               local.tee $run
                               i32.store offset=8
                               br $break|0
                              end
                              global.get $~lib/memory/__stack_pointer
-                             i32.const 8640
+                             i32.const 8704
                              local.tee $run
                              i32.store offset=8
                              br $break|0
                             end
                             global.get $~lib/memory/__stack_pointer
-                            i32.const 8672
+                            i32.const 8736
                             local.tee $run
                             i32.store offset=8
                             br $break|0
                            end
                            global.get $~lib/memory/__stack_pointer
-                           i32.const 8704
+                           i32.const 8768
                            local.tee $run
                            i32.store offset=8
                            br $break|0
                           end
                           global.get $~lib/memory/__stack_pointer
-                          i32.const 8736
+                          i32.const 8800
                           local.tee $run
                           i32.store offset=8
                           br $break|0
                          end
                          global.get $~lib/memory/__stack_pointer
-                         i32.const 8768
+                         i32.const 8832
                          local.tee $run
                          i32.store offset=8
                          br $break|0
                         end
                         global.get $~lib/memory/__stack_pointer
-                        i32.const 8800
+                        i32.const 8864
                         local.tee $run
                         i32.store offset=8
                         br $break|0
                        end
                        global.get $~lib/memory/__stack_pointer
-                       i32.const 8832
+                       i32.const 8896
                        local.tee $run
                        i32.store offset=8
                        br $break|0
                       end
                       global.get $~lib/memory/__stack_pointer
-                      i32.const 8864
+                      i32.const 8928
                       local.tee $run
                       i32.store offset=8
                       br $break|0
                      end
                      global.get $~lib/memory/__stack_pointer
-                     i32.const 8896
+                     i32.const 8960
                      local.tee $run
                      i32.store offset=8
                      br $break|0
                     end
                     global.get $~lib/memory/__stack_pointer
-                    i32.const 8928
+                    i32.const 8992
                     local.tee $run
                     i32.store offset=8
                     br $break|0
                    end
                    global.get $~lib/memory/__stack_pointer
-                   i32.const 8960
+                   i32.const 9024
                    local.tee $run
                    i32.store offset=8
                    br $break|0
                   end
                   global.get $~lib/memory/__stack_pointer
-                  i32.const 8992
+                  i32.const 9056
                   local.tee $run
                   i32.store offset=8
                   br $break|0
                  end
                  global.get $~lib/memory/__stack_pointer
-                 i32.const 9024
+                 i32.const 9088
                  local.tee $run
                  i32.store offset=8
                  br $break|0
                 end
                 global.get $~lib/memory/__stack_pointer
-                i32.const 9056
+                i32.const 9120
                 local.tee $run
                 i32.store offset=8
                 br $break|0
                end
                global.get $~lib/memory/__stack_pointer
-               i32.const 9088
+               i32.const 9152
                local.tee $run
                i32.store offset=8
                br $break|0
               end
               global.get $~lib/memory/__stack_pointer
-              i32.const 9120
+              i32.const 9184
               local.tee $run
               i32.store offset=8
               br $break|0
              end
              global.get $~lib/memory/__stack_pointer
-             i32.const 9152
+             i32.const 9216
              local.tee $run
              i32.store offset=8
              br $break|0
             end
             global.get $~lib/memory/__stack_pointer
-            i32.const 9184
+            i32.const 9248
             local.tee $run
             i32.store offset=8
             br $break|0
            end
            global.get $~lib/memory/__stack_pointer
-           i32.const 9216
+           i32.const 9280
            local.tee $run
            i32.store offset=8
            br $break|0
           end
           global.get $~lib/memory/__stack_pointer
-          i32.const 9248
+          i32.const 9312
           local.tee $run
           i32.store offset=8
           br $break|0
          end
          global.get $~lib/memory/__stack_pointer
-         i32.const 9280
+         i32.const 9344
          local.tee $run
          i32.store offset=8
          br $break|0
         end
         global.get $~lib/memory/__stack_pointer
-        i32.const 9312
+        i32.const 9376
         local.tee $run
         i32.store offset=8
         br $break|0
        end
        global.get $~lib/memory/__stack_pointer
-       i32.const 9344
+       i32.const 9408
        local.tee $run
        i32.store offset=8
        br $break|0
       end
       global.get $~lib/memory/__stack_pointer
-      i32.const 9376
+      i32.const 9440
       local.tee $run
       i32.store offset=8
       br $break|0
      end
      global.get $~lib/memory/__stack_pointer
-     i32.const 9408
+     i32.const 9472
      local.tee $run
      i32.store offset=8
      br $break|0
     end
     global.get $~lib/memory/__stack_pointer
-    i32.const 9440
+    i32.const 9504
     local.tee $run
     i32.store offset=8
     br $break|0
    end
    global.get $~lib/memory/__stack_pointer
-   i32.const 9472
+   i32.const 9536
    local.tee $run
    i32.store offset=8
    br $break|0
@@ -25466,7 +25795,7 @@
   call $src/lib/lib_numbers/toHex
   local.tee $12
   i32.store offset=44
-  i32.const 9632
+  i32.const 9696
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -25480,7 +25809,7 @@
   i32.store offset=4
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 9632
+  i32.const 9696
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -25494,7 +25823,7 @@
   i32.store offset=4
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 9632
+  i32.const 9696
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -25508,7 +25837,7 @@
   i32.store offset=4
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 9632
+  i32.const 9696
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -26706,7 +27035,7 @@
   i32.store offset=4
   local.get $memoryBus
   if (result i32)
-   i32.const 9680
+   i32.const 9744
   else
    i32.const 0
   end
@@ -27017,7 +27346,7 @@
    call $~lib/number/U16#toString
    local.tee $5
    i32.store offset=12
-   i32.const 10048
+   i32.const 10112
    local.set $7
    global.get $~lib/memory/__stack_pointer
    local.get $7
@@ -27031,7 +27360,7 @@
    i32.store offset=16
    local.get $7
    call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 10048
+   i32.const 10112
    local.set $7
    global.get $~lib/memory/__stack_pointer
    local.get $7
@@ -27045,7 +27374,7 @@
    i32.store offset=16
    local.get $7
    call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 10048
+   i32.const 10112
    local.set $7
    global.get $~lib/memory/__stack_pointer
    local.get $7
@@ -27059,7 +27388,7 @@
    i32.store offset=16
    local.get $7
    call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 10048
+   i32.const 10112
    local.set $7
    global.get $~lib/memory/__stack_pointer
    local.get $7
@@ -27348,7 +27677,7 @@
   call $src/lib/lib_numbers/toHex
   local.tee $12
   i32.store offset=20
-  i32.const 10304
+  i32.const 10368
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27362,7 +27691,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10304
+  i32.const 10368
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27376,7 +27705,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10304
+  i32.const 10368
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27390,7 +27719,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10304
+  i32.const 10368
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27404,7 +27733,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10304
+  i32.const 10368
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27457,7 +27786,7 @@
   global.get $src/memory_map/MEMORY_MAP.DEVICE_TABLE_MAX_ENTRIES
   i32.ge_u
   if
-   i32.const 9776
+   i32.const 9840
    i32.const 752
    i32.const 28
    i32.const 13
@@ -27470,7 +27799,7 @@
   i32.const 255
   i32.gt_u
   if
-   i32.const 9776
+   i32.const 9840
    i32.const 752
    i32.const 32
    i32.const 13
@@ -27588,7 +27917,7 @@
   local.get $ioManager
   i32.eqz
   if
-   i32.const 9712
+   i32.const 9776
    i32.const 2960
    i32.const 209
    i32.const 21
@@ -27916,7 +28245,7 @@
      call $~lib/number/U8#toString
      local.tee $5
      i32.store offset=20
-     i32.const 10528
+     i32.const 10592
      local.set $6
      global.get $~lib/memory/__stack_pointer
      local.get $6
@@ -27930,7 +28259,7 @@
      i32.store offset=24
      local.get $6
      call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-     i32.const 10528
+     i32.const 10592
      local.set $6
      global.get $~lib/memory/__stack_pointer
      local.get $6
@@ -27944,7 +28273,7 @@
      i32.store offset=24
      local.get $6
      call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-     i32.const 10528
+     i32.const 10592
      local.set $6
      global.get $~lib/memory/__stack_pointer
      local.get $6
@@ -27958,7 +28287,7 @@
      i32.store offset=24
      local.get $6
      call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-     i32.const 10528
+     i32.const 10592
      local.set $6
      global.get $~lib/memory/__stack_pointer
      local.get $6
@@ -28319,7 +28648,7 @@
   local.get $4
   i32.store offset=4
   local.get $4
-  i32.const 10576
+  i32.const 10640
   call $src/Computer/Breakpoint#set:file
   local.get $this
   local.set $4
@@ -28952,7 +29281,7 @@
     br $for-loop|0
    end
   end
-  i32.const 10624
+  i32.const 10688
   local.get $this
   local.set $9
   global.get $~lib/memory/__stack_pointer

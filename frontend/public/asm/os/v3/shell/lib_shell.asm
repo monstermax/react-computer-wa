@@ -43,6 +43,7 @@ section .data
     STR_COMMAND_PS_TEST   db "Processes list here...", 13, 0
 
     STR_CUSTOM_COMMAND_MISSING db "Custom code not loaded", 13, 0
+    STR_COMMAND_NOT_AVAILABLE db "Command not yet available", 13, 0
 
     STR_COMMANDS_BEGIN    db 0
     STR_COMMAND_PIXELS    db "pixels", 0
@@ -764,8 +765,10 @@ run_command_leds:
     ret
 
 
-run_command_run_command_mkfs:
+run_command_mkfs:
     debug 9, 7
+    lea cl, dl, [STR_COMMAND_NOT_AVAILABLE]
+    call console_print_string
     ; TODO
     ret
 

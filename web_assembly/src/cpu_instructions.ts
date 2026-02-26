@@ -47,7 +47,9 @@ export enum Opcode {
     // STACK
     PUSH_REG = 0x26,
     POP_REG = 0x27,
-    SET_SP = 0x28,
+    SET_SP_IMM = 0x28,     // set SP register
+    SET_SP_REG_REG = 0x29, // set SP register
+    GET_SP_REG_REG = 0x2A, // get SP register
 
     // ALU
     INC_REG = 0x30,

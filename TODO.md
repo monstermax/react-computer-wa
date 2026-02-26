@@ -1,5 +1,5 @@
 
-- os: filesystem
+- os: filesystem (mkfs)
 - os: parser les arguments de la commande shell
 - os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
