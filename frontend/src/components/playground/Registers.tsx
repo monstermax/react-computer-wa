@@ -41,7 +41,7 @@ export const Registers: React.FC<RegistersProps> = (props) => {
 
             <div className="grid grid-cols-2 border-t pt-1 mt-1">
                 <div>
-                    PC: {toHex(Number(registers16.PC), 4)} ({Number(registers16.PC)})
+                    PC: {toHex(Number(registers16.PC ?? 0), 4)} ({Number(registers16.PC ?? 0)})
                 </div>
                 <div className="text-xs">
                     {currentCodeMapped && (
@@ -55,9 +55,9 @@ export const Registers: React.FC<RegistersProps> = (props) => {
                     )}
                 </div>
                 <div>
-                    SP: {toHex(Number(registers16.SP), 4)} ({Number(registers16.SP)})
+                    SP: {toHex(Number(registers16.SP ?? 0), 4)} ({Number(registers16.SP ?? 0)})
                 </div>
-                <div>IR: {toHex(Number(registers16.IR))} ({Number(registers16.IR)})</div>
+                <div>IR: {toHex(Number(registers16.IR ?? 0))} ({Number(registers16.IR ?? 0)})</div>
             </div>
 
             <div className="grid grid-cols-2 border-t pt-1 mt-1">
@@ -66,7 +66,7 @@ export const Registers: React.FC<RegistersProps> = (props) => {
 
                     return (
                         <div key={name} className={`${modifiedRegister ? "bg-yellow-950" : ""} px-1 m-1`}>
-                            {name}: {toHex(value)} ({Number(value)})
+                            {name}: {toHex(value ?? 0)} ({Number(value ?? 0)})
                         </div>
                     )
                 })}

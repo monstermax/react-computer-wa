@@ -196,6 +196,13 @@ run_os:
 
 
 load_os_in_ram:
+
+    ; Vérifie si l'OS est déjà chargé en RAM (apres reboot)
+    mov bl, [OS_START]
+    cmp bl, 0
+    jnz OS_LOADED ; skip le chargement en RAM
+
+
     ; setup dma disk IO
     mov al, [os_disk_device_idx]
     mov cl, [dma_io_base]

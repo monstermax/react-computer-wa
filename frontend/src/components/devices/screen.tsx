@@ -47,6 +47,9 @@ export class ScreenDevice extends IoDevice {
                 }
                 return 0 as u8;
 
+            case 0x03: // CLEAR
+                return 0 as u8; // write only method
+
             default:
                 return 0 as u8;
         }
@@ -73,6 +76,11 @@ export class ScreenDevice extends IoDevice {
                     this.emit('state', { pixels: this.pixels})
                 }
                 break;
+
+            case 0x03: // CLEAR
+                this.clear()
+                break;
+
         }
     }
 

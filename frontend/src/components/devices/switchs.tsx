@@ -147,6 +147,8 @@ export const Switchs: React.FC<SwitchsProps> = (props) => {
         2: 'Draw pixels art',
         3: 'Draw a sprite',
         4: 'Change LEDs status',
+        5: 'Clear Console & Sceeen',
+        6: 'Reboot the computer',
         7: 'Halt the computer',
     };
 

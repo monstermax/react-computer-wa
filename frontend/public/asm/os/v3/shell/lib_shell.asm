@@ -29,14 +29,15 @@ section .data
     STR_COMMAND_NOT_FOUND db "Command not found", 13, 0
     STR_COMMAND_HELP_TEST db "Commands:", 13
                           db " - help (0) : Print help message (this message)", 13 ; test
-                          db " - halt (7) : Halt the computer", 13
-                          db " - reboot : Reboot the computer ( /!\ buggy )", 13
-                          db " - leds (4) : Toggle LEDs", 13
-                          db " - ls : Display files list (Not yet available)", 13
-                          db " - ps : Display processes list (Not yet available)", 13
+                          db " - custom (1) : Run custom code", 13
                           db " - pixels (2) : Screen pixels demo", 13
                           db " - sprite (3) : Screen sprite demo", 13
-                          db " - custom (1) : Run custom code", 13
+                          db " - leds (4) : Toggle LEDs", 13
+                          db " - clear (5) : Clear Console & Screen", 13
+                          db " - reboot (6) : Reboot the computer ( /!\ buggy )", 13
+                          db " - halt (7) : Halt the computer", 13
+                          db " - ls : Display files list (Not yet available)", 13
+                          db " - ps : Display processes list (Not yet available)", 13
                           db 0
     STR_COMMAND_LS_TEST   db "Files list here...", 13, 0
     STR_COMMAND_PS_TEST   db "Processes list here...", 13, 0
@@ -185,11 +186,37 @@ run_shell:
     SKIP_HANDLE_BUTTON_4:
 
 
+    ; check si c'est bouton #5
+    cmp al, 0x05
+    jne SKIP_HANDLE_BUTTON_5
+
+    ; execute l'action du bouton #5 => halt
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_clear
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_5:
+
+
+    ; check si c'est bouton #6
+    cmp al, 0x06
+    jne SKIP_HANDLE_BUTTON_6
+
+    ; execute l'action du bouton #6 => halt
+    mov al, ASCII_EOL
+    call console_print_char
+
+    call run_command_reboot
+    jmp CALL_RUN_COMMAND_END
+    SKIP_HANDLE_BUTTON_6:
+
+
     ; check si c'est bouton #7
     cmp al, 0x07
     jne SKIP_HANDLE_BUTTON_7
 
-    ; execute l'action du bouton #5 => halt
+    ; execute l'action du bouton #7 => halt
     mov al, ASCII_EOL
     call console_print_char
 
@@ -727,18 +754,29 @@ run_command_custom:
 
 run_command_clear:
     debug 9, 8
+    call run_command_clear_console ; clear console
+    call run_command_clear_screen  ; clear screen
+    ret
+
+run_command_clear_console:
+    debug 9, 9
     call console_clear
+    ret
+
+run_command_clear_screen:
+    debug 9, 10
+    call screen_clear
     ret
 
 
 run_command_halt:
-    debug 9, 9
+    debug 9, 11
     hlt
     ret
 
 
 run_command_reboot:
-    debug 9, 10
+    debug 9, 12
     mov al, 0
     mov bl, 0
     mov cl, 0
@@ -746,7 +784,9 @@ run_command_reboot:
     mov el, 0
     mov fl, 0
     mov esp, 0
-    jmp 0x0000 ; ATTENTION BUG : apres reboot, l'OS ne se lance pas (il perd les pedales lors de l'appel "call console_clear" dans "os_v3.asm")
+
+    mov [0x4999], 1 ; DEBUG
+    jmp 0x0000 ; ATTENTION BUG : apres reboot, l'OS ne se lance pas (il perd les pedales lors de l'appel "call init_drivers" dans "os_v3.asm"). il jump à 0x202B au lieu de 0x102B
     ;ret
 
 

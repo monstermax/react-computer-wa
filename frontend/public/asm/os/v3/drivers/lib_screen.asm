@@ -25,6 +25,7 @@ section .data
 
 
 section .text
+    global screen_clear
     global screen_print_pixel
     global screen_set_pixel
 
@@ -38,6 +39,16 @@ init_device_screen:
     lea al, bl, [str_screen]
     lea cl, dl, [screen_device_idx]
     call init_device ; set and store screen_device_idx value
+    ret
+
+
+
+screen_clear:
+    mov cl, [screen_io_base]
+    mov dl, [screen_io_base + 1]
+    mov el, 3
+    call add_cd_e ; set (C:D) to SCREEN_CLEAR port
+    sti cl, dl, 1
     ret
 
 
