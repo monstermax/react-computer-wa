@@ -65,7 +65,7 @@ init_device:
     ; Check if found (C:D == 0?)
     mov el, cl
     or el, dl
-    jz .not_found
+    jz .init_devices_not_found
 
     ; ── Read device index at table entry +0 ──
     ldi fl, cl, dl          ; F = device idx
@@ -96,7 +96,7 @@ init_device:
 
     ret
 
-    .not_found:
+    .init_devices_not_found:
     pop dl
     pop cl
     ret

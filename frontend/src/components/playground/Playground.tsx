@@ -120,7 +120,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         setCyclesCount(cyclesCount_new);
 
         if (followCurrentLine) {
-            const PC = toHex(Number(registers16.PC), 4);
+            const PC = toHex(Number(registers16_new.PC), 4);
             const currentCodeMapped = codeMapping[PC]
 
             if (currentCodeMapped) {

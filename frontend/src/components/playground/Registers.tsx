@@ -41,7 +41,7 @@ export const Registers: React.FC<RegistersProps> = (props) => {
 
             <div className="grid grid-cols-2 border-t pt-1 mt-1">
                 <div>
-                    PC: {toHex(Number(registers16.PC))} ({Number(registers16.PC)})
+                    PC: {toHex(Number(registers16.PC), 4)} ({Number(registers16.PC)})
                 </div>
                 <div className="text-xs">
                     {currentCodeMapped && (
@@ -55,7 +55,7 @@ export const Registers: React.FC<RegistersProps> = (props) => {
                     )}
                 </div>
                 <div>
-                    SP: {toHex(Number(registers16.SP))} ({Number(registers16.SP)})
+                    SP: {toHex(Number(registers16.SP), 4)} ({Number(registers16.SP)})
                 </div>
                 <div>IR: {toHex(Number(registers16.IR))} ({Number(registers16.IR)})</div>
             </div>

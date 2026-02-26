@@ -288,7 +288,7 @@ export const useEmulator = (params: useEmulatorParams) => {
             setCpuHalted(false)
             //startClock()
 
-            //dumpRegisters(false)
+            dumpRegisters(!clockStatus)
 
         } catch (err: any) {
             wasmError(err);
