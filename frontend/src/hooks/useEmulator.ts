@@ -32,7 +32,7 @@ export type WasmExports = typeof releaseModule.__AdaptedExports;
 export type useEmulatorParams = {
     clockFrequency: u32;
     speedMultiplier: u32;
-    dumpRegisters: () => Promise<RegistersDump | null>
+    dumpRegisters: (followCurrentLine?: boolean) => Promise<RegistersDump | null>
     addLog: (msg: string) => void;
 }
 
@@ -286,7 +286,9 @@ export const useEmulator = (params: useEmulatorParams) => {
             wasmExports.computerResetComputer(computerPointer)
 
             setCpuHalted(false)
-            startClock()
+            //startClock()
+
+            //dumpRegisters(false)
 
         } catch (err: any) {
             wasmError(err);
@@ -393,7 +395,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         cyclesPerSecondRef.current = 0
 
         // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
-        dumpRegisters()
+        dumpRegisters(true)
 
         error.message = "[WASM ERROR] " + error.message;
         throw error;

@@ -55,7 +55,6 @@ _start:
 
     ; Affiche la liste des devices
     call display_devices
-    int3
 
     ; Allume la moitié des leds (retour visuel de bon fonctionnement)
     mov al, LEDS_STATE_HALF_2

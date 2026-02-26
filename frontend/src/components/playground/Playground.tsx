@@ -96,7 +96,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const [panelEmulatorHidden, setPanelEmulatorHidden] = useState(false);
     const [panelEditorHidden, setPanelEditorHidden] = useState(false);
 
-    const dumpRegisters = async (): Promise<RegistersDump | null> => {
+    const dumpRegisters = async (followCurrentLine=false): Promise<RegistersDump | null> => {
         if (!emulator.wasmExports || emulator.computerPointer === null) return null;
 
         const registers8_new = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
@@ -118,6 +118,16 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         setRegisters8(registers8_new);
         setRegisters16(registers16_new);
         setCyclesCount(cyclesCount_new);
+
+        if (followCurrentLine) {
+            const PC = toHex(Number(registers16.PC), 4);
+            const currentCodeMapped = codeMapping[PC]
+
+            if (currentCodeMapped) {
+                openAssemblyFileInEditor(currentCodeMapped.file, undefined, currentCodeMapped.line)
+            }
+        }
+
 
         return {
             registers8: registers8_new,
@@ -247,18 +257,21 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
     const handleResetComputer = async () => {
-        setCodeMapping({});
+        //setCodeMapping({});
 
-        // Reload OS on OS_DISK
-        if (osDiskDeviceHook.instance) {
+//        // Reload OS on OS_DISK
+//        if (osDiskDeviceHook.instance) {
 //            const diskData = await compileAndLoadOsCode();
 //            setOsDiskData(diskData);
 //
 //            osDiskDeviceHook.instance.loadRawData(new Map(diskData))
-        }
+//        }
+
+        debuggerHook.setDebugLine(null);
 
         // Reset Computer
         emulator.resetComputer()
+
     }
 
 
@@ -318,7 +331,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // Dump registers when computer is instanciated
     useEffect(() => {
-        dumpRegisters()
+        if (!emulator.computerPointer || !devicesLoaded) return
+        dumpRegisters(true)
     }, [emulator.computerPointer, osDiskData, devicesLoaded]);
 
 
@@ -375,39 +389,20 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         //const dataAfter = emulator.readDataRegisters(emulator.wasmExports, emulator.computerPointer);
         //console.log('AFTER', controlAfter, dataAfter);
 
-        dumpRegisters()
-            .then(registers => {
-                if (!registers) return;
-                const { registers16 } = registers;
-                const PC = toHex(Number(registers16.PC), 4);
-                const currentCodeMapped = codeMapping[PC]
-
-                if (currentCodeMapped) {
-                    openAssemblyFileInEditor(currentCodeMapped.file, undefined, currentCodeMapped.line)
-                }
-            })
-
+        dumpRegisters(true)
     };
 
 
     useEffect(() => {
         if (emulator.clockStatus) {
+            // When clock starts
             //assemblyEditorHook.setMarkerLine(null);
             debuggerHook.setDebugLine(null);
             return;
         }
 
-        dumpRegisters()
-            .then(registers => {
-                if (!registers) return;
-                const { registers16 } = registers;
-                const PC = toHex(Number(registers16.PC), 4);
-                const currentCodeMapped = codeMapping[PC]
-
-                if (currentCodeMapped) {
-                    openAssemblyFileInEditor(currentCodeMapped.file, undefined, currentCodeMapped.line)
-                }
-            })
+        // When clock stops
+        dumpRegisters(true)
 
     }, [emulator.clockStatus])
 
