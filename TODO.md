@@ -1,9 +1,8 @@
 
-- editor: files tabs
-- points d'arret (pour le cpu) dans l'editeur de code
-- os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
+- fix reset & reboot
+- os: gestion des io devices (recuperer ce que le bootloader a initialisé)
 - os: parser les arguments de la commande shell
-+ os: gestion des io devices (recuperer ce que le bootloader a initialisé)
+- os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
 - import/export des io disk via json et/ou raw
 - os: filesystem
@@ -14,7 +13,8 @@
 - io gamepad
 - io mouse
 - io 7-segments display
-- io network/socket/websocket
+- io network/socket => OK (nodejs)
+- io websocket
 - os: interrupts
 - os: syscall
 - os: gestionnaire du root virtual system
