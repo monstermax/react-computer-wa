@@ -53,6 +53,7 @@ section .data
     STR_COMMAND_HELP      db "help", 0
     STR_COMMAND_HALT      db "halt", 0
     STR_COMMAND_LEDS      db "leds", 0
+    STR_COMMAND_MKFS      db "mkfs", 0
     STR_COMMAND_PS        db "ps", 0
     STR_COMMAND_LS        db "ls", 0
     STR_COMMANDS_END      db 0
@@ -524,6 +525,36 @@ run_command:
     AFTER_CHECK_COMMAND_LEDS:
 
 
+
+    ; HANDLE MKFS
+
+    ; recupere un pointer vers la chaine de caractere de la commande à executer
+    lea al, bl, [shell_command_input]
+
+    ; recupere un pointer vers la chaine de caractere à comparer (parmi la liste des commandes connues)
+    lea cl, dl, [STR_COMMAND_MKFS] ; (C,D) = [STR_COMMAND_MKFS]
+
+    ; recupere la longueur de la chaine à comparer
+    push al
+    call strlen ; => A = longueur de la chaine STR_COMMAND_MKFS
+
+    ; compare les longueurs de chaines
+    cmp al, fl
+    pop al
+    jne AFTER_CHECK_COMMAND_MKFS ; si longueur de chaine differente, on passe a la commande suivante
+
+    ; compare les chaines
+    call strcmp_len
+    jne AFTER_CHECK_COMMAND_MKFS ; si chaine differente, on passe a la commande suivante
+
+    call run_command_mkfs ; run command
+    jmp RUN_COMMAND_END
+
+    AFTER_CHECK_COMMAND_MKFS:
+
+
+
+
     ; HANDLE CUSTOM
 
     ; recupere un pointer vers la chaine de caractere de la commande à executer
@@ -733,8 +764,14 @@ run_command_leds:
     ret
 
 
-run_command_custom:
+run_command_run_command_mkfs:
     debug 9, 7
+    ; TODO
+    ret
+
+
+run_command_custom:
+    debug 9, 8
     mov al, [CUSTOM_CODE_LOAD_ADDR] ; detecte si du code est présent a l'adresse CUSTOM_CODE_LOAD_ADDR
     cmp al, 0
     jnz CUSTOM_CODE_START ; si code trouvé on pouvoir l'executer
@@ -753,30 +790,30 @@ run_command_custom:
 
 
 run_command_clear:
-    debug 9, 8
+    debug 9, 9
     call run_command_clear_console ; clear console
     call run_command_clear_screen  ; clear screen
     ret
 
 run_command_clear_console:
-    debug 9, 9
+    debug 9, 10
     call console_clear
     ret
 
 run_command_clear_screen:
-    debug 9, 10
+    debug 9, 11
     call screen_clear
     ret
 
 
 run_command_halt:
-    debug 9, 11
+    debug 9, 12
     hlt
     ret
 
 
 run_command_reboot:
-    debug 9, 12
+    debug 9, 13
     mov al, 0
     mov bl, 0
     mov cl, 0
@@ -791,7 +828,7 @@ run_command_reboot:
 
 
 
-
+; direct start custom code when it is cli mode (nodejs)
 handle_cli:
     lea al, bl, [network_tcp_device_str]
     call find_device_by_name
@@ -808,7 +845,7 @@ handle_cli:
 
     debug 1, 3
 
-    call 0xa000
+    call 0xa000 ; go to custom program
 
     hlt
 
