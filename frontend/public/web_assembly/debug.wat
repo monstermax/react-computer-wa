@@ -178,10 +178,10 @@
  (global $~lib/native/ASC_RUNTIME i32 (i32.const 2))
  (global $~lib/native/ASC_SHRINK_LEVEL i32 (i32.const 0))
  (global $~argumentsLength (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 10400))
- (global $~lib/memory/__data_end i32 (i32.const 10532))
- (global $~lib/memory/__stack_pointer (mut i32) (i32.const 43300))
- (global $~lib/memory/__heap_base i32 (i32.const 43300))
+ (global $~lib/rt/__rtti_base i32 (i32.const 10784))
+ (global $~lib/memory/__data_end i32 (i32.const 10916))
+ (global $~lib/memory/__stack_pointer (mut i32) (i32.const 43684))
+ (global $~lib/memory/__heap_base i32 (i32.const 43684))
  (memory $0 1)
  (data $0 (i32.const 12) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00A\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00\00\00\00\00")
  (data $1 (i32.const 76) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00~\00l\00i\00b\00/\00r\00t\00/\00i\00t\00c\00m\00s\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
@@ -364,17 +364,24 @@
  (data $178 (i32.const 9660) "\1c\00\00\00\00\00\00\00\00\00\00\00\1d\00\00\00\08\00\00\00U\00\00\00\00\00\00\00\00\00\00\00")
  (data $179 (i32.const 9692) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00I\00o\00M\00a\00n\00a\00g\00e\00r\00 \00n\00o\00t\00 \00f\00o\00u\00n\00d\00\00\00\00\00\00\00")
  (data $180 (i32.const 9756) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00&\00\00\00T\00o\00o\00 \00m\00a\00n\00y\00 \00I\00O\00 \00d\00e\00v\00i\00c\00e\00s\00\00\00\00\00\00\00")
- (data $181 (i32.const 9820) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00<\00\00\00D\00e\00v\00i\00c\00e\00 \00s\00t\00r\00i\00n\00g\00s\00 \00m\00e\00m\00o\00r\00y\00 \00o\00v\00e\00r\00f\00l\00o\00w\00")
- (data $182 (i32.const 9900) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00D\00e\00v\00i\00c\00e\00 \00#\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $183 (i32.const 9948) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\04\00\00\00 \00\"\00\00\00\00\00\00\00\00\00")
- (data $184 (i32.const 9980) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\002\00\00\00\"\00 \00e\00n\00t\00r\00y\00 \00a\00d\00d\00e\00d\00 \00a\00t\00 \00a\00d\00d\00r\00e\00s\00s\00 \00\00\00\00\00\00\00\00\00\00\00")
- (data $185 (i32.const 10060) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00 \00(\00i\00o\00B\00a\00s\00e\00 \00=\00 \00\00\00\00\00\00\00")
- (data $186 (i32.const 10108) "<\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00$\00\00\00\c0&\00\00\00\00\00\00\f0&\00\00\00\00\00\00\10\'\00\00\00\00\00\00`\'\00\00\00\00\00\00\90\16\00\00\00\00\00\00\00\00\00\00")
- (data $187 (i32.const 10172) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00m\00a\00i\00n\00.\00a\00s\00m\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $188 (i32.const 10220) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00b\00r\00e\00a\00k\00p\00o\00i\00n\00t\00s\00:\00 \00\00\00")
- (data $189 (i32.const 10268) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
- (data $190 (i32.const 10332) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
- (data $191 (i32.const 10400) " \00\00\00 \00\00\00 \00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00d\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00 \00\00\00 \00\00\00\02A\00\00\00\00\00\00\10A\01\00\02\t\00\00\04A\00\00\00\00\00\00\00\00\00\00A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\82\00\00\00\02A\00\00")
+ (data $181 (i32.const 9820) "\\\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00H\00\00\00D\00e\00v\00i\00c\00e\00 \00s\00t\00r\00i\00n\00g\00s\00 \00m\00e\00m\00o\00r\00y\00 \00o\00v\00e\00r\00f\00l\00o\00w\00 \00(\00p\00t\00r\00=\00\00\00\00\00")
+ (data $182 (i32.const 9916) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\14\00\00\00 \00|\00 \00s\00t\00r\00l\00e\00n\00=\00\00\00\00\00\00\00\00\00")
+ (data $183 (i32.const 9964) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00)\00 \00|\00 \00S\00T\00R\00I\00N\00G\00S\00_\00E\00N\00D\00=\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $184 (i32.const 10028) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\18\00\00\00p&\00\00\00\00\00\00\d0&\00\00\00\00\00\00\00\'\00\00\00\00\00\00\00\00\00\00")
+ (data $185 (i32.const 10076) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00D\00e\00v\00i\00c\00e\00 \00#\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $186 (i32.const 10124) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\04\00\00\00 \00\"\00\00\00\00\00\00\00\00\00")
+ (data $187 (i32.const 10156) "L\00\00\00\00\00\00\00\00\00\00\00\02\00\00\002\00\00\00\"\00 \00e\00n\00t\00r\00y\00 \00a\00d\00d\00e\00d\00 \00a\00t\00 \00a\00d\00d\00r\00e\00s\00s\00 \00\00\00\00\00\00\00\00\00\00\00")
+ (data $188 (i32.const 10236) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\16\00\00\00 \00(\00i\00o\00B\00a\00s\00e\00 \00=\00 \00\00\00\00\00\00\00")
+ (data $189 (i32.const 10284) "<\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00$\00\00\00p\'\00\00\00\00\00\00\a0\'\00\00\00\00\00\00\c0\'\00\00\00\00\00\00\10(\00\00\00\00\00\00\90\16\00\00\00\00\00\00\00\00\00\00")
+ (data $190 (i32.const 10348) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1e\00\00\00R\00e\00l\00o\00a\00d\00 \00D\00e\00v\00i\00c\00e\00 \00#\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $191 (i32.const 10412) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00 \00n\00a\00m\00e\00d\00 \00\"\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $192 (i32.const 10460) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00\"\00 \00(\00t\00y\00p\00e\00 \00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $193 (i32.const 10508) ",\00\00\00\03\00\00\00\00\00\00\00\14\00\00\00\1c\00\00\00\80(\00\00\00\00\00\00\c0(\00\00\00\00\00\00\f0(\00\00\00\00\00\00\90\16\00\00")
+ (data $194 (i32.const 10556) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00m\00a\00i\00n\00.\00a\00s\00m\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $195 (i32.const 10604) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\1a\00\00\00b\00r\00e\00a\00k\00p\00o\00i\00n\00t\00s\00:\00 \00\00\00")
+ (data $196 (i32.const 10652) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00*\00\00\00O\00b\00j\00e\00c\00t\00 \00a\00l\00r\00e\00a\00d\00y\00 \00p\00i\00n\00n\00e\00d\00\00\00")
+ (data $197 (i32.const 10716) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00O\00b\00j\00e\00c\00t\00 \00i\00s\00 \00n\00o\00t\00 \00p\00i\00n\00n\00e\00d\00\00\00\00\00")
+ (data $198 (i32.const 10784) " \00\00\00 \00\00\00 \00\00\00 \00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00d\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\02A\00\00\00\00\00\00 \00\00\00 \00\00\00\02A\00\00\00\00\00\00\10A\01\00\02\t\00\00\04A\00\00\00\00\00\00\00\00\00\00A\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00 \00\00\00\00\00\00\00\82\00\00\00\02A\00\00")
  (table $0 86 86 funcref)
  (elem $0 (i32.const 1) $src/Memory/Memory#read $src/Cpu/fetchInstructionActions~anonymous|0 $src/Cpu/fetchInstructionActions~anonymous|1 $src/Cpu/fetchInstructionActions~anonymous|2 $src/Cpu/fetchInstructionActions~anonymous|3 $src/Cpu/fetchInstructionActions~anonymous|4 $src/Cpu/fetchInstructionActions~anonymous|5 $src/Cpu/fetchInstructionActions~anonymous|6 $src/Cpu/fetchInstructionActions~anonymous|7 $src/Cpu/fetchInstructionActions~anonymous|8 $src/Cpu/fetchInstructionActions~anonymous|9 $src/Cpu/fetchInstructionActions~anonymous|10 $src/Cpu/fetchInstructionActions~anonymous|11 $src/Cpu/fetchInstructionActions~anonymous|12 $src/Cpu/fetchInstructionActions~anonymous|13 $src/Cpu/fetchInstructionActions~anonymous|14 $src/Cpu/fetchInstructionActions~anonymous|15 $src/Cpu/fetchInstructionActions~anonymous|16 $src/Cpu/fetchInstructionActions~anonymous|17 $src/Cpu/fetchInstructionActions~anonymous|18 $src/Cpu/fetchInstructionActions~anonymous|19 $src/Cpu/fetchInstructionActions~anonymous|20 $src/Cpu/fetchInstructionActions~anonymous|21 $src/Cpu/fetchInstructionActions~anonymous|22 $src/Cpu/fetchInstructionActions~anonymous|23 $src/Cpu/fetchInstructionActions~anonymous|24 $src/Cpu/fetchInstructionActions~anonymous|25 $src/Cpu/fetchInstructionActions~anonymous|26 $src/Cpu/fetchInstructionActions~anonymous|27 $src/Cpu/fetchInstructionActions~anonymous|28 $src/Cpu/fetchInstructionActions~anonymous|29 $src/Cpu/fetchInstructionActions~anonymous|30 $src/Cpu/fetchInstructionActions~anonymous|31 $src/Cpu/fetchInstructionActions~anonymous|32 $src/Cpu/fetchInstructionActions~anonymous|33 $src/Cpu/fetchInstructionActions~anonymous|34 $src/Cpu/fetchInstructionActions~anonymous|35 $src/Cpu/fetchInstructionActions~anonymous|36 $src/Cpu/fetchInstructionActions~anonymous|37 $src/Cpu/fetchInstructionActions~anonymous|38 $src/Cpu/fetchInstructionActions~anonymous|39 $src/Cpu/fetchInstructionActions~anonymous|40 $src/Cpu/fetchInstructionActions~anonymous|41 $src/Cpu/fetchInstructionActions~anonymous|42 $src/Cpu/fetchInstructionActions~anonymous|43 $src/Cpu/fetchInstructionActions~anonymous|44 $src/Cpu/fetchInstructionActions~anonymous|45 $src/Cpu/fetchInstructionActions~anonymous|46 $src/Cpu/fetchInstructionActions~anonymous|47 $src/Cpu/fetchInstructionActions~anonymous|48 $src/Cpu/fetchInstructionActions~anonymous|49 $src/Cpu/fetchInstructionActions~anonymous|50 $src/Cpu/fetchInstructionActions~anonymous|51 $src/Cpu/fetchInstructionActions~anonymous|52 $src/Cpu/fetchInstructionActions~anonymous|53 $src/Cpu/fetchInstructionActions~anonymous|54 $src/Cpu/fetchInstructionActions~anonymous|55 $src/Cpu/fetchInstructionActions~anonymous|56 $src/Cpu/fetchInstructionActions~anonymous|57 $src/Cpu/fetchInstructionActions~anonymous|58 $src/Cpu/fetchInstructionActions~anonymous|59 $src/Cpu/fetchInstructionActions~anonymous|60 $src/Cpu/fetchInstructionActions~anonymous|61 $src/Cpu/fetchInstructionActions~anonymous|62 $src/Cpu/fetchInstructionActions~anonymous|63 $src/Cpu/fetchInstructionActions~anonymous|64 $src/Cpu/fetchInstructionActions~anonymous|65 $src/Cpu/fetchInstructionActions~anonymous|66 $src/Cpu/fetchInstructionActions~anonymous|67 $src/Cpu/fetchInstructionActions~anonymous|68 $src/Cpu/fetchInstructionActions~anonymous|69 $src/Cpu/fetchInstructionActions~anonymous|70 $src/Cpu/fetchInstructionActions~anonymous|71 $src/Cpu/fetchInstructionActions~anonymous|72 $src/Cpu/fetchInstructionActions~anonymous|73 $src/Cpu/fetchInstructionActions~anonymous|74 $src/Cpu/fetchInstructionActions~anonymous|75 $src/Cpu/fetchInstructionActions~anonymous|76 $src/Cpu/fetchInstructionActions~anonymous|77 $src/Cpu/fetchInstructionActions~anonymous|78 $src/Cpu/fetchInstructionActions~anonymous|79 $src/Cpu/fetchInstructionActions~anonymous|80 $src/Cpu/fetchInstructionActions~anonymous|81 $src/Cpu/fetchInstructionActions~anonymous|82 $src/Memory/MemoryBus#read)
  (export "instanciateComputer" (func $src/index/instanciateComputer))
@@ -4262,8 +4269,17 @@
   local.get $this
   i32.load offset=4
  )
- (func $src/IoManager/IoManager#reloadDevices (param $this i32)
-  return
+ (func $src/IoManager/IoDevice#get:idx (param $this i32) (result i32)
+  local.get $this
+  i32.load8_u
+ )
+ (func $src/IoManager/IoDevice#get:name (param $this i32) (result i32)
+  local.get $this
+  i32.load offset=4
+ )
+ (func $src/IoManager/IoDevice#get:typeId (param $this i32) (result i32)
+  local.get $this
+  i32.load8_u offset=8
  )
  (func $~lib/array/Array<u16>#get:length_ (param $this i32) (result i32)
   local.get $this
@@ -4344,7 +4360,7 @@
    i32.const 3
    i32.eq
    if
-    i32.const 10288
+    i32.const 10672
     i32.const 96
     i32.const 338
     i32.const 7
@@ -4377,7 +4393,7 @@
   i32.const 3
   i32.ne
   if
-   i32.const 10352
+   i32.const 10736
    i32.const 96
    i32.const 352
    i32.const 5
@@ -4462,10 +4478,10 @@
   i32.const 32
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 10288
+  i32.const 10672
   local.get $0
   call $~lib/rt/itcms/__visit
-  i32.const 10352
+  i32.const 10736
   local.get $0
   call $~lib/rt/itcms/__visit
   i32.const 1440
@@ -5024,8 +5040,8 @@
   global.get $~lib/memory/__data_end
   i32.lt_s
   if
-   i32.const 43328
-   i32.const 43376
+   i32.const 43712
+   i32.const 43760
    i32.const 1
    i32.const 1
    call $~lib/builtins/abort
@@ -5842,7 +5858,7 @@
   if
    i32.const 640
    i32.const 752
-   i32.const 136
+   i32.const 135
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -7227,7 +7243,7 @@
    local.get $9
    call $~lib/string/String#concat
    i32.const 752
-   i32.const 169
+   i32.const 168
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -8025,7 +8041,7 @@
    local.get $8
    call $~lib/string/String#concat
    i32.const 752
-   i32.const 148
+   i32.const 147
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -26937,33 +26953,37 @@
  )
  (func $src/IoManager/IoManager#writeString (param $this i32) (param $str i32) (result i32)
   (local $ptr i32)
-  (local $i i32)
+  (local $3 i32)
   (local $4 i32)
+  (local $5 i32)
+  (local $i i32)
+  (local $7 i32)
   global.get $~lib/memory/__stack_pointer
-  i32.const 8
+  i32.const 20
   i32.sub
   global.set $~lib/memory/__stack_pointer
   call $~stack_check
   global.get $~lib/memory/__stack_pointer
-  i64.const 0
-  i64.store
+  i32.const 0
+  i32.const 20
+  memory.fill
   local.get $this
-  local.set $4
+  local.set $7
   global.get $~lib/memory/__stack_pointer
-  local.get $4
+  local.get $7
   i32.store
-  local.get $4
+  local.get $7
   call $src/IoManager/IoManager#get:stringCursor
   local.set $ptr
   local.get $ptr
   i32.const 65535
   i32.and
   local.get $str
-  local.set $4
+  local.set $7
   global.get $~lib/memory/__stack_pointer
-  local.get $4
+  local.get $7
   i32.store
-  local.get $4
+  local.get $7
   call $~lib/string/String#get:length
   i32.add
   i32.const 1
@@ -26973,9 +26993,82 @@
   global.get $src/memory_map/MEMORY_MAP.DEVICE_STRINGS_END
   i32.gt_u
   if
-   i32.const 9840
+   global.get $~lib/memory/__stack_pointer
+   local.get $ptr
+   i32.const 10
+   call $~lib/number/U16#toString
+   local.tee $3
+   i32.store offset=4
+   global.get $~lib/memory/__stack_pointer
+   local.get $str
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store
+   local.get $7
+   call $~lib/string/String#get:length
+   i32.const 10
+   call $~lib/number/I32#toString
+   local.tee $4
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   global.get $src/memory_map/MEMORY_MAP.DEVICE_STRINGS_END
+   i32.const 10
+   call $~lib/number/U16#toString
+   local.tee $5
+   i32.store offset=12
+   i32.const 10048
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store
+   local.get $7
+   i32.const 1
+   local.get $3
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store offset=16
+   local.get $7
+   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
+   i32.const 10048
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store
+   local.get $7
+   i32.const 3
+   local.get $4
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store offset=16
+   local.get $7
+   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
+   i32.const 10048
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store
+   local.get $7
+   i32.const 5
+   local.get $5
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store offset=16
+   local.get $7
+   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
+   i32.const 10048
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store
+   local.get $7
+   i32.const 2672
+   call $~lib/staticarray/StaticArray<~lib/string/String>#join
    i32.const 752
-   i32.const 115
+   i32.const 114
    i32.const 13
    call $~lib/builtins/abort
    unreachable
@@ -26985,48 +27078,48 @@
   loop $for-loop|0
    local.get $i
    local.get $str
-   local.set $4
+   local.set $7
    global.get $~lib/memory/__stack_pointer
-   local.get $4
+   local.get $7
    i32.store
-   local.get $4
+   local.get $7
    call $~lib/string/String#get:length
    i32.lt_s
    if
     local.get $this
-    local.set $4
+    local.set $7
     global.get $~lib/memory/__stack_pointer
-    local.get $4
+    local.get $7
     i32.store
-    local.get $4
+    local.get $7
     local.get $this
-    local.set $4
+    local.set $7
     global.get $~lib/memory/__stack_pointer
-    local.get $4
-    i32.store offset=4
-    local.get $4
+    local.get $7
+    i32.store offset=16
+    local.get $7
     call $src/IoManager/IoManager#get:stringCursor
     local.get $str
-    local.set $4
+    local.set $7
     global.get $~lib/memory/__stack_pointer
-    local.get $4
-    i32.store offset=4
-    local.get $4
+    local.get $7
+    i32.store offset=16
+    local.get $7
     local.get $i
     call $~lib/string/String#charCodeAt
     call $src/IoManager/IoManager#writeRam
     local.get $this
-    local.set $4
+    local.set $7
     global.get $~lib/memory/__stack_pointer
-    local.get $4
+    local.get $7
     i32.store
-    local.get $4
+    local.get $7
     local.get $this
-    local.set $4
+    local.set $7
     global.get $~lib/memory/__stack_pointer
-    local.get $4
-    i32.store offset=4
-    local.get $4
+    local.get $7
+    i32.store offset=16
+    local.get $7
     call $src/IoManager/IoManager#get:stringCursor
     i32.const 1
     i32.add
@@ -27039,43 +27132,43 @@
    end
   end
   local.get $this
-  local.set $4
+  local.set $7
   global.get $~lib/memory/__stack_pointer
-  local.get $4
+  local.get $7
   i32.store
-  local.get $4
+  local.get $7
   local.get $this
-  local.set $4
+  local.set $7
   global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
+  local.get $7
+  i32.store offset=16
+  local.get $7
   call $src/IoManager/IoManager#get:stringCursor
   i32.const 0
   call $src/IoManager/IoManager#writeRam
   local.get $this
-  local.set $4
+  local.set $7
   global.get $~lib/memory/__stack_pointer
-  local.get $4
+  local.get $7
   i32.store
-  local.get $4
+  local.get $7
   local.get $this
-  local.set $4
+  local.set $7
   global.get $~lib/memory/__stack_pointer
-  local.get $4
-  i32.store offset=4
-  local.get $4
+  local.get $7
+  i32.store offset=16
+  local.get $7
   call $src/IoManager/IoManager#get:stringCursor
   i32.const 1
   i32.add
   call $src/IoManager/IoManager#set:stringCursor
   local.get $ptr
-  local.set $4
+  local.set $7
   global.get $~lib/memory/__stack_pointer
-  i32.const 8
+  i32.const 20
   i32.add
   global.set $~lib/memory/__stack_pointer
-  local.get $4
+  local.get $7
   return
  )
  (func $src/IoManager/IoManager#writeDeviceTableEntry (param $this i32) (param $deviceIdx i32) (param $name i32) (param $typeId i32)
@@ -27255,7 +27348,7 @@
   call $src/lib/lib_numbers/toHex
   local.tee $12
   i32.store offset=20
-  i32.const 10128
+  i32.const 10304
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27269,7 +27362,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10128
+  i32.const 10304
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27283,7 +27376,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10128
+  i32.const 10304
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27297,7 +27390,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10128
+  i32.const 10304
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27311,7 +27404,7 @@
   i32.store offset=24
   local.get $13
   call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-  i32.const 10128
+  i32.const 10304
   local.set $13
   global.get $~lib/memory/__stack_pointer
   local.get $13
@@ -27727,6 +27820,204 @@
   i32.add
   global.set $~lib/memory/__stack_pointer
  )
+ (func $src/IoManager/IoManager#reloadDevices (param $this i32)
+  (local $i i32)
+  (local $device i32)
+  (local $3 i32)
+  (local $4 i32)
+  (local $5 i32)
+  (local $6 i32)
+  global.get $~lib/memory/__stack_pointer
+  i32.const 28
+  i32.sub
+  global.set $~lib/memory/__stack_pointer
+  call $~stack_check
+  global.get $~lib/memory/__stack_pointer
+  i32.const 0
+  i32.const 28
+  memory.fill
+  local.get $this
+  local.set $6
+  global.get $~lib/memory/__stack_pointer
+  local.get $6
+  i32.store
+  local.get $6
+  global.get $src/memory_map/MEMORY_MAP.DEVICE_STRINGS_START
+  call $src/IoManager/IoManager#set:stringCursor
+  i32.const 0
+  local.set $i
+  loop $for-loop|0
+   local.get $i
+   local.get $this
+   local.set $6
+   global.get $~lib/memory/__stack_pointer
+   local.get $6
+   i32.store offset=4
+   local.get $6
+   call $src/IoManager/IoManager#get:devices
+   local.set $6
+   global.get $~lib/memory/__stack_pointer
+   local.get $6
+   i32.store
+   local.get $6
+   call $~lib/array/Array<src/IoManager/IoDevice>#get:length
+   i32.lt_s
+   if
+    global.get $~lib/memory/__stack_pointer
+    local.get $this
+    local.set $6
+    global.get $~lib/memory/__stack_pointer
+    local.get $6
+    i32.store offset=4
+    local.get $6
+    call $src/IoManager/IoManager#get:devices
+    local.set $6
+    global.get $~lib/memory/__stack_pointer
+    local.get $6
+    i32.store
+    local.get $6
+    local.get $i
+    call $~lib/array/Array<src/IoManager/IoDevice>#__get
+    local.tee $device
+    i32.store offset=8
+    local.get $device
+    if
+     global.get $~lib/memory/__stack_pointer
+     local.get $device
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     call $src/IoManager/IoDevice#get:idx
+     i32.const 10
+     call $~lib/number/U8#toString
+     local.tee $3
+     i32.store offset=12
+     global.get $~lib/memory/__stack_pointer
+     local.get $device
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     call $src/IoManager/IoDevice#get:name
+     local.tee $4
+     i32.store offset=16
+     global.get $~lib/memory/__stack_pointer
+     local.get $device
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     call $src/IoManager/IoDevice#get:typeId
+     i32.const 10
+     call $~lib/number/U8#toString
+     local.tee $5
+     i32.store offset=20
+     i32.const 10528
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     i32.const 1
+     local.get $3
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=24
+     local.get $6
+     call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
+     i32.const 10528
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     i32.const 3
+     local.get $4
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=24
+     local.get $6
+     call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
+     i32.const 10528
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     i32.const 5
+     local.get $5
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=24
+     local.get $6
+     call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
+     i32.const 10528
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     i32.const 2672
+     call $~lib/staticarray/StaticArray<~lib/string/String>#join
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store
+     local.get $6
+     call $src/external_functions/console.log
+     local.get $this
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store
+     local.get $6
+     local.get $device
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=24
+     local.get $6
+     call $src/IoManager/IoDevice#get:idx
+     local.get $device
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=24
+     local.get $6
+     call $src/IoManager/IoDevice#get:name
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=4
+     local.get $6
+     local.get $device
+     local.set $6
+     global.get $~lib/memory/__stack_pointer
+     local.get $6
+     i32.store offset=24
+     local.get $6
+     call $src/IoManager/IoDevice#get:typeId
+     call $src/IoManager/IoManager#writeDeviceTableEntry
+    end
+    local.get $i
+    i32.const 1
+    i32.add
+    local.set $i
+    br $for-loop|0
+   end
+  end
+  global.get $~lib/memory/__stack_pointer
+  i32.const 28
+  i32.add
+  global.set $~lib/memory/__stack_pointer
+ )
  (func $src/index/computerResetComputer (param $computer i32)
   (local $ram i32)
   (local $ioManager i32)
@@ -28028,7 +28319,7 @@
   local.get $4
   i32.store offset=4
   local.get $4
-  i32.const 10192
+  i32.const 10576
   call $src/Computer/Breakpoint#set:file
   local.get $this
   local.set $4
@@ -28661,7 +28952,7 @@
     br $for-loop|0
    end
   end
-  i32.const 10240
+  i32.const 10624
   local.get $this
   local.set $9
   global.get $~lib/memory/__stack_pointer

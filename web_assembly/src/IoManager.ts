@@ -64,14 +64,13 @@ export class IoManager {
     // Reload devices in RAM
     public reloadDevices(): void {
 
-        return
-
-        // TODO: debug => Device strings memory overflow
+        this.stringCursor = MEMORY_MAP.DEVICE_STRINGS_START;
 
         for (let i=0; i<this.devices.length; i++) {
             const device = this.devices[i];
 
             if (device) {
+                console.log(`Reload Device #${device.idx} named "${device.name}" (type ${device.typeId})`)
                 this.writeDeviceTableEntry(device.idx, device.name, device.typeId);
             }
         }
@@ -112,7 +111,7 @@ export class IoManager {
         const ptr = this.stringCursor;
 
         if (ptr + str.length + 1 as u16 > MEMORY_MAP.DEVICE_STRINGS_END) {
-            throw new Error(`Device strings memory overflow`);
+            throw new Error(`Device strings memory overflow (ptr=${ptr} | strlen=${str.length}) | STRINGS_END=${MEMORY_MAP.DEVICE_STRINGS_END}`);
         }
 
         // Write each character

@@ -11,30 +11,31 @@
 
 section .data
     ; Bootloader config
-    BOOTLOADER_VERSION  equ 2
-    SKIP_PRINT_DEVICES  equ 0x00
-    SKIP_PRINT_INFO     equ 0x00
-    SKIP_PRINT_GITHUB   equ 0x00
-    SKIP_PRINT_WAITING  equ 0x00
-    SKIP_PRINT_RUN      equ 0x00
+    BOOTLOADER_VERSION   equ 2
+    SKIP_PRINT_DEVICES   equ 0x00
+    SKIP_PRINT_INFO      equ 0x00
+    SKIP_PRINT_GITHUB    equ 0x00
+    SKIP_PRINT_WAITING   equ 0x00
+    SKIP_PRINT_RUN       equ 0x00
 
     ; LEDs states
-    LEDS_STATE_HALF_1   equ 0x55
-    LEDS_STATE_HALF_2   equ 0xAA
+    LEDS_STATE_HALF_1    equ 0x55
+    LEDS_STATE_HALF_2    equ 0xAA
 
     ; Emplacements memoire (voir MEMORY_MAP)
-    OS_START            equ 0x1000
-    STACK_END           equ 0xEFFF
+    OS_START             equ 0x1000
+    STACK_END            equ 0xEFFF
 
     ; Strings
-    ASCII_LF            equ 0x0D
-    ASCII_SPACE         equ 0x20
-    ASCII_MINUS         equ 0x2D
-    STR_WELCOME_LINE_1  db "BOOTLOADER OK", 13, 0
-    STR_GITHUB_LINK     db "GITHUB.COM/MONSTERMAX", 13, 0
-    STR_WAITING_OS      db "WAITING FOR OS...", 13, 0
-    STR_OS_FOUND        db "OS FOUND ON DEVICE #", 0
-    STR_DEVICES_COUNT   db " devices found", 13, 0
+    ASCII_LF             equ 0x0D
+    ASCII_SPACE          equ 0x20
+    ASCII_MINUS          equ 0x2D
+    STR_WELCOME_LINE_1   db "BOOTLOADER OK", 13, 0
+    STR_GITHUB_LINK      db "GITHUB.COM/MONSTERMAX", 13, 0
+    STR_WAITING_OS       db "WAITING FOR OS...", 13, 0
+    STR_OS_FOUND         db "OS FOUND ON DEVICE #", 0
+    STR_DEVICES_COUNT    db " devices found", 13, 0
+    STR_NO_DEVICES_FOUND db "No devices found /!\ ", 13, 13, 0
 
 
 
@@ -54,6 +55,7 @@ _start:
 
     ; Affiche la liste des devices
     call display_devices
+    int3
 
     ; Allume la moitié des leds (retour visuel de bon fonctionnement)
     mov al, LEDS_STATE_HALF_2
@@ -186,7 +188,7 @@ run_os:
     mov esp, STACK_END
 
     ; Saute à l'adresse de l'OS
-;int3
+    ;int3
     jmp OS_START
 
     hlt ; Jamais atteint
@@ -272,12 +274,20 @@ load_os_in_ram:
 display_devices:
     mov al, SKIP_PRINT_DEVICES ; verifier si on skip ce print
     cmp al, 1
-    je DISPLAY_DEVICES_END ; skip display_devices
+    je DISPLAY_DEVICES_END
 
 
-    mov el, [DEVICE_TABLE_COUNT]
+    mov el, [DEVICE_TABLE_COUNT] ; lit de nombre de devices
     cmp el, 0
-    je DISPLAY_DEVICES_END ; aucune device presente
+    jne DISPLAY_DEVICES_START
+
+    ; aucune device presente
+    lea cl, dl, [STR_NO_DEVICES_FOUND]
+    call console_print_string
+    jmp DISPLAY_DEVICES_END ; skip display_devices
+
+
+    DISPLAY_DEVICES_START:
 
     ; TODO: verifier que le device console existe (pour la sortie). sinon quitter ou halt
 
