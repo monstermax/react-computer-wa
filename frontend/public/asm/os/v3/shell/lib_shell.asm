@@ -34,7 +34,7 @@ section .data
                           db " - sprite (3) : Screen sprite demo", 13
                           db " - leds (4) : Toggle LEDs", 13
                           db " - clear (5) : Clear Console & Screen", 13
-                          db " - reboot (6) : Reboot the computer ( /!\ buggy )", 13
+                          db " - reboot (6) : Reboot the computer", 13
                           db " - halt (7) : Halt the computer", 13
                           db " - ls : Display files list (Not yet available)", 13
                           db " - ps : Display processes list (Not yet available)", 13
