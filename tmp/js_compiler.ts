@@ -55,6 +55,9 @@ class JsToAsmCompiler {
             sourceType: 'module'
         }) as Program
 
+        console.log('ast:', JSON.stringify(ast));
+        process.exit()
+
         this.traverse(ast)
         return this.asmAst
     }
@@ -262,7 +265,7 @@ function formatNumber(num: number): string {
 
 // Utilisation
 
-if (false) {
+if (true) {
     // Compile JS to AST
     const compiler = new JsToAsmCompiler()
 
@@ -270,6 +273,14 @@ if (false) {
         let x = 43
         let y = x + 10
         y++
+
+        function func1(a) {
+            return a + 4;
+        }
+
+        const z = func1(y)
+
+        console.log("z = " + z.toString())
     `);
 
     console.log('asmAst:', asmAst.data)
@@ -284,7 +295,7 @@ if (false) {
 
 
 
-if (true) {
+if (false) {
     // Precompiled AST tokens
     const asmAst: AsmAst = {
         data: [
