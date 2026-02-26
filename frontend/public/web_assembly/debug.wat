@@ -25770,6 +25770,17 @@
        i32.store
        local.get $9
        call $src/Cpu/Cpu#get:isOnBreakpoint
+       if (result i32)
+        i32.const 1
+       else
+        local.get $cpu|8
+        local.set $9
+        global.get $~lib/memory/__stack_pointer
+        local.get $9
+        i32.store
+        local.get $9
+        call $src/Cpu/Cpu#get:halted
+       end
        if
         i32.const 0
         local.set $canContinue

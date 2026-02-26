@@ -1,6 +1,6 @@
 {
-  "generated": "2026-02-25T22:04:10.216Z",
-  "count": 43,
+  "generated": "2026-02-25T23:16:12.960Z",
+  "count": 45,
   "files": [
     "bootloader/lib_devices.asm",
     "bootloader/lib_string.asm",
@@ -12,11 +12,13 @@
     "user/examples/tower_of_hanoi.asm",
     "user/examples/draw_fractal_on_screen_hd.asm",
     "user/examples/sokoban_game.asm",
+    "user/examples/network_tcp_client_test.asm",
     "user/examples/snake_game.asm",
     "user/examples/color_sort.asm",
     "user/examples/trex_game.asm",
     "user/examples/game_of_life.asm",
     "user/examples/draw_fractal_on_screen.asm",
+    "user/examples/network_tcp_server_test.asm",
     "user/tests/audio_test_lune.asm",
     "user/tests/audio_test_monkey.asm",
     "user/tests/rng_test.asm",

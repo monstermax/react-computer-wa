@@ -68,7 +68,7 @@ export function computerRunCycles(computer: Computer, cycles: u32, skipBreakpoin
 
                 if (!cpu) throw new Error(`Missing CPU #${i}`);
 
-                if (cpu.isOnBreakpoint) {
+                if (cpu.isOnBreakpoint || cpu.halted) {
                     canContinue = false;
 
                 } else {

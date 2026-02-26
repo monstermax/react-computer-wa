@@ -34,7 +34,7 @@ async function main() {
     let cyclesCount = 0 as number;
 
     let clockFrequency = 1 as u32;
-    let speedMultiplier = 100 as u32;
+    let speedMultiplier = 1000 as u32;
     let osDiskData = null as [u16, u8][] | null;
 
     let codeMapping: any = {};
@@ -136,6 +136,42 @@ async function main() {
             codeMapping = { ...codeMapping, ...newCodeMapping };
         }
 
+
+        if (true) {
+            // Load Program
+
+            //const programName = "network_tcp_client_test";
+            const programName = "network_tcp_server_test";
+
+            const compiled = JSON.parse(fs.readFileSync(`${__dirname}/../compiled/${programName}.bin.json`).toString()) as CompiledProgram;
+
+            //const newCodeMapping = getAssemblyCodeMapping(compiled);
+            //updateCodeMapping(newCodeMapping)
+
+            const byteCodeMap: MapIterator<[u16, u8]> = getBytecodeArray(compiled).entries();
+            const byteCodeArr = Array.from(byteCodeMap);
+            const data = byteCodeArr ?? [];
+
+            //osDiskData = data;
+
+            const addr = 0xA000 as u16;
+
+            if (isNaN(addr) || addr < 0 || addr > 0xFFFF) {
+                throw new Error('Invalid load address');
+            }
+
+            // Write each byte to emulator RAM at the correct address
+            for (const [offset, value] of data) {
+                emulator.writeRam(addr + offset as u16, value as u8);
+            }
+
+
+            const newCodeMapping = getAssemblyCodeMapping(compiled);
+            codeMapping = { ...codeMapping, ...newCodeMapping };
+        }
+
+
+
         //const keyboardDeviceHook = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
         //const consoleDeviceHook = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
         //const screenDeviceHook = useDevice<ScreenDevice>(emulator.devicesManager, 'screen', ScreenDevice, {});
@@ -185,7 +221,7 @@ async function main() {
         for (let i=0; i<50_000; i++) {
             try {
                 const canContinue = emulator.runCycles(speedMultiplier);
-                //if (!canContinue) error = true;
+                if (!canContinue) error = true;
 
             } catch (err: any) {
                 error = err;
@@ -194,6 +230,10 @@ async function main() {
             showState()
 
             if (error) {
+                process.exit();
+            }
+
+            if (emulator.cpuHalted) {
                 process.exit();
             }
 

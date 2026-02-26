@@ -63,6 +63,11 @@ section .data
     CUSTOM_CODE_LOAD_ADDR equ 0xA000
     ASCII_EOL             equ 13
 
+    network_tcp_device_str db "network_tcp"
+    network_tcp_device_idx db 0x00       ; must be followed by network_tcp_device_io_base. will be auto filled
+    network_tcp_device_io_base dw 0x0000 ; must be placed just after network_tcp_device_idx. will be auto filled
+
+
 
 section .bss
     shell_command_input  resb 128 ; 128 bits pour stocker la commande en cours (la taille doit correspondre à SHELL_COMMAND_MAX_LEN)
@@ -87,6 +92,10 @@ run_shell:
     ; Affiche le prompt:
     lea cl, dl, [STR_CONSOLE_PROMPT]
     call console_print_string
+
+
+    ; cas particulier pour l'emulateur en mode NodeJS (et non Browser+React)
+    call handle_cli
 
 
     ; Boucle d'ecoute de touches clavier
@@ -738,3 +747,28 @@ run_command_reboot:
     jmp 0x0000 ; ATTENTION BUG : apres reboot, l'OS ne se lance pas (il perd les pedales lors de l'appel "call console_clear" dans "os_v3.asm")
     ;ret
 
+
+
+
+handle_cli:
+    lea al, bl, [network_tcp_device_str]
+    call find_device_by_name
+
+    cmp cl, 0
+    jne handle_cli_apply ; device network_tcp found
+
+    cmp dl, 0
+    jne handle_cli_apply ; device network_tcp found
+
+    jmp handle_cli_end ; device network_tcp not found
+
+    handle_cli_apply:
+
+    debug 1, 3
+
+    call 0xa000
+
+    hlt
+
+    handle_cli_end:
+    ret
