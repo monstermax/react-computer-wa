@@ -240,3 +240,32 @@ Public cible :
 * gens intéressés par l’EVM
 * gens qui veulent comprendre ce qu’il y a sous WASM
 
+
+---
+
+j'aimerais une video remotion ( react-computer-videos/video_builder/ ) d'environ 1 à 2 minutes.
+voici le script de la video (ci-dessous)
+
+je voudrais que la video affiche des animations/sequences des concepts dont je parle.
+1 sequence par concept/paragraphe
+
+c'est un format court, on se doit de vulgariser au maximum et ne pas afficher de complexité inutile dans les animations.
+
+---
+
+
+Un CPU, c'est quoi ?
+
+Imagine que t'as six petites boîtes : A, B, C, D, E, F. On appelle ça des registres. Chacune peut stocker un nombre entre 0 et 255.
+
+Pour manipuler ces boîtes, on utilise des instructions. Par exemple, "mov al, el" ça veut dire : prends le contenu de la boîte E et copie-le dans la boîte A.
+
+Mais avec seulement six boîtes, on va pas loin. Pour stocker plus de trucs, le CPU peut dialoguer avec la RAM. Il peut écrire dedans, ou lire ce qu'elle contient.
+
+Maintenant qu'on peut déplacer des données, on veut aussi les transformer. C'est le boulot de l'ALU, l'unité de calcul du CPU. Avec des instructions comme "add", "sub", "and", "or", on peut additionner, soustraire, comparer des valeurs.
+
+Là, on a un CPU qui calcule, mais tout seul dans son coin, il sert à rien.
+
+Ce qui le rend utile, c'est les périphériques : écran, clavier, réseau... Grâce à son jeu d'instructions, le CPU peut les piloter. Et c'est là que la magie opère.
+
+
