@@ -15,6 +15,7 @@ section .data
 
 
 section .text
+    global init_device_keyboard
     global get_keyboard_status
     global get_keyboard_char
     global set_keyboard_status

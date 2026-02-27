@@ -25,6 +25,7 @@ section .data
 
 
 section .text
+    global init_device_screenhd
     global screenhd_print_pixel
     global screenhd_set_pixel
 

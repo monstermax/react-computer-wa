@@ -17,6 +17,7 @@ section .data
 
 
 section .text
+    global init_device_leds
     global leds_get_value
     global leds_set_value
     global leds_set_all

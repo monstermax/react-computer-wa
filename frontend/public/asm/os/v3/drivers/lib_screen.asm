@@ -25,6 +25,7 @@ section .data
 
 
 section .text
+    global init_device_screen
     global screen_clear
     global screen_print_pixel
     global screen_set_pixel
