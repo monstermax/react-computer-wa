@@ -1,12 +1,10 @@
 
 
-.include "os/v3/drivers/lib_screen.asm"
 
 .org 0xA000
 
-
 section .data
-    ; screen_io_base  dw 0xF0D0
+    screen_io_base  dw 0xF0D0
 
 
 section .text
@@ -14,8 +12,6 @@ section .text
 
 
 _start:
-    call init_device_screen
-
     ; Example: XOR fractal on screen
     mov el, 0
 

@@ -1,8 +1,5 @@
 
 
-.include "os/v3/drivers/lib_screen_hd.asm"
-
-
 .org 0xA000
 
 section .data
@@ -14,8 +11,6 @@ section .text
 
 
 _start:
-    call init_device_screenhd
-
     ; Example: XOR fractal on screen
     mov el, 0
 
