@@ -15,6 +15,11 @@ section .text
     global strlen
     global strcmp
     global strcmp_len
+    global int_to_str
+    global str_to_int
+
+
+; TODO: strlower & strupper
 
 
 _exit:
@@ -46,10 +51,6 @@ strlen:
     pop dl
     pop cl
     ret
-
-
-
-; TODO: strlower & strupper & int_to_str & str_to_int
 
 
 ; -----------------------------------------------
