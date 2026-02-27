@@ -1,4 +1,8 @@
 
+
+
+.org 0xA000
+
 section .data
     screen_io_base  dw 0xF0D0
 

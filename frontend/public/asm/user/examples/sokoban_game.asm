@@ -13,6 +13,7 @@
 ; - Turn-based (no timer dependency)
 ; - Full redraw only after valid moves
 
+.org 0xA000
 
 .include "os/v3/drivers/lib_screen.asm"
 .include "os/v3/drivers/lib_keyboard.asm"

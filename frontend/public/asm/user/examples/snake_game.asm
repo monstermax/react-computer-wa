@@ -6,6 +6,7 @@
 ; Contrôles : Z=Haut, S=Bas, Q=Gauche, D=Droite
 ; Serpent limité à 16 segments max (simplicité)
 
+.org 0xA000
 
 ; NOT FONCTIONNAL
 

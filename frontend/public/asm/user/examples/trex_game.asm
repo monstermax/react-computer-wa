@@ -11,6 +11,7 @@
 ; Obstacles : cactus 8x16
 ; Sol : ligne en bas de l'écran
 
+.org 0xA000
 
 ; NOT FONCTIONNAL
 

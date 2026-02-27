@@ -515,6 +515,36 @@ export class CompilerV2 {
         const directive = this.normalize(directiveToken.value);
         const lastInstructionOrIdentifierPos: number | null = this.pos;
 
+
+        // .ORG: Set origin address (.org directive)
+        if (directive === '.ORG') {
+            this.advance();
+
+            if (this.peek().type !== 'NUMBER') {
+                throw new Error("Unknown case : .org ...")
+            }
+
+            const addressHex = this.peek().value;
+            this.currentAddress = this.parseNumber(addressHex);
+
+            this.advance();
+            return;
+        }
+
+
+        // Include directive
+        if (directive === '.INCLUDE' || directive === 'INCLUDE') {
+            this.advance();
+
+            if (this.peek().type !== 'STRING') {
+                throw new Error("Unknown case : .include ...")
+            }
+
+            this.skip('STRING')
+            return;
+        }
+
+
         // Switch to different section (.text, .data, .bss)
         if (directive === 'SECTION' || directive.startsWith('.')) {
             this.advance();
@@ -551,9 +581,13 @@ export class CompilerV2 {
                 this.setCurrentSection(".text")
                 //console.log(`[STEP1] new section : ".text" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
-            } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
-                this.skip('STRING')
-                return;
+            //} else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
+            //    this.skip('STRING')
+            //    return;
+
+            //} else if (sectionName === '.ORG' || sectionName === 'ORG') {
+            //    this.skip('NUMBER')
+            //    return;
 
             } else {
                 throw new Error(`Unknown case : Unknown section "${sectionName}"`)
@@ -581,23 +615,6 @@ export class CompilerV2 {
             //console.log("New Instruction:", instructionData);
             if (!this.currentSection) throw new Error(`Missing currentSection`);
             this.currentSection.compileInstructions.push(instructionData);
-
-            return;
-        }
-
-
-        // .ORG: Set origin address (.org directive)
-        if (directive === '.ORG') {
-            this.advance();
-
-            if (this.peek().type === 'NUMBER') {
-                throw new Error('EDIT ME handleDirectivePass1')
-                this.currentAddress = this.parseNumber(this.peek().value);
-                this.advance();
-
-            } else {
-                throw new Error("Unknown case : .org ...")
-            }
 
             return;
         }

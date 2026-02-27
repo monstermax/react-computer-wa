@@ -11,6 +11,7 @@
 ; - Switch 1: clear
 ; - Switch 2: random fill
 
+.org 0xA000
 
 ; NOT FONCTIONNAL
 

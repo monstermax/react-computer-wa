@@ -18,6 +18,39 @@ section .text
     int3
     ret
 
+_fn_add:
+    ; load param a [SP+4]
+    push cl
+    push dl
+    push el
+    mov  cl, dl, esp  ; C:D = SP
+    mov  el, 7
+    call add_cd_e  ; C:D += 7
+    ldi  al, cl, dl
+    mov  bl, al
+    pop  el
+    pop  dl
+    pop  cl
+    mov  al, bl
+    push al
+    ; load param b [SP+3]
+    push cl
+    push dl
+    push el
+    mov  cl, dl, esp  ; C:D = SP
+    mov  el, 6
+    call add_cd_e  ; C:D += 6
+    ldi  al, cl, dl
+    mov  bl, al
+    pop  el
+    pop  dl
+    pop  cl
+    mov  al, bl
+    mov  bl, al
+    pop  al
+    add  al, bl
+    ret
+
 _main:
     call init_device_console  ; init console I/O
     mov  al, 0x0A
@@ -30,7 +63,7 @@ _main:
     push al  ; arg0
     mov  al, [y]  ; y
     push al  ; arg1
-    ; unknown function: add
+    call _fn_add  ; add()
     pop  bl  ; clean 2 args
     pop  bl
     mov  [result], al  ; result

@@ -7,6 +7,7 @@
 ; - R: reset
 ; - ESC: quit
 
+.org 0xA000
 
 ; A DEBUGUER
 

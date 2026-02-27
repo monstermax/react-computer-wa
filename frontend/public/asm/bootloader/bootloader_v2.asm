@@ -3,6 +3,7 @@
 ; Name: bootloader_v2
 ; Description: Bootloader for React Machine (v2)
 
+.org 0x0000
 
 .include "bootloader/lib_math.asm"
 .include "bootloader/lib_devices.asm"

@@ -3,6 +3,7 @@
 ; Name: os_v3
 ; Description: OS for React Machine (v3)
 
+.org 0x2000
 
 .include "os/v3/drivers/init_devices.asm"
 .include "os/v3/shell/lib_shell.asm"

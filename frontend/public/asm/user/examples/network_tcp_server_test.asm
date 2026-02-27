@@ -16,9 +16,9 @@
 ; Type text in nc and press Enter, emulator should echo bytes back.
 ; -----------------------------------------------------------------------------
 
-
 ; /!\ Device not usable in Browser. Use it only with NodeJS (The emulator cli mode)
 
+.org 0xA000
 
 .include "os/v3/arithmetic/lib_math.asm"
 
