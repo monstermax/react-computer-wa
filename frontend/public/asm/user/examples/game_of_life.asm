@@ -2,6 +2,8 @@
 .include "os/v3/drivers/lib_screen.asm"
 .include "os/v3/drivers/lib_keyboard.asm"
 .include "os/v3/drivers/lib_console.asm"
+.include "os/v3/arithmetic/lib_math.asm"
+
 
 section .data
   W equ 8
@@ -250,7 +252,11 @@ life_get:
   mov bl, el
   shl bl, 3
   add bl, fl
-  mov al, [grid + bl]
+  ;mov al, [grid + bl]
+  lea cl, dl, [grid]
+  mov el, bl
+  call add_cd_e
+  ldi al, cl, dl
   ret
 
 life_set:
@@ -258,21 +264,33 @@ life_set:
   mov bl, el
   shl bl, 3
   add bl, fl
-  mov [grid + bl], al
+  ;mov [grid + bl], al
+  lea cl, dl, [grid]
+  mov el, bl
+  call add_cd_e
+  sti al, cl, dl
   ret
 
 life_get_next:
   mov bl, el
   shl bl, 3
   add bl, fl
-  mov al, [next_grid + bl]
+  ;mov al, [next_grid + bl]
+  lea cl, dl, [next_grid]
+  mov el, bl
+  call add_cd_e
+  sti al, cl, dl
   ret
 
 life_set_next:
   mov bl, el
   shl bl, 3
   add bl, fl
-  mov [next_grid + bl], al
+  ;mov [next_grid + bl], al
+  lea cl, dl, [next_grid]
+  mov el, bl
+  call add_cd_e
+  sti al, cl, dl
   ret
 
 life_render:
