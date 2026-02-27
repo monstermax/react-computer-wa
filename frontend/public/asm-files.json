@@ -1,6 +1,6 @@
 {
-  "generated": "2026-02-26T18:19:29.997Z",
-  "count": 45,
+  "generated": "2026-02-27T13:36:55.646Z",
+  "count": 47,
   "files": [
     "bootloader/bootloader_v2.asm",
     "bootloader/devices/lib_console.asm",
@@ -9,6 +9,7 @@
     "bootloader/lib_devices.asm",
     "bootloader/lib_math.asm",
     "bootloader/lib_string.asm",
+    "bootloader/v4/bootloader_v4.asm",
     "os/os_v3.asm",
     "os/v3/arithmetic/lib_math.asm",
     "os/v3/arithmetic/russian_multiply.asm",
@@ -30,6 +31,7 @@
     "os/v3/shell/lib_shell.asm",
     "os/v3/strings/lib_ascii.asm",
     "os/v3/strings/lib_string.asm",
+    "os/v4/os_v4.asm",
     "user/examples/color_sort.asm",
     "user/examples/draw_fractal_on_screen.asm",
     "user/examples/draw_fractal_on_screen_hd.asm",
