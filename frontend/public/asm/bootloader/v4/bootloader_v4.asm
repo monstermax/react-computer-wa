@@ -1,199 +1,163 @@
-; =============================================================================
-; BOOTLOADER v4
-; =============================================================================
-; Goal:
-; - read OS stage1 from device "os_disk"
-; - load bytes in RAM at 0x1000
-; - jump to 0x1000
-;
-; Assumptions:
-; - os_disk I/O base = 0xF050 (device index 5)
-; - disk port map:
-;     +0 DATA
-;     +1 SIZE_LOW
-;     +2 SIZE_HIGH
-;     +3 ADDR_LOW
-;     +4 ADDR_HIGH
-; - stage1 starts at disk address 0x0000
-; =============================================================================
+; Author: Bob + yomax
+; Name: bootloader_v4
+; Description: Bootloader v4 (dynamic os_disk lookup, no hardcoded io base)
 
-.include "os/v3/drivers/lib_console.asm"
+.org 0x0000
+
+.include "bootloader/lib_math.asm"
+.include "bootloader/lib_devices.asm"
+.include "bootloader/init_devices.asm"
 
 section .data
-    os_disk_io_base      dw 0xF050
-    stage1_load_addr     dw 0x1000
+    BOOTLOADER_VERSION   equ 4
+    OS_START             equ 0x1000
+    STACK_END            equ 0xEFFF
 
-    size_low             db 0
-    size_high            db 0
+    ASCII_LF             equ 0x0D
 
-    rem_low              db 0
-    rem_high             db 0
-
-    disk_addr_low        db 0
-    disk_addr_high       db 0
-
-    ram_ptr_low          db 0
-    ram_ptr_high         db 0
-
-    msg_boot             db "[bootloader v4] loading os stage1 -> 0x1000", 10, 0
-    msg_size             db "[bootloader v4] stage1 size bytes:", 32, 0
-    msg_jump             db "[bootloader v4] jump 0x1000", 10, 0
-    msg_err              db "[bootloader v4] empty os_disk", 10, 0
+    STR_BOOT             db "BOOTLOADER V4", 13, 0
+    STR_WAITING          db "WAITING FOR os_disk...", 13, 0
+    STR_FOUND            db "os_disk FOUND", 13, 0
+    STR_LOADING          db "LOADING STAGE1 TO 0x1000", 13, 0
+    STR_JUMP             db "JUMP 0x1000", 13, 0
 
 section .text
     global _start
 
 _start:
-    lea cl, dl, [msg_boot]
+    mov dl, BOOTLOADER_VERSION
+    mov esp, STACK_END
+
+    ; discover devices (fills os_disk_device_idx/os_disk_io_base, console, leds, dma...)
+    call init_devices
+
+    ; feedback
+    lea cl, dl, [STR_BOOT]
     call console_print_string
 
-    ; [C:D] = os disk base
+    lea cl, dl, [STR_WAITING]
+    call console_print_string
+
+    call wait_for_os_disk
+
+    lea cl, dl, [STR_FOUND]
+    call console_print_string
+
+    lea cl, dl, [STR_LOADING]
+    call console_print_string
+
+    ; load raw stage1 from os_disk to RAM @ 0x1000 (same robust path as v2)
+    call load_os_in_ram
+
+    lea cl, dl, [STR_JUMP]
+    call console_print_string
+
+    mov esp, STACK_END
+    jmp OS_START
+
+
+; -----------------------------------------------------------------------------
+; wait_for_os_disk
+; - no hardcoded io base, uses os_disk_io_base discovered by init_device
+; -----------------------------------------------------------------------------
+wait_for_os_disk:
+.wait_loop:
     mov cl, [os_disk_io_base]
     mov dl, [os_disk_io_base + 1]
 
-    ; Read disk size low/high
-    mov el, 1
-    call add_cd_e
-    mov al, [cl:dl]
-    mov [size_low], al
+    ; if base is 0x0000 => not discovered yet
+    cmp cl, 0
+    jne .check_marker
+    cmp dl, 0
+    jne .check_marker
+    jmp .wait_loop
 
-    call inc_cd
-    mov al, [cl:dl]
-    mov [size_high], al
-
-    mov el, 2
-    call sub_cd_e
-
-    ; if size == 0 => error
-    mov al, [size_low]
-    or al, [size_high]
-    cmp al, 0
-    jne .size_ok
-
-    lea cl, dl, [msg_err]
-    call console_print_string
-    hlt
-
-.size_ok:
-    ; print size low for quick debug
-    lea cl, dl, [msg_size]
-    call console_print_string
-    mov al, [size_low]
-    debug 1, al
-    mov al, [size_high]
-    debug 1, al
-
-    ; remaining = size
-    mov al, [size_low]
-    mov [rem_low], al
-    mov al, [size_high]
-    mov [rem_high], al
-
-    ; disk_addr = 0
-    mov al, 0
-    mov [disk_addr_low], al
-    mov [disk_addr_high], al
-
-    ; ram_ptr = 0x1000
-    mov al, [stage1_load_addr]
-    mov [ram_ptr_low], al
-    mov al, [stage1_load_addr + 1]
-    mov [ram_ptr_high], al
-
-.load_loop:
-    ; done when rem == 0
-    mov al, [rem_low]
-    or al, [rem_high]
-    cmp al, 0
-    je .jump_stage1
-
-    ; [C:D] = os disk base
-    mov cl, [os_disk_io_base]
-    mov dl, [os_disk_io_base + 1]
-
-    ; set disk address low/high
+.check_marker:
+    ; configure disk address = 0x0000 (ports +3/+4)
     mov el, 3
     call add_cd_e
-    mov al, [disk_addr_low]
-    mov [cl:dl], al
+    sti cl, dl, 0
 
     call inc_cd
-    mov al, [disk_addr_high]
-    mov [cl:dl], al
+    sti cl, dl, 0
 
-    ; back to DATA port
+    ; back to DATA port and read first byte
     mov el, 4
     call sub_cd_e
+    ldi al, cl, dl
+    cmp al, 0
+    je .wait_loop
 
-    ; read byte from disk data
-    mov al, [cl:dl]
+    ret
 
-    ; write byte to RAM at [ram_ptr]
-    mov cl, [ram_ptr_low]
-    mov dl, [ram_ptr_high]
+
+; -----------------------------------------------------------------------------
+; load_os_in_ram
+; - identical strategy to bootloader_v2 (DMA copy full os_disk content)
+; - source disk device discovered dynamically via init_device
+; -----------------------------------------------------------------------------
+load_os_in_ram:
+    ; if already loaded, skip
+    mov bl, [OS_START]
+    cmp bl, 0
+    jnz .loaded
+
+    ; setup dma source disk index
+    mov al, [os_disk_device_idx]
+    mov cl, [dma_io_base]
+    mov dl, [dma_io_base + 1]
     sti cl, dl, al
 
-    ; ram_ptr++
-    mov al, [ram_ptr_low]
-    inc al
-    mov [ram_ptr_low], al
-    jnz .ram_no_carry
-    mov al, [ram_ptr_high]
-    inc al
-    mov [ram_ptr_high], al
-.ram_no_carry:
+    ; DMA_ADDR_START = 0x0000
+    call inc_cd
+    sti cl, dl, 0
+    call inc_cd
+    sti cl, dl, 0
 
-    ; disk_addr++
-    mov al, [disk_addr_low]
-    inc al
-    mov [disk_addr_low], al
-    jnz .disk_no_carry
-    mov al, [disk_addr_high]
-    inc al
-    mov [disk_addr_high], al
-.disk_no_carry:
+    ; read disk size from os_disk ports +1/+2 -> A:B
+    mov cl, [os_disk_io_base]
+    mov dl, [os_disk_io_base + 1]
 
-    ; rem--
-    mov al, [rem_low]
-    cmp al, 0
-    jne .dec_low
-    mov al, 0xFF
-    mov [rem_low], al
-    mov al, [rem_high]
+    call inc_cd
+    ldi al, cl, dl
+    call inc_cd
+    ldi bl, cl, dl
+
+    ; end = size - 1
     dec al
-    mov [rem_high], al
-    jmp .load_loop
-.dec_low:
-    dec al
-    mov [rem_low], al
-    jmp .load_loop
+    jnc .no_carry
+    dec bl
+.no_carry:
 
-.jump_stage1:
-    lea cl, dl, [msg_jump]
-    call console_print_string
-    jmp 0x1000
+    ; set DMA_ADDR_END = A:B (ports +3/+4 from dma base)
+    mov cl, [dma_io_base]
+    mov dl, [dma_io_base + 1]
 
+    mov el, 3
+    call add_cd_e
+    sti cl, dl, al
 
-; -----------------------------------------------------------------------------
-; Helpers on [C:D]
-; -----------------------------------------------------------------------------
-inc_cd:
-    inc cl
-    jnz .inc_cd_end
-    inc dl
-.inc_cd_end:
-    ret
+    call inc_cd
+    sti cl, dl, bl
 
-add_cd_e:
-    add cl, el
-    jnc .add_cd_e_end
-    inc dl
-.add_cd_e_end:
-    ret
+    ; set DMA_TARGET_ADDR = OS_START (ports +5/+6)
+    lea al, bl, OS_START
+    call inc_cd
+    sti cl, dl, al
 
-sub_cd_e:
-    sub cl, el
-    jnc .sub_cd_e_end
-    dec dl
-.sub_cd_e_end:
+    call inc_cd
+    sti cl, dl, bl
+
+    ; trigger DMA copy (port +7)
+    call inc_cd
+    sti cl, dl, 1
+
+    ; safety check
+    mov bl, [OS_START]
+    cmp bl, 0
+    jnz .loaded
+
+    hlt
+
+.loaded:
     ret
