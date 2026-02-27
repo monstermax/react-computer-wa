@@ -3,6 +3,7 @@
 .include "os/v3/drivers/lib_keyboard.asm"
 .include "os/v3/drivers/lib_console.asm"
 
+
 section .data
   KEY_1 equ 49
   KEY_2 equ 50
@@ -20,11 +21,16 @@ section .data
   msg db "HANOI: select source then destination (1/2/3), R reset",10,0
 
 section .text
-global _start
+    global _start
+
 _start:
-  lea cl, dl, [msg]
-  call console_print_string
-  call h_reset
+    call init_device_screen
+    call init_device_keyboard
+    call init_device_console
+
+    lea cl, dl, [msg]
+    call console_print_string
+    call h_reset
 
 .loop:
   call get_keyboard_status

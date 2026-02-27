@@ -20,33 +20,41 @@ section .data
 
   msg db "COLOR SORT mini: pick src then dst (1/2/3)",10,0
 
+
 section .text
-global _start
+    global _start
+
+
 _start:
-  lea cl, dl, [msg]
-  call console_print_string
-  call cs_reset
+    call init_device_screen
+    call init_device_keyboard
+    call init_device_console
+
+    lea cl, dl, [msg]
+    call console_print_string
+    call cs_reset
+
 
 .loop:
-  call get_keyboard_status
-  and al,0x01
-  cmp al,0
-  je .chk
-  call get_keyboard_char
-  mov bl,al
-  call set_keyboard_status
+    call get_keyboard_status
+    and al,0x01
+    cmp al,0
+    je .chk
+    call get_keyboard_char
+    mov bl,al
+    call set_keyboard_status
 
-  cmp bl,KEY_ESC
-  je .quit
-  cmp bl,KEY_R
-  je .reset
-  cmp bl,KEY_1
-  je .k1
-  cmp bl,KEY_2
-  je .k2
-  cmp bl,KEY_3
-  je .k3
-  jmp .chk
+    cmp bl,KEY_ESC
+    je .quit
+    cmp bl,KEY_R
+    je .reset
+    cmp bl,KEY_1
+    je .k1
+    cmp bl,KEY_2
+    je .k2
+    cmp bl,KEY_3
+    je .k3
+    jmp .chk
 
 .reset:
   call cs_reset

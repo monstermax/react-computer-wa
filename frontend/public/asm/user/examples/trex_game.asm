@@ -17,8 +17,13 @@ section .data
   msg db "TREX mini: SPACE jump, N next tick, ESC quit",10,0
 
 section .text
-global _start
+    global _start
+
 _start:
+    call init_device_screen
+    call init_device_keyboard
+    call init_device_console
+
   lea cl, dl, [msg]
   call console_print_string
   call tx_render

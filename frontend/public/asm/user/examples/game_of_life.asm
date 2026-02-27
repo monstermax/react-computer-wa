@@ -36,8 +36,13 @@ section .data
     db 0,0,0,0,0,0,0,0
 
 section .text
-global _start
+    global _start
+
 _start:
+    call init_device_screen
+    call init_device_keyboard
+    call init_device_console
+
   lea cl, dl, [msg]
   call console_print_string
   call life_render

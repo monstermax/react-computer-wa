@@ -3,8 +3,11 @@
 
 .org 0xA000
 
+.include "os/v3/drivers/lib_screen_hd.asm"
+
+
 section .data
-    screen_io_base  dw 0xF0D0
+    ;screenhd_io_base  dw 0xF0D0
 
 
 section .text
@@ -12,6 +15,8 @@ section .text
 
 
 _start:
+    call init_device_screenhd
+
     ; Example: XOR fractal on screen
     mov el, 0
 
@@ -43,8 +48,8 @@ _start:
 screen_set_pixel:
     push cl
     push dl
-    mov cl, [screen_io_base]
-    mov dl, [screen_io_base + 1]
+    mov cl, [screenhd_io_base]
+    mov dl, [screenhd_io_base + 1]
     sti cl, dl, fl
     call _inc_cd
     sti cl, dl, el

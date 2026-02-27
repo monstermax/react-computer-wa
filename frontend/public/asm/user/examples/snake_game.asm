@@ -15,14 +15,20 @@ section .data
   quit_flag db 0
   px db 4
   py db 4
-  fx db 2
-  fy db 2
+  food_x db 2
+  food_y db 2
 
   msg db "SNAKE mini: ZQSD/WASD moves, ESC quit",10,0
 
+
 section .text
-global _start
+    global _start
+
 _start:
+    call init_device_screen
+    call init_device_keyboard
+    call init_device_console
+
   lea cl, dl, [msg]
   call console_print_string
   call sn_render
@@ -94,19 +100,19 @@ _start:
 .after_move:
   ; eat food => move food
   mov al,[px]
-  cmp al,[fx]
+  cmp al,[food_x]
   jne .render
   mov al,[py]
-  cmp al,[fy]
+  cmp al,[food_y]
   jne .render
-  mov al,[fx]
+  mov al,[food_x]
   add al,3
   and al,7
-  mov [fx],al
-  mov al,[fy]
+  mov [food_x],al
+  mov al,[food_y]
   add al,5
   and al,7
-  mov [fy],al
+  mov [food_y],al
 
 .render:
   call sn_render
@@ -145,8 +151,8 @@ sn_render:
 .draw:
   ; draw food yellow (4x4)
   mov al,0x2A
-  mov fl,[fx]
-  mov el,[fy]
+  mov fl,[food_x]
+  mov el,[food_y]
   call sn_draw_cell4
 
   ; draw player magenta (4x4)

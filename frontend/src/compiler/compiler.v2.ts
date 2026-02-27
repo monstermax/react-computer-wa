@@ -432,7 +432,7 @@ export class CompilerV2 {
                                 //this.advance();
 
                             } else {
-                                throw new Error(`debug me: pass1CollectSymbols (2) : ${nextAfter.type}`)
+                                throw new Error(`debug me: pass1CollectSymbols (2) : ${nextAfter.type} on file ${nextAfter.file} line ${nextAfter.line}`)
                                 break;
                             }
                         }
