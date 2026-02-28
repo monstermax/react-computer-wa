@@ -60,13 +60,13 @@ section .data
     ;os_disk_device_idx    db 0,0,0 ; idx, io_lo, io_hi (filled by init_device)
 
     ; ---------------- Messages ----------------
-    m_start               db "[os v4] stage1 start", 10, 0
-    m_vfs                 db "[os v4] init vfs", 10, 0
-    m_mount               db "[os v4] mount os_disk -> /usr", 10, 0
-    m_symlink             db "[os v4] symlink /bin -> /usr/bin", 10, 0
-    m_dev                 db "[os v4] build virtual /dev from DEVICE_TABLE", 10, 0
-    m_proc                db "[os v4] init virtual /proc", 10, 0
-    m_done                db "[os v4] ready", 10, 0
+    m_start               db "[os v3] stage1 start", 10, 0
+    m_vfs                 db "[os v3] init vfs", 10, 0
+    m_mount               db "[os v3] mount os_disk -> /usr", 10, 0
+    m_symlink             db "[os v3] symlink /bin -> /usr/bin", 10, 0
+    m_dev                 db "[os v3] build virtual /dev from DEVICE_TABLE", 10, 0
+    m_proc                db "[os v3] init virtual /proc", 10, 0
+    m_done                db "[os v3] ready", 10, 0
 
 
 section .bss

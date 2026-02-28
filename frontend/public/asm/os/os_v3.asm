@@ -45,6 +45,9 @@ _start:
     ; init gestion des utilisateurs
     call init_users
 
+    ; clear console
+    call console_clear
+
     ; run /sbin/init (then spawn a shell)
     call run_shell
 
