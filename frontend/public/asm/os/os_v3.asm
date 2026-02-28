@@ -25,7 +25,7 @@ _start:
     call init_devices
 
     ; init virtual file system
-    call init_virtual_file_system
+    call init_virtual_file_system ; EN COURS DE DEV
 
     ; clear console
     call console_clear
