@@ -24,11 +24,11 @@ _start:
     ; init drivers
     call init_devices
 
-    ; init virtual file system
-    call init_virtual_file_system ; EN COURS DE DEV
-
     ; clear console
     call console_clear
+
+    ; init virtual file system
+    call init_virtual_file_system ; EN COURS DE DEV
 
     ; init open files
     call init_open_files
