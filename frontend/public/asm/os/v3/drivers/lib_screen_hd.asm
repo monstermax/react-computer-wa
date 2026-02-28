@@ -30,8 +30,7 @@ section .text
     global screenhd_set_pixel
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 init_device_screenhd:

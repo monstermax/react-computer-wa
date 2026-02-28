@@ -21,8 +21,7 @@ section .text
     global set_keyboard_status
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 init_device_keyboard:

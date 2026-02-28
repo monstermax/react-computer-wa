@@ -31,8 +31,7 @@ section .text
     global screen_set_pixel
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 init_device_screen:

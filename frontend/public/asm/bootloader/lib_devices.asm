@@ -1,7 +1,7 @@
 ; Author: yomax
 ; Date: 2026-02
 ; Name: lib_devices
-; Description: Lib devices for bootloader_v2
+; Description: Lib devices for bootloader
 
 
 .include "bootloader/lib_math.asm"
@@ -31,7 +31,9 @@ section .data
     _find_name_ptr   dw 0x0000 ; variable contenant la string à rechercher
     _find_table_ptr  dw 0x0000 ; variable contenant le pointeur de la string à comparer (parmi les strings de la table, soit les bits 5/6 de chaque entrée)
     _find_counter    db 0x00   ; variable contenant le compteur de loop
-
+    ;_find_name_ptr    equ 0x9000
+    ;_find_table_ptr   equ 0x9002
+    ;_find_counter     equ 0x9004
 
 
 

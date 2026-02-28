@@ -35,16 +35,16 @@ export const useCompiler = (): CompilerHook => {
     }
 
     // Compile Assembly Booloader
-    const compileBootloader = async (): Promise<CompiledProgram> => {
-        const filepath = "bootloader/bootloader_v2.asm";
+    const compileBootloader = async (bootloaderFilepath?: string): Promise<CompiledProgram> => {
+        const filepath = bootloaderFilepath ?? "bootloader/bootloader_v2.asm";
         const startAddress = MEMORY_MAP.ROM_START;
         const compiled = await compileFile(filepath, startAddress)
         return compiled;
     }
 
     // Compile Assembly OS
-    const compileOs = async (): Promise<CompiledProgram> => {
-        const filepath = "os/os_v3.asm";
+    const compileOs = async (osFilepath?: string): Promise<CompiledProgram> => {
+        const filepath = osFilepath ?? "os/os_v3.asm";
         const startAddress = MEMORY_MAP.OS_START;
         const compiled = await compileFile(filepath, startAddress)
         return compiled;
@@ -65,7 +65,7 @@ export const useCompiler = (): CompilerHook => {
 export type CompilerHook = {
     compileCode: (sourceCode: string, filepath?: string, startAddress?: number) => Promise<CompiledProgram>;
     compileFile: (filepath: string, startAddress?: number) => Promise<CompiledProgram>;
-    compileBootloader: () => Promise<CompiledProgram>;
-    compileOs: () => Promise<CompiledProgram>;
+    compileBootloader: (bootloaderFilepath?: string) => Promise<CompiledProgram>;
+    compileOs: (osFilepath?: string) => Promise<CompiledProgram>;
 }
 

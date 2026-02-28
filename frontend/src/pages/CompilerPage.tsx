@@ -46,11 +46,12 @@ export const CompilerPage: React.FC = () => {
         //const bootloaderFilepath = "user/tests/lcd_test.asm";
         //const bootloaderFilepath = "bootloader/bootloader_v2.asm";
         //const bootloaderFilepath = "os/v3/shell/lib_shell.asm";
-        const bootloaderFilepath = "os/os_v3.asm";
+        //const bootloaderFilepath = "os/os_v3.asm";
+        const bootloaderFilepath = "bootloader/v4/bootloader_v4_stage1.asm";
 
         const startAddress = 0xA000;
-        //const compiled = await compileFileV2(bootloaderFilepath, { startAddress })
-        const compiled = await compileCodeV2(demoCode, 'custom.asm', { startAddress })
+        const compiled = await compileFileV2(bootloaderFilepath, { startAddress })
+        //const compiled = await compileCodeV2(demoCode, 'custom.asm', { startAddress })
 
         console.log("labels:", compiled.labels)
         console.log("sections:", compiled.sections)

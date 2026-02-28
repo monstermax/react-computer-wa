@@ -20,8 +20,7 @@ section .text
     global draw_sprite_hd
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 ; ============================================================================

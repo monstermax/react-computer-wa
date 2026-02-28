@@ -14,21 +14,21 @@
 section .data
 
 ; --- Palette ---
-COL_TRANSPARENT equ 0x00
-COL_RED         equ 0x01
-COL_BROWN       equ 0x08
-COL_SKIN        equ 0x18
-COL_YELLOW      equ 0x2A
-COL_GREEN       equ 0x55
-COL_CYAN        equ 0x6E
-COL_BLUE_LIGHT  equ 0x80
-COL_BLUE_DARK   equ 0xAA
-COL_PURPLE      equ 0xBB
-COL_PINK        equ 0xD5
-COL_WHITE       equ 0xC0
-COL_ORANGE      equ 0x10
+PACK2_COL_TRANSPARENT equ 0x00
+PACK2_COL_RED         equ 0x01
+PACK2_COL_BROWN       equ 0x08
+PACK2_COL_SKIN        equ 0x18
+PACK2_COL_YELLOW      equ 0x2A
+PACK2_COL_GREEN       equ 0x55
+PACK2_COL_CYAN        equ 0x6E
+PACK2_COL_BLUE_LIGHT  equ 0x80
+PACK2_COL_BLUE_DARK   equ 0xAA
+PACK2_COL_PURPLE      equ 0xBB
+PACK2_COL_PINK        equ 0xD5
+PACK2_COL_WHITE       equ 0xC0
+PACK2_COL_ORANGE      equ 0x10
 
-_X equ COL_TRANSPARENT
+_X equ PACK2_COL_TRANSPARENT
 
 
 ; ============================================================================
@@ -52,7 +52,7 @@ _X equ COL_TRANSPARENT
 ;     . . . . . . Y Y Y Y Y . . . . .
 ; ============================================================================
 
-_Y equ COL_YELLOW
+_Y equ PACK2_COL_YELLOW
 
 sprite_pacman:
     db _X, _X, _X, _X, _X, _X, _Y, _Y, _Y, _Y, _Y, _X, _X, _X, _X, _X
@@ -94,9 +94,9 @@ sprite_pacman:
 ;     . . . . . . . . . . . . . . . .
 ; ============================================================================
 
-_R equ COL_RED
-_W equ COL_WHITE
-_K equ COL_BROWN
+_R equ PACK2_COL_RED
+_W equ PACK2_COL_WHITE
+_K equ PACK2_COL_BROWN
 
 sprite_ghost:
     db _X, _X, _X, _X, _X, _X, _R, _R, _R, _R, _X, _X, _X, _X, _X, _X
@@ -138,7 +138,7 @@ sprite_ghost:
 ;     . . G . G . . . . . . G . G . .
 ; ============================================================================
 
-_G equ COL_GREEN
+_G equ PACK2_COL_GREEN
 
 sprite_invader:
     db _X, _X, _X, _X, _G, _X, _X, _X, _X, _X, _X, _G, _X, _X, _X, _X
@@ -180,7 +180,7 @@ sprite_invader:
 ;     . . . . . . . . . . . . . . . .
 ; ============================================================================
 
-_H equ COL_RED
+_H equ PACK2_COL_RED
 
 sprite_heart:
     db _X, _X, _X, _H, _H, _H, _X, _X, _X, _X, _H, _H, _H, _X, _X, _X
@@ -222,7 +222,7 @@ sprite_heart:
 ;     . . . . W W W W W W W W . . . .
 ; ============================================================================
 
-_S equ COL_SKIN
+_S equ PACK2_COL_SKIN
 
 sprite_mushroom:
     db _X, _X, _X, _X, _X, _X, _W, _W, _W, _W, _X, _X, _X, _X, _X, _X
@@ -294,8 +294,9 @@ section .text
 
 
 
-_exit:
-    ret
+; entrypoint
+call draw_invader
+ret
 
 
 ; ============================================================================

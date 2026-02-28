@@ -3,9 +3,13 @@
 
 section .text
     global russian_multiply
+    global russian_multiply_test
 
 
-_exit:
+ret ; this is a lib. no default entrypoint defined
+
+
+russian_multiply_test:
     mov al, 104
     mov bl, 8
     ;call russian_multiply

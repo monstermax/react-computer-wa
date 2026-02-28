@@ -22,8 +22,7 @@ section .text
 ; TODO: strlower & strupper
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 
@@ -139,10 +138,10 @@ int_to_str:
     push dl
 
     mov el, 0           ; compteur de caractères
-    
+
     ; Cas spécial: nombre = 0
     cmp al, 0
-    jne .not_zero
+    jne .int_to_str_not_zero
 
     mov fl, DIGIT_0
     sti cl, dl, fl
@@ -150,7 +149,7 @@ int_to_str:
     inc el
     jmp .null_term
 
-.not_zero:
+.int_to_str_not_zero:
     ; Sauvegarde la valeur originale
     push al
 
@@ -218,8 +217,8 @@ int_to_str:
     call inc_cd
     inc el
 
-    ; Nettoie la pile de la sauvegarde de .not_zero
-    pop al              ; correspond au push al de .not_zero
+    ; Nettoie la pile de la sauvegarde de .int_to_str_not_zero
+    pop al              ; correspond au push al de .int_to_str_not_zero
 
 .null_term:
     mov fl, 0
@@ -255,19 +254,19 @@ str_to_int:
     mov al, 0        ; résultat
     mov el, 0        ; compteur de chiffres (max 3)
 
-.next_char:
+.str_to_int_next_char:
     ; Lecture du caractère
     ldi fl, cl, dl   ; FL = caractère courant
 
     ; Fin de chaine ?
     cmp fl, 0
-    je .end_success
+    je .str_to_int_end_success
 
     ; Vérification que c'est un chiffre (0-9)
     cmp fl, DIGIT_0
-    jb .error
+    jb .str_to_int_error
     cmp fl, DIGIT_9
-    ja .error
+    ja .str_to_int_error
 
     ; Conversion ASCII → valeur (soustraire '0')
     sub fl, DIGIT_0
@@ -283,7 +282,7 @@ str_to_int:
     ; Ajout du nouveau chiffre
     pop fl
     add al, fl
-    jc .error        ; Si carry, dépassement (>255)
+    jc .str_to_int_error        ; Si carry, dépassement (>255)
 
     ; Passage au caractère suivant
     call inc_cd
@@ -291,16 +290,16 @@ str_to_int:
 
     ; Maximum 3 chiffres pour 0-255
     cmp el, 3
-    jge .check_end
-    jmp .next_char
+    jge .str_to_int_check_end
+    jmp .str_to_int_next_char
 
-.check_end:
+.str_to_int_check_end:
     ; Vérifie qu'il n'y a plus que le null terminator
     ldi fl, cl, dl
     cmp fl, 0
-    jne .error       ; Si pas null, trop long
+    jne .str_to_int_error       ; Si pas null, trop long
 
-.end_success:
+.str_to_int_end_success:
     pop fl
     pop el
     pop dl
@@ -308,7 +307,7 @@ str_to_int:
     pop bl
     ret
 
-.error:
+.str_to_int_error:
     mov al, 0xFF
     pop fl
     pop el

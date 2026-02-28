@@ -2,11 +2,12 @@
 ; Name: os_v4 (stage1)
 ; Description: Stage1 init for VFS/mount/symlink + virtual /dev and /proc metadata (no hardcoded /dev/<idx>)
 
-.org 0x1000
+;.org 0x1000
 
 .include "os/v3/drivers/init_devices.asm"
 .include "os/v3/drivers/lib_console.asm"
 .include "os/v3/drivers/lib_devices.asm"
+
 
 section .data
     OS_VERSION            equ 4
@@ -22,23 +23,23 @@ section .data
     ; mount entry = 8 bytes
     ; [0]=dev_idx [1]=flags [2]=mount_path_ptr_low [3]=mount_path_ptr_high
     ; [4]=src_name_ptr_low [5]=src_name_ptr_high [6..7]=reserved
-    mount_table:
-      times 64 db 0
+    ;mount_table: 
+    ;  times 64 db 0
 
     ; symlink entry = 6 bytes
     ; [0]=src_ptr_low [1]=src_ptr_high [2]=dst_ptr_low [3]=dst_ptr_high [4..5]=reserved
-    symlink_table:
-      times 48 db 0
+    ;symlink_table: 
+    ;  times 48 db 0
 
     ; very small inode metadata table (RAM POC)
-    inode_table:
-      times 256 db 0
+    ;inode_table: 
+    ;  times 256 db 0
 
     ; /dev virtual entries generated from device table at boot
     ; fixed capacity for names copied from DEVICE_TABLE pointers
     dev_node_count        db 0
-    dev_node_name_ptrs:
-      times 64 db 0   ; up to 32 ptrs (lo/hi)
+    ;dev_node_name_ptrs: 
+    ;  times 64 db 0   ; up to 32 ptrs (lo/hi)
 
     ; /proc virtual entries (for now static process ids seeded by scheduler stage later)
     proc_node_count       db 0
@@ -52,8 +53,8 @@ section .data
     p_dev                 db "/dev", 0
     p_proc                db "/proc", 0
 
-    str_os_disk           db "os_disk", 0
-    os_disk_info          db 0,0,0 ; idx, io_lo, io_hi (filled by init_device)
+    ;str_os_disk           db "os_disk", 0
+    ;os_disk_device_idx    db 0,0,0 ; idx, io_lo, io_hi (filled by init_device)
 
     ; ---------------- Messages ----------------
     m_start               db "[os v4] stage1 start", 10, 0
@@ -64,18 +65,19 @@ section .data
     m_proc                db "[os v4] init virtual /proc", 10, 0
     m_done                db "[os v4] ready", 10, 0
 
+
+section .bss
+    mount_table resb 64
+    symlink_table resb 48
+    inode_table resb 256
+    dev_node_name_ptrs resb 64   ; up to 32 ptrs (lo/hi)
+
+
 section .text
-    global _start
+    global init_virtual_file_system
 
-_start:
-    mov dl, OS_VERSION
 
-    ; init all known drivers/devices infos
-    call init_devices
-
-    lea cl, dl, [m_start]
-    call console_print_string
-
+init_virtual_file_system:
     call init_vfs
     call init_mounts
     call init_symlinks
@@ -85,7 +87,7 @@ _start:
     lea cl, dl, [m_done]
     call console_print_string
 
-    hlt
+    ret
 
 
 init_vfs:
@@ -109,14 +111,14 @@ init_mounts:
     call console_print_string
 
     ; resolve os_disk dynamically (no hardcoded device index/base)
-    lea al, bl, [str_os_disk]
-    lea cl, dl, [os_disk_info]
-    call init_device
+    ;lea al, bl, [str_os_disk]
+    ;lea cl, dl, [os_disk_device_idx]
+    ;call init_device
 
     ; mount entry #0
     lea cl, dl, [mount_table]
 
-    mov al, [os_disk_info]
+    mov al, [os_disk_device_idx]
     sti cl, dl, al                  ; dev_idx
 
     call inc_cd
@@ -209,7 +211,7 @@ init_virtual_dev:
     inc dl
 .no_carry2:
 
-    dec byte [dev_node_count]
+    dec [dev_node_count]
     jnz .loop
 
     ; restore real count
@@ -231,20 +233,4 @@ init_virtual_proc:
     ; basic inode slots reservation for /proc + /dev roots
     mov al, 2
     mov [inode_count], al
-    ret
-
-
-; ---- pointer helpers ----
-inc_cd:
-    inc cl
-    jnz .end
-    inc dl
-.end:
-    ret
-
-inc_ef:
-    inc el
-    jnz .end
-    inc fl
-.end:
     ret

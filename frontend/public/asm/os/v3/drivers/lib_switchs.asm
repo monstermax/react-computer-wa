@@ -33,8 +33,7 @@ section .text
     global get_switch_state
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 init_device_switchs:
@@ -144,12 +143,12 @@ get_switchs_mask:
     call get_switchs_value        ; A = état global
     and al, bl                    ; appliquer le masque
     cmp al, bl                    ; égal au masque ?
-    jne .not_equal
+    jne .get_switchs_mask_not_equal
     mov al, 1                     ; oui → 1
-    jmp .done
-.not_equal:
+    jmp .get_switchs_mask_done
+.get_switchs_mask_not_equal:
     mov al, 0                     ; non → 0
-.done:
+.get_switchs_mask_done:
     pop bl
     ret
 
@@ -167,36 +166,36 @@ wait_switch_mask:
     mov cl, al                    ; CL = masque
     mov bl, al                    ; BL = valeur attendue
     
-.wait_loop:
+.wait_switch_mask_wait_loop:
     call get_switchs_value        ; A = état global
     and al, cl                    ; appliquer le masque
     
     cmp bl, 0
-    je .check_zero
+    je .wait_switch_mask_check_zero
     ; On attend que ce soit != 0 (au moins un bit à 1)
     cmp al, 0
-    je .wait_loop
-    jmp .found
-.check_zero:
+    je .wait_switch_mask_wait_loop
+    jmp .wait_switch_mask_found
+.wait_switch_mask_check_zero:
     ; On attend que ce soit == 0 (tous à 0)
     cmp al, 0
-    jne .wait_loop
+    jne .wait_switch_mask_wait_loop
     
-.found:
+.wait_switch_mask_found:
     ; Trouver le premier bit à 1 (si valeur attendue = 1)
     cmp bl, 0
-    je .done
+    je .wait_switch_mask_done
     
     mov cl, 0                     ; compteur
-.find_bit:
+.wait_switch_mask_find_bit:
     shr al, 1
-    jc .bit_found
+    jc .wait_switch_mask_bit_found
     inc cl
-    jmp .find_bit
-.bit_found:
+    jmp .wait_switch_mask_find_bit
+.wait_switch_mask_bit_found:
     mov al, cl                    ; A = index
     
-.done:
+.wait_switch_mask_done:
     pop cl
     pop bl
     ret

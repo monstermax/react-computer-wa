@@ -30,10 +30,10 @@ export function computerloadCode(
     valPtr: usize,
     dataLen: i32
 ): void {
-    const memoryBus = computer.memoryBus;
+    const rom = computer.rom;
 
-    if (!memoryBus) {
-        throw new Error("Memory Bus not found");
+    if (!rom) {
+        throw new Error("ROM not found");
     }
 
     if (dataLen > (MEMORY_MAP.ROM_END + 1 as i32)) {
@@ -45,7 +45,7 @@ export function computerloadCode(
         const addr: u16 = i as u16;
         const val: u8 = load<u8>(valPtr + i);
         //console.log(`load code line #${i} (addr=${addr} | val=${val})`)
-        memoryBus.write(addr, val);
+        rom.write(addr, val);
     }
 }
 

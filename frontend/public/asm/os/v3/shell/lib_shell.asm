@@ -27,18 +27,18 @@ section .data
     STR_CONSOLE_PROMPT    db "root@playground $ ", 0
     STR_RUN_COMMAND       db "Running command...", 13, 0
     STR_COMMAND_NOT_FOUND db "Command not found", 13, 0
-    STR_COMMAND_HELP_TEST db "Commands:", 13
-                          db " - help (0) : Print help message (this message)", 13 ; test
-                          db " - custom (1) : Run custom code", 13
-                          db " - pixels (2) : Screen pixels demo", 13
-                          db " - sprite (3) : Screen sprite demo", 13
-                          db " - leds (4) : Toggle LEDs", 13
-                          db " - clear (5) : Clear Console & Screen", 13
-                          db " - reboot (6) : Reboot the computer", 13
-                          db " - halt (7) : Halt the computer", 13
-                          db " - ls : Display files list (Not yet available)", 13
-                          db " - ps : Display processes list (Not yet available)", 13
-                          db 0
+    STR_COMMAND_HELP_TEST db 13, "Commands:", 13
+                          db "   help      (0) Print help message (this message)", 13 ; test
+                          db "   custom    (1) Run custom code", 13
+                          db "   pixels    (2) Screen pixels demo", 13
+                          db "   sprite    (3) Screen sprite demo", 13
+                          db "   leds      (4) Toggle LEDs", 13
+                          db "   clear     (5) Clear Console & Screen", 13
+                          db "   reboot    (6) Reboot the computer", 13
+                          db "   halt      (7) Halt the computer", 13
+                          db "   ls            Display files list (Not yet available)", 13
+                          db "   ps            Display processes list (Not yet available)", 13
+                          db 13, 0
     STR_COMMAND_LS_TEST   db "Files list here...", 13, 0
     STR_COMMAND_PS_TEST   db "Processes list here...", 13, 0
 
@@ -80,8 +80,7 @@ section .text
     global run_shell
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 run_shell:

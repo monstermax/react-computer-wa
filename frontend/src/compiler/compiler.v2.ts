@@ -161,7 +161,7 @@ export class CompilerV2 {
         //console.log('.text', this.sections.get('.text'))
 
         if (currentAddressAfterPass1 !== currentAddressAfterPass2) {
-            console.warn(`addresses count mismatch (step1 = ${toHex(currentAddressAfterPass1, 4)} (${currentAddressAfterPass1}) vs step2 = ${toHex(currentAddressAfterPass2, 4)} (${currentAddressAfterPass2})).`);
+            console.warn(`addresses count mismatch (step1 = ${toHex(currentAddressAfterPass1, 4)} (${currentAddressAfterPass1}) vs step2 = ${toHex(currentAddressAfterPass2, 4)} (${currentAddressAfterPass2})) in ${this.tokens[0].file}.`);
             debugger
             //throw new Error(`addresses count mismatch (step1=${currentAddressAfterPass1} vs step2=${currentAddressAfterPass2}).`);
         }
@@ -259,6 +259,10 @@ export class CompilerV2 {
                 // example => "main:"
                 const labelName = token.value;
                 lastInstructionOrIdentifierPos = this.pos;
+
+                if (this.labels.has(labelName)) {
+                    throw new Error(`Duplicate label "${labelName}" in ${token.file}:${token.line}`);
+                }
 
                 this.labels.set(labelName, {
                     section: this.currentSectionName,
@@ -358,12 +362,16 @@ export class CompilerV2 {
 
                         const valueStartAddress = this.currentAddress as u16;
 
+                        if (this.labels.has(varName)) {
+                            console.warn(`Duplicate identifier "${varName}" in ${token.file}:${token.line}`);
+                        }
+
                         this.labels.set(varName, {
                             section: this.currentSectionName,
                             addressStep1: valueStartAddress,
                             address: null,
                             //values: null,
-                            immValue: undefined,
+                            immValue: undefined, // peut etre un imm8 ou imm16 ou un identifier vers un autre "equ"
                             dataSize: itemSize,
                         });
 
@@ -900,6 +908,7 @@ export class CompilerV2 {
                         this.advance();
 
                         this.reserveSpace(directiveToken);
+                        this.appendInstructionCommentAndNewline()
 
                     } else {
                         throw new Error("unknown identifier+directive case")
@@ -1059,6 +1068,15 @@ export class CompilerV2 {
         if (['DB', 'DW', 'DD', 'DQ'].includes(directive)) {
             //throw new Error('code utile ?') // oui
             this.generateData(undefined, directive, directiveToken);
+            //this.appendInstructionCommentAndNewline()
+            return;
+        }
+
+        // Handle bare data directives (RESB/RESW/RESD/RESQ without preceding identifier)
+        if (['RESB', 'RESW', 'RESD', 'RESQ'].includes(directive)) {
+            throw new Error('code utile ?')
+            this.reserveSpace(directiveToken);
+            //this.appendInstructionCommentAndNewline()
             return;
         }
 
@@ -1287,7 +1305,7 @@ export class CompilerV2 {
                     : this.parseNumber(op.value);
 
                 if (value === null) {
-                    throw new Error("edit me emitOperands (1)");
+                    throw new Error(`Unknown operand "${op.value}"`);
                 }
 
                 this.emitByte(value & 0xFF, op.value, refInstrToken, false);

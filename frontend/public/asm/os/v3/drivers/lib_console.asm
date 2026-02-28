@@ -22,8 +22,7 @@ section .text
     global console_print_sized_string
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 init_device_console:

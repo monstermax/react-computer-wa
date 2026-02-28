@@ -1,17 +1,23 @@
 ; Author: Bob + yomax
-; Name: bootloader_v4
-; Description: Bootloader v4 (dynamic os_disk lookup, no hardcoded io base)
+; Name: bootloader_v3
+; Description: Bootloader v3
+
+
+; 1. Attend que le deivce "os_disk" soit présent et contienne une valeur différente de 0x00 dans son 1er byte de stockage.
+; 2. Charge le contenu du disque "os_disk" dans la RAM à l'adresse 0x1000
+; 3. Jump à l'adresse 0x1000 pour déléguer la suite de l'execution à l'OS
+
 
 .org 0x0000
 
 .include "bootloader/lib_math.asm"
-.include "bootloader/lib_devices.asm"
 .include "bootloader/init_devices.asm"
+
 
 section .data
     BOOTLOADER_VERSION   equ 4
-    OS_START             equ 0x1000
     STACK_END            equ 0xEFFF
+    OS_START             equ 0x1000
 
     ASCII_LF             equ 0x0D
 
@@ -21,8 +27,10 @@ section .data
     STR_LOADING          db "LOADING STAGE1 TO 0x1000", 13, 0
     STR_JUMP             db "JUMP 0x1000", 13, 0
 
+
 section .text
     global _start
+
 
 _start:
     mov dl, BOOTLOADER_VERSION

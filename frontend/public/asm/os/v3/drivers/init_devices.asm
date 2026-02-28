@@ -14,17 +14,17 @@
 
 
 section .data
-    str_screen          db "screen", 0 ; libellé du device
-    screen_device_idx   db 0x00
-    screen_io_base      dw 0x0000 ; must be placed just after screen_device_idx. will be auto filled
+    ;str_screen          db "screen", 0 ; libellé du device
+    ;screen_device_idx   db 0x00
+    ;screen_io_base      dw 0x0000 ; must be placed just after screen_device_idx. will be auto filled
 
     str_os_disk         db "os_disk", 0 ; libellé du device
     os_disk_device_idx  db 0x00
     os_disk_io_base     dw 0x0000 ; must be placed just after os_disk_device_idx. will be auto filled
 
-    str_dma             db "dma", 0 ; libellé du device
-    dma_device_idx      db 0x00
-    dma_io_base         dw 0x0000 ; must be placed just after dma_device_idx. will be auto filled
+    ;str_dma             db "dma", 0 ; libellé du device
+    ;dma_device_idx      db 0x00
+    ;dma_io_base         dw 0x0000 ; must be placed just after dma_device_idx. will be auto filled
 
 
 

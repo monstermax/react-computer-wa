@@ -70,6 +70,10 @@ export class MemoryBus {
                 throw new Error(`No ROM found. Cannot write at address ${toHex(address)}`);
             }
 
+            //if (1) throw new Error(`ROM is Read-Only. Cannot write at address ${toHex(address)}`);
+            // TODO: activer cette ligne
+            // => Cela requiert de charger le bootloader en RAM au lieu de l'executer directement depuis la ROM
+
             rom.write(address, value)
             return;
         }
