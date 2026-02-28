@@ -21,7 +21,7 @@ section .data
 
     ASCII_LF             equ 0x0D
 
-    STR_BOOT             db "BOOTLOADER V4", 13, 0
+    STR_BOOT             db "BOOTLOADER V3", 13, 0
     STR_WAITING          db "WAITING FOR os_disk...", 13, 0
     STR_FOUND            db "os_disk FOUND", 13, 0
     STR_LOADING          db "LOADING STAGE1 TO 0x1000", 13, 0
