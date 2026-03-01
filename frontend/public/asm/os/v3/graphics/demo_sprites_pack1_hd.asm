@@ -96,9 +96,9 @@ section .text
     global draw_mario_and_sonic_hd
 
 
-_exit:
-    ;call draw_mario_hd
-    ret
+; entrypoint
+call draw_mario_hd
+ret
 
 
 ; ============================================================================

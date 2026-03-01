@@ -40,6 +40,9 @@ section .text
     global find_device_by_name
 
 
+ret ; this is a lib. no default entrypoint defined
+
+
 
 ; ─────────────────────────────────────────────────
 ; init_device

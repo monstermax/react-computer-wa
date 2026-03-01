@@ -21,8 +21,7 @@ section .text
     global lcd_print_string
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 init_device_lcd:
@@ -97,7 +96,7 @@ lcd_print_string:
 ; Affiche une string depuis un buffer mémoire (string max length = 256)
 ; Input: C:D = adresse du buffer, B = taille
 lcd_print_sized_string:
-    DEQUEUE:
+    lcd_print_sized_string_dequeue:
     ; Lire caractère depuis buffer
     ldi al, cl, dl ; A = [C:D]
 
@@ -105,13 +104,13 @@ lcd_print_sized_string:
 
     ; Incrémenter pointeur C:D
     inc cl
-    jnc NO_CARRY_PRINT
+    jnc lcd_print_sized_string_no_carry_print
     inc dl
 
-    NO_CARRY_PRINT:
+    lcd_print_sized_string_no_carry_print:
     ; Décrémenter compteur
     dec bl
-    jnz DEQUEUE
+    jnz lcd_print_sized_string_dequeue
 
     LCD_PRINT_SIZED_STRING_END:
     ret

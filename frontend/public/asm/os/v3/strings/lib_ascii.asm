@@ -98,6 +98,6 @@ section .data
 
 section .text
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
+
 

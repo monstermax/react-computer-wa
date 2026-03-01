@@ -1,7 +1,7 @@
 ; Author: yomax
 ; Date: 2026-02
 ; Name: lib_math
-; Description: Lib Math for bootloader_v2
+; Description: Lib Math for bootloader
 
 
 section .text
@@ -27,6 +27,15 @@ inc_cd:
     jnc INC_CD_END
     inc dl
     INC_CD_END:
+    ret
+
+
+; Incrémente (E:F)
+inc_ef:
+    inc el
+    jnc INC_EF_END
+    inc fl
+    INC_EF_END:
     ret
 
 

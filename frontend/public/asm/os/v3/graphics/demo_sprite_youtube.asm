@@ -13,13 +13,13 @@
 
 section .data
 
-COL_TRANSPARENT equ 0x00
-COL_RED         equ 0x01
-COL_WHITE       equ 0xC0
+YT_COL_TRANSPARENT equ 0x00
+YT_COL_RED         equ 0x01
+YT_COL_WHITE       equ 0xC0
 
-_X equ COL_TRANSPARENT
-_R equ COL_RED
-_W equ COL_WHITE
+_X equ YT_COL_TRANSPARENT
+_R equ YT_COL_RED
+_W equ YT_COL_WHITE
 
 ; ============================================================================
 ; YOUTUBE 16x16
@@ -65,8 +65,9 @@ section .text
     global draw_youtube_logo
 
 
-_exit:
-    ret
+; entrypoint
+call draw_youtube_logo
+ret
 
 
 ; ============================================================================

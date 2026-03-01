@@ -55,9 +55,13 @@ export type RegistersDump = {
 }
 
 
-const defaultCodeFilepath = "user/examples/sokoban_game.asm";
+//const bootloaderCodeFilepath = "bootloader/bootloader_v2.asm";
+const bootloaderCodeFilepath = "bootloader/bootloader_v3.asm";
+
 const osCodeFilepath = "os/os_v3.asm";
-const bootloaderCodeFilepath = "bootloader/bootloader_v2.asm";
+
+const defaultCodeFilepath = "user/examples/sokoban_game.asm";
+
 
 const asmPrefixUrl = "";
 
@@ -205,15 +209,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     // Load bootloader ROM when computer is instanciated
     useEffect(() => {
         if (!emulator.computerPointer) return;
-        const bootloaderFileUrl = "bootloader/bootloader_v2.asm";
-        const timer = setTimeout(() => loadBootloader(bootloaderFileUrl), 100);
+        const timer = setTimeout(() => loadBootloader(bootloaderCodeFilepath), 100);
         return () => clearTimeout(timer);
     }, [emulator.computerPointer]);
 
 
     // Load bootloader
-    const loadBootloader = async (bootloaderFileUrl: string) => {
-        const compiled = await compilerHook.compileBootloader()
+    const loadBootloader = async (bootloaderFilepath: string) => {
+        const compiled = await compilerHook.compileBootloader(bootloaderFilepath)
 
         const newCodeMapping = getAssemblyCodeMapping(compiled);
         updateCodeMapping(newCodeMapping)
@@ -237,13 +240,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
 
 
+    // open files in editor at startup
     useEffect(() => {
         const _run = async () => {
-            const contentDefault = await assemblyEditorHook.fetchFile(defaultCodeFilepath)
-            assemblyEditorHook.openFile(defaultCodeFilepath, contentDefault)
+            //const contentDefault = await assemblyEditorHook.fetchFile(defaultCodeFilepath)
+            //assemblyEditorHook.openFile(defaultCodeFilepath, contentDefault)
 
-            //const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
-            //assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, undefined, false)
+            const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
+            assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, undefined, false)
 
             //const contentOs = await assemblyEditorHook.fetchFile(osCodeFilepath)
             //assemblyEditorHook.openFile(osCodeFilepath, contentOs, undefined, undefined, false)
@@ -277,7 +281,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
 
     // Compile OS Code
     const compileAndLoadOsCode = async () => {
-        const compiled = await compilerHook.compileOs()
+        const compiled = await compilerHook.compileOs(osCodeFilepath)
 
         const newCodeMapping = getAssemblyCodeMapping(compiled);
         updateCodeMapping(newCodeMapping)

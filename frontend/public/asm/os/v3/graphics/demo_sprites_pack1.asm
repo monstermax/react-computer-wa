@@ -154,8 +154,9 @@ section .text
     global draw_mario_and_sonic
 
 
-_exit:
-    ret
+; entrypoint
+call draw_mario
+ret
 
 
 ; ============================================================================

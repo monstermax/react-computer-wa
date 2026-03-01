@@ -31,8 +31,9 @@ section .text
     global draw_plasma
 
 
-_exit:
-    ret
+; entrypoint
+call draw_rainbow_diagonal
+ret
 
 
 

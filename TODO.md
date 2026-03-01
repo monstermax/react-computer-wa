@@ -4,6 +4,8 @@
 - os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
 - import/export des io disk via json et/ou raw
+- gui: afficher l'etat de la pile
+- gui connexion/deconnexion de device io à chaud
 
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 

@@ -7,6 +7,7 @@
 
 .include "os/v3/drivers/init_devices.asm"
 .include "os/v3/shell/lib_shell.asm"
+.include "os/v3/filesystem/lib_virtual_filesystem.asm"
 
 
 section .data
@@ -21,13 +22,13 @@ _start:
     mov dl, OS_VERSION ; set register D with the OS version => D = OS_VERSION
 
     ; init drivers
-    call init_drivers
-
-    ; init virtual file system
-    call init_vfs
+    call init_devices
 
     ; clear console
     call console_clear
+
+    ; init virtual file system
+    call init_virtual_file_system ; EN COURS DE DEV
 
     ; init open files
     call init_open_files
@@ -44,20 +45,13 @@ _start:
     ; init gestion des utilisateurs
     call init_users
 
+    ; clear console
+    call console_clear
+
     ; run /sbin/init (then spawn a shell)
     call run_shell
 
     hlt
-
-
-init_vfs:
-    ; todo
-    ret
-
-
-init_drivers:
-    call init_devices
-    ret
 
 
 init_open_files:

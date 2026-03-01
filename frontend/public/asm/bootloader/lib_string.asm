@@ -1,7 +1,7 @@
 ; Author: yomax
 ; Date: 2026-02
 ; Name: lib_string
-; Description: Lib string for bootloader_v2
+; Description: Lib string for bootloader
 
 
 .include "bootloader/lib_math.asm"

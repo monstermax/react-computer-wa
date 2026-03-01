@@ -7,6 +7,7 @@
 section .text
     global inc_ab
     global inc_cd
+    global inc_ef
     global dec_ab
     global dec_cd
     global add_ab_e
@@ -15,8 +16,7 @@ section .text
     global sub_cd_e
 
 
-_exit:
-    ret
+ret ; this is a lib. no default entrypoint defined
 
 
 ; Incrémente (A:B)
@@ -37,6 +37,15 @@ inc_cd:
     ret
 
 
+; Incrémente (E:F)
+inc_ef:
+    inc el
+    jnc INC_EF_END
+    inc fl
+    INC_EF_END:
+    ret
+
+
 ; Décrémente (A:B)
 dec_ab:
     dec al
@@ -52,6 +61,15 @@ dec_cd:
     jnc DEC_CD_END
     dec dl
     DEC_CD_END:
+    ret
+
+
+; Décrémente (E:F)
+dec_ef:
+    dec el
+    jnc DEC_EF_END
+    dec fl
+    DEC_EF_END:
     ret
 
 
@@ -152,11 +170,11 @@ mul8_signed:
 
     ; Applique le signe si nécessaire
     test cl, cl
-    jz .end
+    jz .mul8_signed_end
     not al           ; Complément à 1
     add al, 1        ; Complément à 2
 
-.end:
+.mul8_signed_end:
     pop dx
     pop cx
     ret
@@ -202,13 +220,13 @@ div8:
     ; Résultats
     mov al, ch       ; quotient
     mov bl, dl       ; reste
-    jmp .end
+    jmp .div8_end
 
 .error:
     mov al, 0xFF
     mov bl, 0xFF
 
-.end:
+.div8_end:
     pop dx
     pop cx
     ret

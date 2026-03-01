@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
   "generated": "2026-03-01T00:27:16.186Z",
   "count": 47,
+=======
+  "generated": "2026-02-27T23:24:54.678Z",
+  "count": 48,
+>>>>>>> fb29256a4a71e272d44ca55bf0361be6f367e711
   "files": [
     "bootloader/bootloader_v2.asm",
     "bootloader/devices/lib_console.asm",
@@ -9,7 +14,8 @@
     "bootloader/lib_devices.asm",
     "bootloader/lib_math.asm",
     "bootloader/lib_string.asm",
-    "bootloader/v4/bootloader_v4.asm",
+    "bootloader/v4/bootloader_v4_stage1.asm",
+    "bootloader/v4/bootloader_v4_stage2.asm",
     "os/os_v3.asm",
     "os/v3/arithmetic/lib_math.asm",
     "os/v3/arithmetic/russian_multiply.asm",
