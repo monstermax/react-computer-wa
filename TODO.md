@@ -1,11 +1,15 @@
 
-- os: filesystem (mkfs)
+- creer boot_disk (contenant le code du bootloader) + au demarrage copier le contenu de ce disk en ram
+
+- os: partitions / secteur d'amorcage
+- os: filesystem (mkfs) => voir https://github.com/ReturnInfinity/BareMetal-OS-legacy/blob/master/os/drivers/filesystems/bmfs.asm
 - os: parser les arguments de la commande shell
 - os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)
 - import/export des io disk via json et/ou raw
 - gui: afficher l'etat de la pile
 - gui connexion/deconnexion de device io à chaud
+- cpu: gérer des registres 16-bit (couple de registres 8-bit) ?
 
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 
@@ -74,3 +78,30 @@ idées noms chaine youtube / discord:
 - RétroCode
 - La Guerre des Bits
 - Le Bastion 8-bit
+
+
+
+
+
+Doc Dev OS :
+- https://wiki.osdev.org/
+
+
+FileSystem
+- https://wiki.osdev.org/BMFS => https://github.com/ReturnInfinity/BareMetal-OS-legacy/blob/master/os/drivers/filesystems/bmfs.asm
+- https://mikeos.sourceforge.net/handbook-appdev-asm.html#syscalldisk => Mike OS Floppy Files
+
+
+Autre projet d'OS:
+- https://mikeos.sourceforge.net/ => (description FR : https://www.berlios.de/software/mikeos/ )
+- https://github.com/ReturnInfinity/BareMetal-OS
+- https://github.com/ReturnInfinity/BareMetal
+- https://github.com/ReturnInfinity/BareMetal-OS-legacy
+- https://github.com/prochazkaml/MichalOS => MikeOS fork
+- https://tomos.sourceforge.net/ => MikeOS fork
+
+
+
+Compilateur :
+- https://github.com/wojtup/mosbc => MikeOS' BASIC Compiler
+
