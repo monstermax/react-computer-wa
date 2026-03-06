@@ -37,7 +37,7 @@ export const useCompiler = (): CompilerHook => {
     // Compile Assembly Booloader
     const compileBootloader = async (bootloaderFilepath?: string): Promise<CompiledProgram> => {
         const filepath = bootloaderFilepath ?? "bootloader/bootloader_v2.asm";
-        const startAddress = MEMORY_MAP.ROM_START;
+        const startAddress = MEMORY_MAP.BOOTLOADER_START;
         const compiled = await compileFile(filepath, startAddress)
         return compiled;
     }

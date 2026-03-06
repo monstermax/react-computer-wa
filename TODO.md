@@ -1,6 +1,4 @@
 
-- creer boot_disk (contenant le code du bootloader) + au demarrage copier le contenu de ce disk en ram
-
 - os: partitions / secteur d'amorcage
 - os: filesystem (mkfs) => voir https://github.com/ReturnInfinity/BareMetal-OS-legacy/blob/master/os/drivers/filesystems/bmfs.asm
 - os: parser les arguments de la commande shell

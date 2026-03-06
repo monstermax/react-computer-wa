@@ -13,12 +13,19 @@ declare namespace __AdaptedExports {
    */
   export function allocate(size: number): number;
   /**
-   * src/index/computerloadCode
+   * src/index/computerloadCodeInROM
    * @param computer `src/Computer/Computer`
    * @param valPtr `usize`
    * @param dataLen `i32`
    */
-  export function computerloadCode(computer: __Internref4, valPtr: number, dataLen: number): void;
+  export function computerloadCodeInROM(computer: __Internref4, valPtr: number, dataLen: number): void;
+  /**
+   * src/index/computerloadCodeInRAM
+   * @param computer `src/Computer/Computer`
+   * @param valPtr `usize`
+   * @param dataLen `i32`
+   */
+  export function computerloadCodeInRAM(computer: __Internref4, valPtr: number, dataLen: number): void;
   /**
    * src/index/computerRunCycles
    * @param computer `src/Computer/Computer`

@@ -40,10 +40,15 @@ export async function instantiate(module, imports = {}) {
       // src/index/allocate(i32) => usize
       return exports.allocate(size) >>> 0;
     },
-    computerloadCode(computer, valPtr, dataLen) {
-      // src/index/computerloadCode(src/Computer/Computer, usize, i32) => void
+    computerloadCodeInROM(computer, valPtr, dataLen) {
+      // src/index/computerloadCodeInROM(src/Computer/Computer, usize, i32) => void
       computer = __lowerInternref(computer) || __notnull();
-      exports.computerloadCode(computer, valPtr, dataLen);
+      exports.computerloadCodeInROM(computer, valPtr, dataLen);
+    },
+    computerloadCodeInRAM(computer, valPtr, dataLen) {
+      // src/index/computerloadCodeInRAM(src/Computer/Computer, usize, i32) => void
+      computer = __lowerInternref(computer) || __notnull();
+      exports.computerloadCodeInRAM(computer, valPtr, dataLen);
     },
     computerRunCycles(computer, cycles, skipBreakpoints) {
       // src/index/computerRunCycles(src/Computer/Computer, u32, bool?) => bool

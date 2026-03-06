@@ -2,13 +2,17 @@
 export namespace MEMORY_MAP {
 
     // ## ROM ## (0x0000-0x04FF) - 1280 bytes
-    export const ROM_START: u16 = 0x0000;
-    export const ROM_END: u16 = 0x04FF;
+    //export const ROM_START: u16 = 0x0000;
+    //export const ROM_END: u16 = 0x04FF;
 
 
     // ## RAM ## (0x0500-0xEFFF) - ~60KB (OS + STACK)
-    export const RAM_START: u16 = 0x0500;
+    //export const RAM_START: u16 = 0x0500;
+    export const RAM_START: u16 = 0x0000;
     export const RAM_END: u16 = 0xEFFF;
+
+        // RAM / BOOTLOADER (0x0000-???)
+        export const BOOTLOADER_START: u16 = 0x0000;
 
         // ## RAM / Device Table ## (0x0500-0x057F) - 4096 bytes
         // Header: 1 byte (device count)
@@ -26,7 +30,6 @@ export namespace MEMORY_MAP {
         // Null-terminated strings, allocated sequentially
         export const DEVICE_STRINGS_START: u16 = 0x0580;
         export const DEVICE_STRINGS_END: u16 = 0x05FF;
-
 
         // RAM / OS (0x1000-???)
         export const OS_START: u16 = 0x1000;
@@ -73,7 +76,8 @@ export const DEVICE_TYPE_STORAGE: u8 = 0x03;
 
 
 export function isRomAddress(address: u16): boolean {
-    return address >= MEMORY_MAP.ROM_START && address <= MEMORY_MAP.ROM_END;
+    return false;
+    //return address >= MEMORY_MAP.ROM_START && address <= MEMORY_MAP.ROM_END;
 }
 
 

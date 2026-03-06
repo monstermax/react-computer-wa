@@ -221,7 +221,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         const newCodeMapping = getAssemblyCodeMapping(compiled);
         updateCodeMapping(newCodeMapping)
 
-        const size = emulator.loadBootloader(compiled)
+        const size = emulator.loadBootloaderInRAM(compiled)
         setBootloaderLoaded(true);
         addLog(`Bootloader loaded (${size} bytes)`);
     };
@@ -276,6 +276,7 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
         // Reset Computer
         emulator.resetComputer()
 
+        //loadBootloader(bootloaderCodeFilepath)
     }
 
 

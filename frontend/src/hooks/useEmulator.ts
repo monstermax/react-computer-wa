@@ -405,7 +405,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     // Load code
 
     // Load bootloader
-    const loadBootloader = (compiled: CompiledProgram): number => {
+    const loadBootloaderInRAM = (compiled: CompiledProgram): number => {
         if (!wasmExports || !computerPointer || !devicesManager.devicesRef.current) return 0;
 
         const uint8Arr: Uint8Array = getBytecodeUint8Array(compiled);
@@ -414,7 +414,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         new Uint8Array(wasmExports.memory.buffer).set(uint8Arr, valPtr);
 
         try {
-            wasmExports.computerloadCode(computerPointer, valPtr, uint8Arr.length);
+            wasmExports.computerloadCodeInRAM(computerPointer, valPtr, uint8Arr.length);
             return uint8Arr.length;
 
         } catch (err: any) {
@@ -444,7 +444,7 @@ export const useEmulator = (params: useEmulatorParams) => {
         readRam,
         writeRam,
         resetComputer,
-        loadBootloader,
+        loadBootloaderInRAM,
         setEditorBreakpointsForCpu,
         wasmError,
     };
@@ -473,7 +473,7 @@ export type EmulatorHook = {
     readRam: (address: u16) => u8;
     writeRam: (address: u16, value: u8) => void;
     resetComputer: () => void;
-    loadBootloader: (compiled: CompiledProgram) => number;
+    loadBootloaderInRAM: (compiled: CompiledProgram) => number;
     setEditorBreakpointsForCpu: (breakpoints: Breakpoint[]) => void;
     wasmError: (error: Error) => never;
 }

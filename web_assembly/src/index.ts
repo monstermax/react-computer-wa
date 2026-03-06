@@ -25,18 +25,36 @@ export function allocate(size: i32): usize {
 
 
 // Load bootloader code in ROM
-export function computerloadCode(
-    computer: Computer,
-    valPtr: usize,
-    dataLen: i32
-): void {
+export function computerloadCodeInROM(computer: Computer, valPtr: usize, dataLen: i32): void {
     const rom = computer.rom;
 
     if (!rom) {
         throw new Error("ROM not found");
     }
 
-    if (dataLen > (MEMORY_MAP.ROM_END + 1 as i32)) {
+    //if (dataLen > (MEMORY_MAP.ROM_END + 1 as i32)) {
+    //    throw new Error("Bootloader code too heavy");
+    //}
+
+    for (let i: i32 = 0; i < dataLen; i++) {
+        //const addr: u16 = load<u16>(addrPtr + i);
+        const addr: u16 = i as u16;
+        const val: u8 = load<u8>(valPtr + i);
+        //console.log(`load code line #${i} (addr=${addr} | val=${val})`)
+        rom.write(addr, val);
+    }
+}
+
+
+// Load bootloader code in RAM
+export function computerloadCodeInRAM(computer: Computer, valPtr: usize, dataLen: i32): void {
+    const ram = computer.ram;
+
+    if (!ram) {
+        throw new Error("RAM not found");
+    }
+
+    if (dataLen > (MEMORY_MAP.RAM_END + 1 as i32)) {
         throw new Error("Bootloader code too heavy");
     }
 
@@ -45,7 +63,7 @@ export function computerloadCode(
         const addr: u16 = i as u16;
         const val: u8 = load<u8>(valPtr + i);
         //console.log(`load code line #${i} (addr=${addr} | val=${val})`)
-        rom.write(addr, val);
+        ram.write(addr, val);
     }
 }
 
