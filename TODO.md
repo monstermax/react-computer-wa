@@ -101,6 +101,7 @@ Autre projet d'OS:
 - https://www.haiku-os.org/ => Haiku OS
 - https://git.kolibrios.org/KolibriOS/kolibrios => Kolibri OS
 - https://lifo.sh/ => A browser-native operating system
+- https://templeos.org/ => Temple OS
 
 
 
