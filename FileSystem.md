@@ -61,6 +61,33 @@ mount /dev/0 /usr
 
 
 
+## MBR
+
+```
++-------------------------------+---------------------------+-----------------+
+|      Code d'amorçage          |   Table des partitions    |   Signature     |
+|      (Bootloader code)        |   (Partition table)       |   0x55AA        |
+|      (446 octets)             |   (64 octets)             |   (2 octets)    |
++-------------------------------+---------------------------+-----------------+
+^                               ^                           ^
+0x0000                          0x01BE                      0x01FE
+(Tout début du disque)           (Début de la table)        (Fin du MBR)
+```
+
+
+1. Si le disque n'est PAS bootable (disque de données)
+- Même si vous ne pouvez pas démarrer dessus, le disque a besoin d'une table des partitions pour que le système d'exploitation puisse organiser et trouver vos fichiers.
+- Code d'amorçage (octets 0-445) : Cette zone est soit vide (remplie de zéros), soit elle contient des données aléatoires ou un code inoffensif, mais rien qui ne permette de lancer un OS.
+- Table des partitions (octets 446-509) : Elle est bien présente et correctement renseignée. C'est elle qui indique où se trouve la partition "Data" (en NTFS, ext4, etc.).
+- Signature 0x55AA (octets 510-511) : Elle est toujours présente. C'est elle qui valide que le secteur 0 est bien un secteur de type MBR (valide), même si le code dedans est inutilisable pour booter.
+
+2. Si le disque EST bootable (disque système)
+- Code d'amorçage (octets 0-445) : Cette zone contient un petit programme (bootloader). Son rôle est de chercher dans la table des partitions la partition marquée comme "active" (bootable) pour charger le reste du système.
+- Table des partitions (octets 446-509) : Elle est présente, et l'une des entrées a un flag spécial appelé "boot flag" (indicateur de démarrage).
+- Signature 0x55AA (octets 510-511) : Toujours présente.
+
+
+
 ---
 
 ## Process
