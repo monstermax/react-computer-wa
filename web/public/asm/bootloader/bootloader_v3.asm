@@ -8,6 +8,12 @@
 ; 3. Jump à l'adresse 0x1000 pour déléguer la suite de l'execution à l'OS
 
 
+; TODO
+; 1. scanner toutes les devices
+; 2. si device de type storage, examiner le master boot record (512 1er octets)
+; 3. si MBR valide et amorcable on utilise ce disk
+
+
 .org 0x0000
 
 .include "bootloader/lib_math.asm"

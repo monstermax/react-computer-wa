@@ -93,15 +93,17 @@ FileSystem
 
 Autre projet d'OS:
 - https://mikeos.sourceforge.net/ => (description FR : https://www.berlios.de/software/mikeos/ )
-- https://github.com/ReturnInfinity/BareMetal-OS
-- https://github.com/ReturnInfinity/BareMetal
-- https://github.com/ReturnInfinity/BareMetal-OS-legacy
+- https://github.com/ReturnInfinity/BareMetal-OS => BareMetal
+- https://github.com/ReturnInfinity/BareMetal => BareMetal
+- https://github.com/ReturnInfinity/BareMetal-OS-legacy => BareMetal
 - https://github.com/prochazkaml/MichalOS => MikeOS fork
 - https://tomos.sourceforge.net/ => MikeOS fork
 - https://www.haiku-os.org/ => Haiku OS
 - https://git.kolibrios.org/KolibriOS/kolibrios => Kolibri OS
-- https://lifo.sh/ => A browser-native operating system
+- https://lifo.sh/ => Lifo - A browser-native operating system
 - https://templeos.org/ => Temple OS
+- https://github.com/SerenityOS/serenity => Serenity OS
+- https://github.com/rh1tech/frankos => Frank OS
 
 
 
