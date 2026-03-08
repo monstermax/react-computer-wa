@@ -23,11 +23,11 @@ In short: devices turn opcodes into real, observable behavior.
 A device is implemented as a frontend class extending `IoDevice`.
 
 Reference base class:
-- `frontend/src/components/devices/IoDevice.ts`
+- `web/src/components/devices/IoDevice.ts`
 
 Typical implementation files:
-- `frontend/src/components/devices/<device>.tsx`
-- or `frontend/src/components/devices/<device>.ts`
+- `web/src/components/devices/<device>.tsx`
+- or `web/src/components/devices/<device>.ts`
 
 A device is accessed through memory-mapped I/O:
 - global I/O range starts at `0xF000`
@@ -54,7 +54,7 @@ Optional (recommended):
 ## 1) Create the device file
 
 Add a file in:
-- `frontend/src/components/devices/`
+- `web/src/components/devices/`
 
 Example filename:
 - `my_device.tsx`

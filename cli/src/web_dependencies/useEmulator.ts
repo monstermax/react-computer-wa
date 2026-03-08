@@ -5,13 +5,13 @@ import { deviceTypeFromString, useDevicesManager, type DeviceHook, type DevicesM
 import { Clock } from "./devices/clock";
 import { delayer } from "../lib/lib_delayer";
 
-import * as releaseModule from "../../../web_assembly/build/release";
+import * as releaseModule from "../../../webassembly/build/release";
 
 import type { u32, u8, u16 } from "@/types";
 import type { IoDevice } from "./IoDevice";
 import type { InterruptTimerDevice } from "./devices/interrupt_timer";
 
-import type { CompiledProgram } from "../../../frontend/src/types/compiler.types";
+import type { CompiledProgram } from "../../../web/src/types/compiler.types";
 
 
 interface Window {
@@ -384,7 +384,7 @@ export const useEmulator = async (params: useEmulatorParams) => {
         new Uint8Array(wasmExports.memory.buffer).set(values, valPtr);
 
         try {
-            wasmExports.computerloadCode(computerPointer, valPtr, values.length);
+            wasmExports.computerloadCodeInRAM(computerPointer, valPtr, values.length);
             return values.length;
 
         } catch (err: any) {
@@ -449,9 +449,11 @@ export type EmulatorHook = {
 async function loadWasmExports(imports: { env: unknown }, debug=true) {
     const urlPrefix = "http://localhost:3950";
 
+    console.log(`Loading WASM`)
+
     const wasmFileUrl = debug
-        ? `${urlPrefix}/web_assembly/debug.wasm`
-        : `${urlPrefix}/web_assembly/release.wasm`
+        ? `${urlPrefix}/webassembly/debug.wasm`
+        : `${urlPrefix}/webassembly/release.wasm`
 
     const _module = await WebAssembly.compileStreaming(fetch(wasmFileUrl));
     const wasmExports = await releaseModule.instantiate(_module, imports);

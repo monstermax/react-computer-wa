@@ -15,5 +15,5 @@ npm run asbuild
 
 ## Main folders
 
-- `frontend/`: UI, compiler integration, playground
-- `web_assembly/`: CPU, memory bus, I/O manager, wasm exports
+- `web/`: UI, compiler integration, playground
+- `webassembly/`: CPU, memory bus, I/O manager, wasm exports

@@ -1,6 +1,6 @@
 # Rtc
 
-Source file: [`frontend/src/components/devices/rtc.tsx`](../../../frontend/src/components/devices/rtc.tsx)
+Source file: [`web/src/components/devices/rtc.tsx`](../../../web/src/components/devices/rtc.tsx)
 
 ## Description
 

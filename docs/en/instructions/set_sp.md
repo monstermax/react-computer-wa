@@ -18,7 +18,7 @@ Set stack pointer.
 
 ## Runtime status
 
-- Implemented in `web_assembly/src/Cpu.ts`.
+- Implemented in `webassembly/src/Cpu.ts`.
 
 ## Assembly example
 

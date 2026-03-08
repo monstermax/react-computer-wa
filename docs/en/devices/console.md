@@ -1,6 +1,6 @@
 # Console
 
-Source file: [`frontend/src/components/devices/console.tsx`](../../frontend/src/components/devices/console.tsx)
+Source file: [`web/src/components/devices/console.tsx`](../../web/src/components/devices/console.tsx)
 
 ## Description
 

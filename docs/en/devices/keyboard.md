@@ -1,6 +1,6 @@
 # Keyboard
 
-Source file: [`frontend/src/components/devices/keyboard.tsx`](../../frontend/src/components/devices/keyboard.tsx)
+Source file: [`web/src/components/devices/keyboard.tsx`](../../web/src/components/devices/keyboard.tsx)
 
 ## Description
 

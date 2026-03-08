@@ -1,6 +1,6 @@
 # Switchs
 
-Source file: [`frontend/src/components/devices/switchs.tsx`](../../../frontend/src/components/devices/switchs.tsx)
+Source file: [`web/src/components/devices/switchs.tsx`](../../../web/src/components/devices/switchs.tsx)
 
 ## Description
 

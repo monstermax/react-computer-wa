@@ -20,7 +20,7 @@ Load a 16-bit address/value reference into a register pair.
 
 ## Runtime status
 
-- Implemented in `web_assembly/src/Cpu.ts`.
+- Implemented in `webassembly/src/Cpu.ts`.
 
 ## Assembly example
 

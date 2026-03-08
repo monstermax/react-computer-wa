@@ -1,6 +1,6 @@
 # Speaker
 
-Source file: [`frontend/src/components/devices/speaker.ts`](../../../frontend/src/components/devices/speaker.ts)
+Source file: [`web/src/components/devices/speaker.ts`](../../../web/src/components/devices/speaker.ts)
 
 ## Description
 

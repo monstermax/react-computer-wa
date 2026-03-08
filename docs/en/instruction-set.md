@@ -1,10 +1,10 @@
 # Instruction Set
 
-Source file: [`web_assembly/src/cpu_instructions.ts`](../../web_assembly/src/cpu_instructions.ts)  
-Source file: [`web_assembly/src/Cpu.ts`](../../web_assembly/src/Cpu.ts)  
+Source file: [`webassembly/src/cpu_instructions.ts`](../../webassembly/src/cpu_instructions.ts)  
+Source file: [`webassembly/src/Cpu.ts`](../../webassembly/src/Cpu.ts)  
 
-Opcode definitions are in `web_assembly/src/cpu_instructions.ts`.
-Execution behavior is implemented in `web_assembly/src/Cpu.ts`.
+Opcode definitions are in `webassembly/src/cpu_instructions.ts`.
+Execution behavior is implemented in `webassembly/src/Cpu.ts`.
 
 ## Control
 

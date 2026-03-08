@@ -99,10 +99,10 @@ npm run asbuild
 ## Project Structure
 
 ```
-web_assembly/
+webassembly/
   src/                # AssemblyScript CPU implementation (→ WASM)
 
-frontend/
+web/
   src/
     compiler/         # Assembly compiler (two-pass, TypeScript)
     components/

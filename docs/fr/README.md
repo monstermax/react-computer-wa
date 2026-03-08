@@ -13,8 +13,8 @@
 
 ## Structure du projet
 
-- `frontend/` : application React + Vite + TypeScript
-- `web_assembly/` : CPU/runtime en AssemblyScript compilé en WebAssembly
+- `web/` : application React + Vite + TypeScript
+- `webassembly/` : CPU/runtime en AssemblyScript compilé en WebAssembly
 
 ## Portée FR
 

@@ -1,6 +1,6 @@
 # Leds
 
-Source file: [`frontend/src/components/devices/leds.tsx`](../../frontend/src/components/devices/leds.tsx)
+Source file: [`web/src/components/devices/leds.tsx`](../../web/src/components/devices/leds.tsx)
 
 ## Description
 

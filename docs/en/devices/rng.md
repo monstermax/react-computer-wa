@@ -1,6 +1,6 @@
 # Rng
 
-Source file: [`frontend/src/components/devices/rng.tsx`](../../../frontend/src/components/devices/rng.tsx)
+Source file: [`web/src/components/devices/rng.tsx`](../../../web/src/components/devices/rng.tsx)
 
 ## Description
 

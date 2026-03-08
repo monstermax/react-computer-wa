@@ -15,5 +15,5 @@
 
 ## Project layout
 
-- `frontend/`: React + Vite + TypeScript application
-- `web_assembly/`: AssemblyScript CPU/runtime compiled to WebAssembly
+- `web/`: React + Vite + TypeScript application
+- `webassembly/`: AssemblyScript CPU/runtime compiled to WebAssembly

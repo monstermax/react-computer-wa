@@ -1,6 +1,6 @@
 # Dma
 
-Source file: [`frontend/src/components/devices/dma.tsx`](../../frontend/src/components/devices/dma.tsx)
+Source file: [`web/src/components/devices/dma.tsx`](../../web/src/components/devices/dma.tsx)
 
 ## Description
 

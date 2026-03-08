@@ -1,7 +1,7 @@
 
 import React from "react";
 
-import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
+import { MEMORY_MAP } from "@/../../webassembly/src/memory_map";
 import { toHex } from "@/lib/lib_numbers";
 
 

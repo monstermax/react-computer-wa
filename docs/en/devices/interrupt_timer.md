@@ -1,6 +1,6 @@
 # Interrupt_timer
 
-Source file: [`frontend/src/components/devices/interrupt_timer.tsx`](../../../frontend/src/components/devices/interrupt_timer.tsx)
+Source file: [`web/src/components/devices/interrupt_timer.tsx`](../../../web/src/components/devices/interrupt_timer.tsx)
 
 ## Description
 

@@ -1,6 +1,6 @@
 {
-  "generated": "2026-03-03T01:50:20.601Z",
-  "count": 47,
+  "generated": "2026-03-08T10:17:29.594Z",
+  "count": 48,
   "files": [
     "bootloader/bootloader_v2.asm",
     "bootloader/bootloader_v3.asm",
@@ -32,6 +32,7 @@
     "os/v3/shell/lib_shell.asm",
     "os/v3/strings/lib_ascii.asm",
     "os/v3/strings/lib_string.asm",
+    "os/v3/syscalls/syscalls.asm",
     "user/examples/color_sort.asm",
     "user/examples/draw_fractal_on_screen.asm",
     "user/examples/draw_fractal_on_screen_hd.asm",

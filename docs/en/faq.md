@@ -2,15 +2,15 @@
 
 ## Where are opcodes defined?
 
-`web_assembly/src/cpu_instructions.ts`
+`webassembly/src/cpu_instructions.ts`
 
 ## Where is instruction behavior implemented?
 
-`web_assembly/src/Cpu.ts` (`fetchInstructionActions`)
+`webassembly/src/Cpu.ts` (`fetchInstructionActions`)
 
 ## Where are wasm exports declared?
 
-`web_assembly/src/index.ts`
+`webassembly/src/index.ts`
 
 ## How does memory-mapped I/O work?
 

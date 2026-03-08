@@ -1,25 +1,25 @@
 
 import fs from 'fs';
 
-import * as releaseModule from "../../web_assembly/build/release";
+import * as releaseModule from "../../webassembly/build/release";
 
-import { EmulatorHook, getBytecodeArray, RegistersDump, useEmulator } from "./frontend_dependencies/useEmulator";
+import { EmulatorHook, getBytecodeArray, RegistersDump, useEmulator } from "./web_dependencies/useEmulator";
 
-//import { compileCode, compileCodeV2, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "../../frontend/src/compiler/compiler_utils";
+//import { compileCode, compileCodeV2, getAssemblyCodeMapping, getBytecodeArray, loadSourceCodeFromFile } from "../../web/src/compiler/compiler_utils";
 
-import { CompiledProgram, CompilerError } from "../../frontend/src/types/compiler.types";
+import { CompiledProgram, CompilerError } from "../../web/src/types/compiler.types";
 
 import type { u16, u32, u8 } from './types';
-import { useDevice } from './frontend_dependencies/useDevice';
-import { InterruptDevice } from './frontend_dependencies/devices/interrupt';
-import { InterruptTimerDevice } from './frontend_dependencies/devices/interrupt_timer';
-import { DiskDevice } from './frontend_dependencies/devices/disk';
-import { DmaDevice } from './frontend_dependencies/devices/dma';
-import { RtcDevice } from './frontend_dependencies/devices/rtc';
-import { RngDevice } from './frontend_dependencies/devices/rng';
+import { useDevice } from './web_dependencies/useDevice';
+import { InterruptDevice } from './web_dependencies/devices/interrupt';
+import { InterruptTimerDevice } from './web_dependencies/devices/interrupt_timer';
+import { DiskDevice } from './web_dependencies/devices/disk';
+import { DmaDevice } from './web_dependencies/devices/dma';
+import { RtcDevice } from './web_dependencies/devices/rtc';
+import { RngDevice } from './web_dependencies/devices/rng';
 import { toHex } from './lib/lib_numbers';
-import { SwitchsDevice } from './frontend_dependencies/devices/switchs';
-import { NetworkTcpDevice } from './frontend_dependencies/devices/network_tcp';
+import { SwitchsDevice } from './web_dependencies/devices/switchs';
+import { NetworkTcpDevice } from './web_dependencies/devices/network_tcp';
 
 
 export type WasmExports = typeof releaseModule.__AdaptedExports;
@@ -90,6 +90,8 @@ async function main() {
     }
 
 
+    console.log(`Running Emulator`)
+
 
     const emulator = await useEmulator({ clockFrequency, speedMultiplier, addLog, dumpRegisters })
 
@@ -98,12 +100,16 @@ async function main() {
         if (true) {
             // Load bootloader
 
+            console.log(`Loading Bootloader`)
+
             //const bootloaderFileUrl = "bootloader/bootloader_v2.asm";
             //const sourceCode = await loadSourceCodeFromFile(bootloaderFileUrl);
 
             //const compiled = await compileCode(sourceCode, { startAddress: MEMORY_MAP.ROM_START, architecture: CUSTOM_CPU });
             //const compiled = await compileCodeV2(sourceCode, bootloaderFileUrl, { startAddress: MEMORY_MAP.ROM_START });
-            const compiled = JSON.parse(fs.readFileSync(`${__dirname}/../compiled/booloader_v2.bin.json`).toString()) as CompiledProgram;
+
+            const jsonContent = fs.readFileSync(`${__dirname}/../compiled/booloader_v2.bin.json`).toString();
+            const compiled = JSON.parse(jsonContent) as CompiledProgram;
 
             if (compiled.errors.length > 0) {
                 const errMsg = compiled.errors.map((e: CompilerError) => `Line ${e.line}: ${e.message}`).join('\n');
@@ -121,7 +127,10 @@ async function main() {
         if (true) {
             // Load OS
 
-            const compiled = JSON.parse(fs.readFileSync(`${__dirname}/../compiled/os_v3.bin.json`).toString()) as CompiledProgram;
+            console.log(`Loading OS`)
+
+            const jsonContent = fs.readFileSync(`${__dirname}/../compiled/os_v3.bin.json`).toString();
+            const compiled = JSON.parse(jsonContent) as CompiledProgram;
 
             //const newCodeMapping = getAssemblyCodeMapping(compiled);
             //updateCodeMapping(newCodeMapping)
@@ -139,6 +148,8 @@ async function main() {
 
         if (true) {
             // Load Program
+
+            console.log(`Loading Program`)
 
             const programName = "network_tcp_client_test";
             //const programName = "network_tcp_server_test";
@@ -171,6 +182,7 @@ async function main() {
         }
 
 
+        console.log(`Loading Devices`)
 
         //const keyboardDeviceHook = useDevice<KeyboardDevice>(emulator.devicesManager, 'keyboard', KeyboardDevice, {})
         //const consoleDeviceHook = useDevice<ConsoleDevice>(emulator.devicesManager, 'console', ConsoleDevice, { width: 80, height: 25 });
@@ -215,6 +227,10 @@ async function main() {
 
         //emulator.clock.start()
         //if (1) return;
+
+
+
+        console.log(`Running Cycles`)
 
         let error: any | null = null;
 

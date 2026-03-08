@@ -1,5 +1,5 @@
 
-import { MEMORY_MAP } from "../../../web_assembly/src/memory_map";
+import { MEMORY_MAP } from "../../../webassembly/src/memory_map";
 
 import { compileCodeV2, loadSourceCodeFromFile } from "@/compiler/compiler_utils";
 import { CUSTOM_CPU } from "@/compiler/arch_custom";

@@ -1,6 +1,6 @@
 # Buzzer
 
-Source file: [`frontend/src/components/devices/buzzer.tsx`](../../../frontend/src/components/devices/buzzer.tsx)
+Source file: [`web/src/components/devices/buzzer.tsx`](../../../web/src/components/devices/buzzer.tsx)
 
 ## Description
 

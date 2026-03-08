@@ -1,6 +1,6 @@
 # Screen
 
-Source file: [`frontend/src/components/devices/screen.tsx`](../../frontend/src/components/devices/screen.tsx)
+Source file: [`web/src/components/devices/screen.tsx`](../../web/src/components/devices/screen.tsx)
 
 ## Description
 

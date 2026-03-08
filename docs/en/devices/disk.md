@@ -1,6 +1,6 @@
 # Disk
 
-Source file: [`frontend/src/components/devices/disk.tsx`](../../frontend/src/components/devices/disk.tsx)
+Source file: [`web/src/components/devices/disk.tsx`](../../web/src/components/devices/disk.tsx)
 
 ## Description
 

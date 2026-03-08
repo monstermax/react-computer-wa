@@ -1,6 +1,6 @@
 # Interrupt
 
-Source file: [`frontend/src/components/devices/interrupt.tsx`](../../../frontend/src/components/devices/interrupt.tsx)
+Source file: [`web/src/components/devices/interrupt.tsx`](../../../web/src/components/devices/interrupt.tsx)
 
 ## Description
 

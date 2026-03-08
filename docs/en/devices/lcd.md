@@ -1,6 +1,6 @@
 # Lcd
 
-Source file: [`frontend/src/components/devices/lcd.tsx`](../../../frontend/src/components/devices/lcd.tsx)
+Source file: [`web/src/components/devices/lcd.tsx`](../../../web/src/components/devices/lcd.tsx)
 
 ## Description
 

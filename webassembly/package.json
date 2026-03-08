@@ -13,7 +13,7 @@
   "scripts": {
     "asbuild:debug": "asc src/index.ts --target debug",
     "asbuild:release": "asc src/index.ts --target release",
-    "asbuild": "npm run asbuild:debug && npm run asbuild:release && cp -a build/* ../frontend/public/web_assembly/",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release && cp -a build/* ../web/public/webassembly/",
     "test": "node tests",
     "start": "npx serve ."
   },

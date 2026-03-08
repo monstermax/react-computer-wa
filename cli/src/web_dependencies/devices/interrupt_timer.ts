@@ -2,7 +2,7 @@
 import { IoDevice } from "../IoDevice";
 import { U8 } from "../../lib/lib_numbers";
 
-//import { IRQ_MAP } from "../../../web_assembly/src/memory_map";
+//import { IRQ_MAP } from "../../../webassembly/src/memory_map";
 import { IRQ_MAP } from "../../webassembly_dependencies/memory_map";
 
 import type { u16, u8 } from "@/types";

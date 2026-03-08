@@ -1,6 +1,6 @@
 # Memory Map
 
-Source file: [`web_assembly/src/memory_map.ts`](../../web_assembly/src/memory_map.ts)
+Source file: [`webassembly/src/memory_map.ts`](../../webassembly/src/memory_map.ts)
 
 ## Address ranges
 

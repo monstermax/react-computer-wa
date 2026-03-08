@@ -3,11 +3,11 @@
 
 cd `dirname $0`
 
-cd web_assembly
+cd webassembly
 npm run asbuild
 
 cd ..
 
-cd frontend
+cd web
 npm run build
 

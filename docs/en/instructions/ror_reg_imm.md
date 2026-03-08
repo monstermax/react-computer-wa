@@ -19,7 +19,7 @@ Rotate right.
 
 ## Runtime status
 
-- Defined but not currently connected in `web_assembly/src/Cpu.ts`.
+- Defined but not currently connected in `webassembly/src/Cpu.ts`.
 
 ## Assembly example
 

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IoDevice } from "./IoDevice";
 import { high16, low16, toHex, U16, U8 } from "@/lib/lib_numbers";
 
-import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
+import { MEMORY_MAP } from "@/../../webassembly/src/memory_map";
 
 import type { u16, u8 } from "@/types/computer.types";
 

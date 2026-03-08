@@ -1,6 +1,6 @@
 # Screen_canvas
 
-Source file: [`frontend/src/components/devices/screen_canvas.tsx`](../../../frontend/src/components/devices/screen_canvas.tsx)
+Source file: [`web/src/components/devices/screen_canvas.tsx`](../../../web/src/components/devices/screen_canvas.tsx)
 
 ## Description
 

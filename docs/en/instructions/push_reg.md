@@ -18,7 +18,7 @@ Push register value on stack.
 
 ## Runtime status
 
-- Implemented in `web_assembly/src/Cpu.ts`.
+- Implemented in `webassembly/src/Cpu.ts`.
 
 ## Assembly example
 

@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { MEMORY_MAP } from "@/../../web_assembly/src/memory_map";
+import { MEMORY_MAP } from "@/../../webassembly/src/memory_map";
 
 import { getAssemblyCodeMapping, getBytecodeArray, getBytecodeUint8Array } from "@/compiler/compiler_utils";
 import { toHex } from "@/lib/lib_numbers";

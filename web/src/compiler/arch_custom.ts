@@ -1,5 +1,5 @@
 
-import { Opcode } from '@/../../web_assembly/src/cpu_instructions';
+import { Opcode } from '@/../../webassembly/src/cpu_instructions';
 
 import type { CPUArchitecture, RegisterDef, InstructionDef } from '@/types/compiler.types';
 

@@ -1,6 +1,6 @@
 # Clock
 
-Source file: [`frontend/src/components/devices/clock.tsx`](../../../frontend/src/components/devices/clock.tsx)
+Source file: [`web/src/components/devices/clock.tsx`](../../../web/src/components/devices/clock.tsx)
 
 ## Description
 

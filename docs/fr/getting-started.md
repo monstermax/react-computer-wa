@@ -15,5 +15,5 @@ npm run asbuild
 
 ## Dossiers principaux
 
-- `frontend/` : interface, intégration compiler, playground
-- `web_assembly/` : CPU, bus mémoire, I/O manager, exports wasm
+- `web/` : interface, intégration compiler, playground
+- `webassembly/` : CPU, bus mémoire, I/O manager, exports wasm
