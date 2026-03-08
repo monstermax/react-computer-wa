@@ -452,8 +452,8 @@ async function loadWasmExports(imports: { env: unknown }, debug=true) {
     console.log(`Loading WASM`)
 
     const wasmFileUrl = debug
-        ? `${urlPrefix}/webassembly/debug.wasm`
-        : `${urlPrefix}/webassembly/release.wasm`
+        ? `${urlPrefix}/webassembly_build/debug.wasm`
+        : `${urlPrefix}/webassembly_build/release.wasm`
 
     const _module = await WebAssembly.compileStreaming(fetch(wasmFileUrl));
     const wasmExports = await releaseModule.instantiate(_module, imports);

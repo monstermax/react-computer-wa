@@ -8,7 +8,7 @@ import { deviceTypeFromString, useDevicesManager, type DeviceHook, type DevicesM
 import { Clock } from "@/components/devices/clock";
 import { delayer } from "@/lib/lib_delayer";
 
-import * as releaseModule from "@/../public/webassembly/release";
+import * as releaseModule from "@/../public/webassembly_build/release";
 
 import type { u32, u8, u16 } from "@/types/computer.types";
 import type { CompiledProgram } from "@/types/compiler.types";
@@ -481,8 +481,8 @@ export type EmulatorHook = {
 
 async function loadWasmExports(imports: { env: unknown }, debug=true) {
     const wasmFileUrl = debug
-        ? "/webassembly/debug.wasm"
-        : "/webassembly/release.wasm"
+        ? "/webassembly_build/debug.wasm"
+        : "/webassembly_build/release.wasm"
 
     const _module = await globalThis.WebAssembly.compileStreaming(globalThis.fetch(wasmFileUrl));
     const wasmExports = await releaseModule.instantiate(_module, imports);
