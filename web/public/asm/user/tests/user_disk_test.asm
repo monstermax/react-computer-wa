@@ -1,7 +1,7 @@
 ; user_disk_test
 
 
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data

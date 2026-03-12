@@ -4,18 +4,18 @@
 ; Description: Shell Library
 
 
-.include "os/v3/arithmetic/lib_math.asm"
-.include "os/v3/drivers/lib_console.asm"
-.include "os/v3/drivers/lib_leds.asm"
-.include "os/v3/drivers/lib_keyboard.asm"
-.include "os/v3/drivers/lib_screen.asm"
-.include "os/v3/drivers/lib_switchs.asm"
-.include "os/v3/strings/lib_ascii.asm"
-.include "os/v3/strings/lib_string.asm"
-.include "os/v3/graphics/demo_screen.asm"
-.include "os/v3/graphics/demo_sprites_pack1.asm"
-.include "os/v3/graphics/demo_sprites_pack2.asm"
-.include "os/v3/graphics/demo_sprite_youtube.asm"
+%include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/drivers/lib_console.asm"
+%include "os/v3/drivers/lib_leds.asm"
+%include "os/v3/drivers/lib_keyboard.asm"
+%include "os/v3/drivers/lib_screen.asm"
+%include "os/v3/drivers/lib_switchs.asm"
+%include "os/v3/strings/lib_ascii.asm"
+%include "os/v3/strings/lib_string.asm"
+%include "os/v3/graphics/demo_screen.asm"
+%include "os/v3/graphics/demo_sprites_pack1.asm"
+%include "os/v3/graphics/demo_sprites_pack2.asm"
+%include "os/v3/graphics/demo_sprite_youtube.asm"
 
 
 section .data

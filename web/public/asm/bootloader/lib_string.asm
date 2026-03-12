@@ -4,7 +4,7 @@
 ; Description: Lib string for bootloader
 
 
-.include "bootloader/lib_math.asm"
+%include "bootloader/lib_math.asm"
 
 
 section .text

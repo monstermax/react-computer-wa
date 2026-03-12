@@ -4,8 +4,8 @@
 ; Description: initialise les devices. Repere et enregistre l'idx de chaque device à un emplacement memoire, permettant au bootloader de les manipuler facilement.
 
 
-.include "bootloader/devices/lib_console.asm"
-.include "bootloader/devices/lib_leds.asm"
+%include "bootloader/devices/lib_console.asm"
+%include "bootloader/devices/lib_leds.asm"
 
 
 section .data

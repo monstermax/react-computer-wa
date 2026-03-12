@@ -11,8 +11,8 @@
 ; Couleur HSL : 0=rouge, 42=orange, 85=jaune/vert, 128=cyan, 170=bleu, 213=violet, 255=rouge
 
 
-.include "os/v3/drivers/lib_devices.asm"
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/drivers/lib_devices.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data

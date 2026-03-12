@@ -5,9 +5,9 @@
 
 .org 0x1000
 
-.include "os/v3/drivers/init_devices.asm"
-.include "os/v3/shell/lib_shell.asm"
-.include "os/v3/filesystem/lib_virtual_filesystem.asm"
+%include "os/v3/drivers/init_devices.asm"
+%include "os/v3/shell/lib_shell.asm"
+%include "os/v3/filesystem/lib_virtual_filesystem.asm"
 
 
 section .data

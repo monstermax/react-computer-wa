@@ -3,9 +3,9 @@
 ; Name: rng_test
 ; Description: Genere 10 nombres aléatoires
 
-.include "os/v3/arithmetic/lib_math.asm"
-.include "os/v3/strings/lib_string.asm"
-.include "os/v3/drivers/lib_console.asm"
+%include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/strings/lib_string.asm"
+%include "os/v3/drivers/lib_console.asm"
 
 
 section .data

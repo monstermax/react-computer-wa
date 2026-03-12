@@ -9,6 +9,8 @@
 - gui connexion/deconnexion de device io à chaud
 - cpu: gérer des registres 16-bit (couple de registres 8-bit) ?
 
+- rendre le code assembleur compatible nasm
+
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 
 + cpu: interrupts
@@ -109,4 +111,9 @@ Autre projet d'OS:
 
 Compilateur :
 - https://github.com/wojtup/mosbc => MikeOS' BASIC Compiler
+
+
+Divers
+- https://dosasm.github.io/dosrun/
+- https://gitlab.se.ifmo.ru/tekassh1/assignment-2-dictionary/-/commit/254ba2ceeff4349c8169e1eae6c98b536dc614ac
 

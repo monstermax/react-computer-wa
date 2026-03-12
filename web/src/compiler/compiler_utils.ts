@@ -1,7 +1,7 @@
 
 import { CUSTOM_CPU } from "./arch_custom";
 import { assembleSourceCode, parseSourceCode, type ParsedFile } from "./precompiler";
-import { CompilerV2 } from "./compiler.v2";
+import { CompilerV2 } from "./compiler_v2";
 import { toHex } from "@/lib/lib_numbers";
 
 import type { CompiledProgram, CompilerOptions } from "@/types/compiler.types";

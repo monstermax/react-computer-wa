@@ -4,8 +4,8 @@
 ; Description: Screen Demo
 
 
-.include "os/v3/drivers/lib_screen.asm"
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/drivers/lib_screen.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data

@@ -4,13 +4,13 @@
 ; Description: initialise les devices. Repere et enregistre l'idx de chaque device à un emplacement memoire, permettant au bootloader de les manipuler facilement.
 
 
-.include "os/v3/drivers/lib_console.asm"
-.include "os/v3/drivers/lib_keyboard.asm"
-.include "os/v3/drivers/lib_lcd.asm"
-.include "os/v3/drivers/lib_leds.asm"
-.include "os/v3/drivers/lib_screen.asm"
-.include "os/v3/drivers/lib_screen_hd.asm"
-.include "os/v3/drivers/lib_switchs.asm"
+%include "os/v3/drivers/lib_console.asm"
+%include "os/v3/drivers/lib_keyboard.asm"
+%include "os/v3/drivers/lib_lcd.asm"
+%include "os/v3/drivers/lib_leds.asm"
+%include "os/v3/drivers/lib_screen.asm"
+%include "os/v3/drivers/lib_screen_hd.asm"
+%include "os/v3/drivers/lib_switchs.asm"
 
 
 section .data

@@ -122,7 +122,7 @@ async function extractTokens(arch: CPUArchitecture, sourceCode: string, filepath
         'EQU', 'TIMES',
         'SECTION', 'GLOBAL', 'EXTERN',
         '.DATA', '.CODE', '.TEXT', '.BSS',
-        '.ORG', '.INCLUDE',
+        '.ORG', '.INCLUDE', '%INCLUDE',
     ];
 
     const lexer = new Lexer(sourceCode, instructions, registers, directives, caseSensitive, filepath);

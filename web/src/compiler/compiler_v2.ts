@@ -523,7 +523,6 @@ export class CompilerV2 {
         const directive = this.normalize(directiveToken.value);
         const lastInstructionOrIdentifierPos: number | null = this.pos;
 
-
         // .ORG: Set origin address (.org directive)
         if (directive === '.ORG') {
             this.advance();
@@ -541,7 +540,7 @@ export class CompilerV2 {
 
 
         // Include directive
-        if (directive === '.INCLUDE' || directive === 'INCLUDE') {
+        if (directive === '.INCLUDE' || directive === '%INCLUDE' || directive === 'INCLUDE') {
             this.advance();
 
             if (this.peek().type !== 'STRING') {
@@ -988,7 +987,7 @@ export class CompilerV2 {
         const directiveToken = this.peek();
         const directive = this.normalize(directiveToken.value);
 
-        if (directive === 'SECTION' || directive.startsWith('.')) {
+        if (directive === 'SECTION' || directive.startsWith('.') || directive.startsWith('%')) {
             this.advance();
 
             let sectionName = directive;
@@ -1011,7 +1010,7 @@ export class CompilerV2 {
                 this.setCurrentSection('.bss')
                 //console.log(`[STEP2] new section : ".bss" at address [${toHex(this.currentAddress, 4)}] => in file ${directiveToken.file}:${directiveToken.line}`)
 
-            } else if (sectionName === '.INCLUDE' || sectionName === 'INCLUDE') {
+            } else if (sectionName === '.INCLUDE' || sectionName === '%INCLUDE' || sectionName === 'INCLUDE') {
                 this.advance()
                 return;
 

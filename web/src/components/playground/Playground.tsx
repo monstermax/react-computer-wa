@@ -243,14 +243,14 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     // open files in editor at startup
     useEffect(() => {
         const _run = async () => {
-            //const contentDefault = await assemblyEditorHook.fetchFile(defaultCodeFilepath)
-            //assemblyEditorHook.openFile(defaultCodeFilepath, contentDefault)
-
-            const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
-            assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, undefined, false)
+            //const contentBootloader = await assemblyEditorHook.fetchFile(bootloaderCodeFilepath)
+            //assemblyEditorHook.openFile(bootloaderCodeFilepath, contentBootloader, undefined, undefined, false)
 
             //const contentOs = await assemblyEditorHook.fetchFile(osCodeFilepath)
             //assemblyEditorHook.openFile(osCodeFilepath, contentOs, undefined, undefined, false)
+
+            const contentDefault = await assemblyEditorHook.fetchFile(defaultCodeFilepath)
+            assemblyEditorHook.openFile(defaultCodeFilepath, contentDefault)
 
             // BUG ici. les fichiers n'ecrasent les un-les autres. seul le dernier reste ouvert. pb references react
         }
