@@ -87,6 +87,9 @@ mount /dev/0 /usr
 - Signature 0x55AA (octets 510-511) : Toujours présente.
 
 
+# La Table des Partitions
+Elle est divisée en 4 entrées de 16 octets chacune. Chaque entrée décrit une partition primaire (son type, son début, sa taille, etc.). C'est pour cela qu'avec un MBR traditionnel, on ne peut avoir que 4 partitions primaires maximum.
+
 
 ---
 
