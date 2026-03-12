@@ -4,8 +4,8 @@
 ; Description: Keyboard Driver
 
 
-.include "os/v3/drivers/lib_devices.asm"
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/drivers/lib_devices.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data

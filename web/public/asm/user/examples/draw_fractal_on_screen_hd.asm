@@ -3,7 +3,7 @@
 
 .org 0xA000
 
-.include "os/v3/drivers/lib_screen_hd.asm"
+%include "os/v3/drivers/lib_screen_hd.asm"
 
 
 section .data

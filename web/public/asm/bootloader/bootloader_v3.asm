@@ -14,10 +14,10 @@
 ; 3. si MBR valide et amorcable on utilise ce disk
 
 
-.org 0x0000
+;.org 0x0000
 
-.include "bootloader/lib_math.asm"
-.include "bootloader/init_devices.asm"
+%include "bootloader/lib_math.asm"
+%include "bootloader/init_devices.asm"
 
 
 section .data

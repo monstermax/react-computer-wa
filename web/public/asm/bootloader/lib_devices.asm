@@ -4,8 +4,8 @@
 ; Description: Lib devices for bootloader
 
 
-.include "bootloader/lib_math.asm"
-.include "bootloader/lib_string.asm"
+%include "bootloader/lib_math.asm"
+%include "bootloader/lib_string.asm"
 
 
 ; Table Device Entry format :

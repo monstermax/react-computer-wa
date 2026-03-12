@@ -8,7 +8,7 @@
 
 ; Dépendances : lib_sprites.asm (draw_sprite_hd)
 
-.include "os/v3/graphics/lib_sprites.asm"
+%include "os/v3/graphics/lib_sprites.asm"
 
 
 section .data

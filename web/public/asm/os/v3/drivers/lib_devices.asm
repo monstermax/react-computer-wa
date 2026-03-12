@@ -4,8 +4,8 @@
 ; Description: Lib devices for OS v3
 
 
-.include "os/v3/arithmetic/lib_math.asm"
-.include "os/v3/strings/lib_string.asm"
+%include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/strings/lib_string.asm"
 
 
 ; Table Device Entry format :

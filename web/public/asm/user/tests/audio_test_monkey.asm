@@ -2,7 +2,7 @@
 ; Monkey Island Theme - Opening melody
 ; Tempo ~160 BPM, noire = 375ms
 
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 section .data
     buzzer_io_base  dw 0xF0B0

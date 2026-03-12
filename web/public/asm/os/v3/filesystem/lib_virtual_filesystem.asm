@@ -4,9 +4,9 @@
 
 ;.org 0x1000
 
-.include "os/v3/drivers/init_devices.asm"
-.include "os/v3/drivers/lib_console.asm"
-.include "os/v3/drivers/lib_devices.asm"
+%include "os/v3/drivers/init_devices.asm"
+%include "os/v3/drivers/lib_console.asm"
+%include "os/v3/drivers/lib_devices.asm"
 
 
 ; EN COURS DE DEV

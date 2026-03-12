@@ -4,8 +4,8 @@
 ; Description: Lib console for bootloader_v2
 
 
-.include "bootloader/lib_devices.asm"
-.include "bootloader/lib_math.asm"
+%include "bootloader/lib_devices.asm"
+%include "bootloader/lib_math.asm"
 
 
 section .data

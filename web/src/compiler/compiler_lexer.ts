@@ -160,7 +160,7 @@ export class Lexer {
                 if (this.isDigit(char) || char === '$' || (char === '0' && this.isHexPrefix(this.peek()))) {
                     return this.scanNumber();
 
-                } else if (this.isAlpha(char) || char === '_' || char === '.') {
+                } else if (this.isAlpha(char) || char === '_' || char === '.' || char === '%') {
                     return this.scanIdentifier();
 
                 } else {
@@ -282,7 +282,7 @@ export class Lexer {
         const startCol = this.col;
         const start = this.pos;
 
-        while (this.isAlphaNumeric(this.peek()) || this.peek() === '_' || this.peek() === '.') {
+        while (this.isAlphaNumeric(this.peek()) || this.peek() === '_' || this.peek() === '.' || this.peek() === '%') {
             this.pos++;
             this.col++;
         }

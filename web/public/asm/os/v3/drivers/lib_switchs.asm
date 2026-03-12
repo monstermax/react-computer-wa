@@ -8,8 +8,8 @@
 ;   +1 = SWITCHS_STATUS   (lecture) - index du switch en attente (0-7) ou 0xFF si aucun
 ;   +1 = SWITCHS_ACK      (écriture) - acquitter l'index traité
 
-.include "os/v3/drivers/lib_devices.asm"
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/drivers/lib_devices.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data

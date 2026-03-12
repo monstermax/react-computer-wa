@@ -1,7 +1,8 @@
 ; trex_game.asm (v1 simplified, step-based runner)
-.include "os/v3/drivers/lib_screen.asm"
-.include "os/v3/drivers/lib_keyboard.asm"
-.include "os/v3/drivers/lib_console.asm"
+
+%include "os/v3/drivers/lib_screen.asm"
+%include "os/v3/drivers/lib_keyboard.asm"
+%include "os/v3/drivers/lib_console.asm"
 
 section .data
   KEY_SPACE equ 32

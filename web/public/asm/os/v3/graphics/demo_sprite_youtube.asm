@@ -8,7 +8,7 @@
 ; Convention draw_sprite : A:B=adresse sprite, F=X, E=Y
 
 
-.include "os/v3/graphics/lib_sprites.asm"
+%include "os/v3/graphics/lib_sprites.asm"
 
 
 section .data

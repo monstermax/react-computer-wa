@@ -4,7 +4,7 @@
 ; D4=294Hz → (294-100)/7.45 ≈ 26
 ; E4=330Hz → (330-100)/7.45 ≈ 31
 
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 section .data
     speaker_io_base  dw 0xF0E0

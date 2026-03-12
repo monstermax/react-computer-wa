@@ -15,10 +15,10 @@
 
 .org 0xA000
 
-.include "os/v3/drivers/lib_screen.asm"
-.include "os/v3/drivers/lib_keyboard.asm"
-.include "os/v3/drivers/lib_console.asm"
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/drivers/lib_screen.asm"
+%include "os/v3/drivers/lib_keyboard.asm"
+%include "os/v3/drivers/lib_console.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data

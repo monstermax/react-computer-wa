@@ -3,7 +3,7 @@
 ; Name: buzzer_test
 ; Description: Emet un buzz
 
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data

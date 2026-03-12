@@ -4,8 +4,8 @@
 ; Description: Graphics Sprites Library
 
 
-.include "os/v3/drivers/lib_screen.asm"
-.include "os/v3/drivers/lib_screen_hd.asm"
+%include "os/v3/drivers/lib_screen.asm"
+%include "os/v3/drivers/lib_screen_hd.asm"
 
 
 section .data

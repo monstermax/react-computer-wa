@@ -3,7 +3,7 @@
 ; Name: switchs_test
 ; Description: Switchs/Buttons Test
 
-.include "os/v3/drivers/lib_switchs.asm"
+%include "os/v3/drivers/lib_switchs.asm"
 
 
 _start:

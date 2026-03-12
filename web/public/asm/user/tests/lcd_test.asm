@@ -1,7 +1,7 @@
 
 
-.include "os/v3/drivers/lib_lcd.asm"
-.include "os/v3/arithmetic/lib_math.asm"
+%include "os/v3/drivers/lib_lcd.asm"
+%include "os/v3/arithmetic/lib_math.asm"
 
 
 section .data
