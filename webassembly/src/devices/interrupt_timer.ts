@@ -1,43 +1,22 @@
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-
-import { IoDevice } from "./IoDevice";
-import { high16, low16, toHex, U16, U8 } from "@/lib/lib_numbers";
-
-import { IRQ_MAP } from "@/../../webassembly/src/memory_map";
-
-import type { u16, u8 } from "@/types/computer.types";
-import type { DevicesManagerHook } from "@/hooks/useDevice";
-import type { InterruptDevice } from "./interrupt";
+import { IRQ_MAP } from "../memory_map";
+import { Computer } from "./Computer";
 
 
-throw new Error("DEPRECATED. MOVED INTO WASM")
+export class InterruptTimerDevice {
+    public computer: Computer;
+    public counter: u8 = 0;
+    public period: u8 = 10; // Interrupt toutes les 10 "tick"
+    public enabled: boolean = false;
 
 
-export type InterruptTimerDeviceParams = {
-    type: string;
-    vendor?: string;
-    model?: string;
-    devicesManager: DevicesManagerHook;
-}
-
-export class InterruptTimerDevice extends IoDevice {
-    static type = 'system';
-    public devicesManager: DevicesManagerHook;
-    public counter = 0 as u8;
-    public period = 10 as u8; // Interrupt toutes les 10 "tick"
-    public enabled = false;
-
-
-    constructor(idx: u8, name: string, params: InterruptTimerDeviceParams) {
-        super(idx, name, params);
-
-        this.devicesManager = params.devicesManager;
+    constructor(computer: Computer) {
+        this.computer = computer;
     }
 
 
     // Tick appelé à chaque cycle CPU ou à intervalle fixe => appelé à chaque tick de clock (soit N cycles CPU)
-    tick() {
+    tick(): void {
         //console.log(`⏰ Timer tick: enabled=${this.enabled}, counter=${this.counter}, period=${this.period}`);
         if (!this.enabled) return;
 
@@ -48,16 +27,13 @@ export class InterruptTimerDevice extends IoDevice {
             // Déclencher interruption
             //console.log('⏰ TIMER INTERRUPT! Requesting IRQ 0');
 
-            const interruptIdx = this.devicesManager.devicesMap.get('interrupt') ?? null;
-            const interrupt = (interruptIdx === null)
-                ? null
-                : this.devicesManager.devicesRef.current.get(interruptIdx) as InterruptDevice | undefined ?? null;
+            const interrupt = this.computer.interruptManager;
 
             if (interrupt) {
-                interrupt.requestInterrupt(U8(IRQ_MAP.IRQ_TIMER));
+                interrupt.requestInterrupt(IRQ_MAP.IRQ_TIMER);
 
             } else {
-                console.warn(`Missing Interrupt for Timer`);
+                console.warn(`Missing Interrupt for Timer. Cannot requestInterrupt`);
             }
 
             this.counter = 0 as u8
@@ -91,17 +67,17 @@ export class InterruptTimerDevice extends IoDevice {
         switch (port) {
             case 0x01: // TIMER_CONTROL (0xFF21)
                 this.enabled = (value & 0x01) !== 0;
-                this.emit('state', { enabled: this.enabled })
+                //this.emit('state', { enabled: this.enabled })
 
                 if ((value & 0x02) !== 0) { // Reset bit
                     this.counter = 0 as u8;
-                    this.emit('state', { counter: this.counter })
+                    //this.emit('state', { counter: this.counter })
                 }
                 break;
 
             case 0x02: // TIMER_PRESCALER/PERIOD (0xFF22)
                 this.period = (value & 0xFF) as u8;
-                this.emit('state', { period: this.period })
+                //this.emit('state', { period: this.period })
                 break;
 
             case 0x03: // TIMER_TICK (0xFF23)
@@ -111,11 +87,11 @@ export class InterruptTimerDevice extends IoDevice {
     }
 
 
-    reset() {
+    reset(): void {
         this.counter = 0 as u8
         this.period = 10 as u8
         this.enabled = false
-        this.emit('state', { counter: this.counter, period: this.period, enabled: this.enabled })
+        //this.emit('state', { counter: this.counter, period: this.period, enabled: this.enabled })
     }
 
 }

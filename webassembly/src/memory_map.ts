@@ -23,13 +23,30 @@ export namespace MEMORY_MAP {
         //   offset 4-5: pointer to name string (2 bytes, little-endian)
         export const DEVICE_TABLE_COUNT: u16 = 0x0500;
         export const DEVICE_TABLE_START: u16 = 0x0501;
-        export const DEVICE_TABLE_ENTRY_SIZE: u8 = 6;
-        export const DEVICE_TABLE_MAX_ENTRIES: u8 = 20;
+            export const DEVICE_TABLE_ENTRY_SIZE: u8 = 6;
+            export const DEVICE_TABLE_MAX_ENTRIES: u8 = 20;
 
         // ## Device Name Strings ## (0x0580-0x05FF) - 128 bytes
         // Null-terminated strings, allocated sequentially
         export const DEVICE_STRINGS_START: u16 = 0x0580;
         export const DEVICE_STRINGS_END: u16 = 0x05FF;
+
+
+        // SYSCALLS TABLE
+        // Header: 1 byte (device count)
+        // Entries: N * 6 bytes each:
+        //   offset 0: syscall index (1 byte)
+        //   offset 1: type (1 byte) - currently not specified (syscall return type ? arguments count ? calling convention ?)
+        //   offset 2-3: handler address (2 bytes, little-endian)
+        //   offset 4-5: pointer to name string (2 bytes, little-endian)
+        export const SYSCALLS_TABLE_COUNT: u16 = 0x0600;
+        export const SYSCALLS_TABLE_START: u16 = 0x0601;
+            export const SYSCALLS_TABLE_ENTRY_SIZE: u8 = 6;
+            export const SYSCALLS_TABLE_MAX_ENTRIES: u8 = 20;
+
+        export const SYSCALLS_STRINGS_START: u16 = 0x0680;
+        export const SYSCALLS_STRINGS_END: u16 = 0x06FF;
+
 
         // RAM / OS (0x1000-???)
         export const OS_START: u16 = 0x1000;

@@ -72,28 +72,36 @@ export const Docs: React.FC<DocsProps> = (props) => {
                 The OS, stack, and user programs all live in RAM. User code is loaded at the address
                 specified in the editor toolbar (default <code className="text-amber-400">{loadAddress}</code>).
             </p>
-            <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-xs mb-3 pl-2">
-                <code className="text-amber-400">{toHex(MEMORY_MAP.ROM_START, 4)}-{toHex(MEMORY_MAP.ROM_END, 4)}</code>
-                <span className="text-zinc-400">ROM</span>
+            <div className="font-mono text-xs mb-3 pl-2">
+                <div className="flex gap-4">
+                    <code className="text-amber-400">{toHex(MEMORY_MAP.RAM_START, 4)}-{toHex(MEMORY_MAP.RAM_END, 4)}</code>
+                    <span className="text-zinc-400">RAM</span>
+                </div>
 
-                <code className="text-amber-400">{toHex(MEMORY_MAP.RAM_START, 4)}-{toHex(MEMORY_MAP.RAM_END, 4)}</code>
-                <span className="text-zinc-400">RAM</span>
+                <div className="ps-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                    <code className="text-amber-400">{toHex(MEMORY_MAP.BOOTLOADER_START, 4)}-{toHex(MEMORY_MAP.DEVICE_TABLE_COUNT-1, 4)}</code>
+                    <span className="text-zinc-400">Bootloader</span>
 
-                <code className="text-amber-400">{toHex(MEMORY_MAP.IO_START, 4)}-{toHex(MEMORY_MAP.IO_END, 4)}</code>
-                <span className="text-zinc-400">I/O mapped devices</span>
+                    <code className="text-amber-400">{toHex(MEMORY_MAP.DEVICE_TABLE_COUNT, 4)}-{toHex(MEMORY_MAP.DEVICE_STRINGS_END, 4)}</code>
+                    <span className="text-zinc-400">Devices Table</span>
+
+                    <code className="text-amber-400">{toHex(MEMORY_MAP.SYSCALLS_TABLE_COUNT, 4)}-{toHex(MEMORY_MAP.SYSCALLS_STRINGS_END, 4)}</code>
+                    <span className="text-zinc-400">Syscalls Table</span>
+
+                    <code className="text-amber-400">{toHex(MEMORY_MAP.OS_START, 4)}+</code>
+                    <span className="text-zinc-400">OS code and data</span>
+
+                    <code className="text-amber-400">{loadAddress}+</code>
+                    <span className="text-zinc-400">User program (default load address)</span>
+
+                    <code className="text-amber-400">{toHex(MEMORY_MAP.STACK_END, 4)}</code>
+                    <span className="text-zinc-400">Stack top (grows downward to {toHex(MEMORY_MAP.STACK_START, 4)})</span>
+                </div>
+
             </div>
             <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 font-mono text-xs mb-3 pl-2">
-                <code className="text-amber-400">{toHex(MEMORY_MAP.ROM_START, 4)}+</code>
-                <span className="text-zinc-400">ROM — Bootloader</span>
-
-                <code className="text-amber-400">{toHex(MEMORY_MAP.OS_START, 4)}+</code>
-                <span className="text-zinc-400">RAM — OS code and data</span>
-
-                <code className="text-amber-400">{loadAddress}+</code>
-                <span className="text-zinc-400">RAM — User program (default load address)</span>
-
-                <code className="text-amber-400">{toHex(MEMORY_MAP.STACK_END, 4)}</code>
-                <span className="text-zinc-400">RAM — Stack top (grows downward to {toHex(MEMORY_MAP.STACK_START, 4)})</span>
+                <code className="text-amber-400">{toHex(MEMORY_MAP.IO_START, 4)}-{toHex(MEMORY_MAP.IO_END, 4)}</code>
+                <span className="text-zinc-400">I/O mapped devices</span>
             </div>
 
             {/* ── Devices ── */}

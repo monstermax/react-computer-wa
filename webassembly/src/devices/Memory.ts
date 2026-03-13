@@ -1,8 +1,8 @@
 
-import { isIoAddress, isRamAddress, isRomAddress, MEMORY_MAP } from "./memory_map";
-import { toHex } from "./lib/lib_numbers";
+import { isIoAddress, isRamAddress, isRomAddress, MEMORY_MAP } from "../memory_map";
+import { toHex } from "../utils";
 import { Computer } from "./Computer";
-import { console } from "./external_functions";
+import { console } from "../external_functions";
 
 
 export class MemoryBus {

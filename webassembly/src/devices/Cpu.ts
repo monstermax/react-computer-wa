@@ -1,8 +1,9 @@
 
-import { Opcode } from "./cpu_instructions";
+import { Opcode } from "../cpu_instructions";
 import { BreakpointType, Computer } from "./Computer";
-import { high16, low16, toHex } from "./lib/lib_numbers";
-import { console, jsCpu } from "./external_functions";
+import { high16, low16, toHex } from "../utils";
+import { console, jsCpu } from "../external_functions";
+import { MEMORY_MAP } from "../memory_map";
 
 
 export class CpuRegisters {
@@ -26,6 +27,8 @@ export class Cpu {
     public cycles: u64 = 0;
     public alu: ALU = new ALU;
     public isOnBreakpoint: boolean = false; // TODO: a revoir. (a deplacer sur le computer ? à prevoir sur chaque core ?)
+    public interruptsEnabled: boolean = false;
+    public inInterruptHandler: boolean = false;
 
     constructor(computer: Computer) {
         this.computer = computer;
@@ -38,11 +41,22 @@ export class Cpu {
         this.halted = false;
         this.cycles = 0;
         this.isOnBreakpoint = false;
+        this.interruptsEnabled = true;
+        this.inInterruptHandler = false;
     }
 
 
     public runCpuCycle(skipBreakpoints: boolean=false): void {
         if (this.halted) return;
+
+        const interrupt = this.computer.interruptManager;
+        if (!interrupt) throw new Error("Missing interrupt")
+
+        // Handle Interrupts - Vérifier les interruptions AVANT de fetch
+        if (interrupt && this.interruptsEnabled && !this.inInterruptHandler && interrupt.hasPendingInterrupt()) {
+            this.handleInterrupt();
+            //return; // On saute l'exécution normale ce cycle
+        }
 
         // Unblock current INT3 breakpoint (go to PC + 1)
         if (this.computer.pendingBreakpointType === BreakpointType.INT3) {
@@ -113,8 +127,6 @@ export class Cpu {
             this.computer.pendingBreakpointType = BreakpointType.NONE;
         }
 
-
-        // TODO: gérer les Interrupts
 
         // Fetch instructions actions (fetch & execute)
         const actions: InstructionActions = fetchInstructionActions(opcode);
@@ -221,6 +233,50 @@ export class Cpu {
         const value = this.readMemory(this.registers.SP);
 
         return value;
+    }
+
+
+    handleInterrupt(): void {
+        const interrupt = this.computer.interruptManager;
+        if (!interrupt) throw new Error("Missing interrupt")
+
+        const irq = interrupt.getPendingIRQ(0, 0);
+        if (irq === 0xFF) return;
+
+        //console.log(`🎯 Handling IRQ ${irq}, handlerAddr = ${toHex(interrupt.handlerAddr)}`);
+
+        // 1. Désactiver interruptions
+        this.interruptsEnabled = false;
+        this.inInterruptHandler = true;
+
+        // 2. Sauvegarder contexte sur la pile
+        const sp = this.registers.SP;
+        const pc = this.registers.PC;
+        const flags = this.registers.FLAGS;
+
+        // PUSH Flags
+        this.writeMemory(sp, flags);
+        this.registers.SP = (sp - 1) as u16;
+
+        // PUSH PC (little-endian)
+        this.writeMemory((sp - 1) as u16, ((pc >> 8) & 0xFF) as u8); // High byte
+        this.writeMemory((sp - 2) as u16, (pc & 0xFF) as u8);      // Low byte
+        this.registers.SP = (sp - 3) as u16;
+
+        // 3. Acquitter l'interruption
+        interrupt.acknowledgeInterrupt(irq);
+
+        // 4. Sauter au handler
+        let handlerAddress = interrupt.handlerAddr;
+        if (handlerAddress === 0) {
+            //// Vecteur par défaut: 0x0040 + irq*4
+            //handlerAddress = (0x0040 + (irq * 4)) as u16;
+            throw new Error("missing handlerAddress")
+        }
+
+        this.registers.PC = handlerAddress;
+
+        console.log(`🔄 Interruption IRQ${irq} -> Handler ${toHex(handlerAddress)}`);
     }
 
 
@@ -374,6 +430,77 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
             };
             break;
 
+        case <u8>Opcode.EI:
+            run = (cpu: Cpu) => {
+                cpu.interruptsEnabled = true;
+                cpu.registers.PC += 1;
+            };
+            break;
+
+        case <u8>Opcode.DI:
+            run = (cpu: Cpu) => {
+                cpu.interruptsEnabled = false;
+                cpu.registers.PC += 1;
+            };
+            break;
+
+        case <u8>Opcode.INT:
+            run = (cpu: Cpu) => {
+                const intCode = cpu.readMem8(cpu.registers.PC);
+
+                if (intCode === 0x80) {
+                    // Syscall
+                    // TODO: gérer le dispatch des Syscall vers le code assembleur
+                    // voir "SYSCALLS TABLE" dans le fichier memory_map.ts
+                    const syscallsTablePointer = MEMORY_MAP.SYSCALLS_TABLE_START;
+                    const syscallTablePointer = syscallsTablePointer + intCode * MEMORY_MAP.SYSCALLS_TABLE_ENTRY_SIZE;
+                    const handlerAddressPointerLow = cpu.readMemory(syscallTablePointer + 3)
+                    const handlerAddressPointerHigh = cpu.readMemory(syscallTablePointer + 3)
+                    const handlerAddressPointer = <u8>(handlerAddressPointerLow + 256 * handlerAddressPointerHigh);
+                    const handlerAddress = cpu.readMemory(handlerAddressPointer);
+
+                    // Adresse de retour = PC + 2 (opcode + 1 byte)
+                    const returnAddr = cpu.registers.PC + 2;
+
+                    // PUSH l'adresse de retour sur la pile (16 bits)
+
+                    // PUSH high byte
+                    cpu.pushValue(<u8>(returnAddr >> 8) & 0xFF)
+
+                    // PUSH low byte
+                    cpu.pushValue(<u8>(returnAddr & 0xFF));
+
+                    // Sauter
+                    cpu.registers.PC = handlerAddress;
+                    return;
+                }
+
+                // TODO: gérer plusieurs code d'interruption
+
+                cpu.registers.PC += 2;
+            };
+            break;
+
+        case <u8>Opcode.IRET:
+            run = (cpu: Cpu) => {
+                // POP return address
+                const pcLow = cpu.popValue();
+                const pcHigh = cpu.popValue();
+                const returnAddr = ((pcHigh << 8) | pcLow) as u16;
+
+                // POP Flags
+                const flags = cpu.popValue();
+
+                // Mettre à jour registres
+                cpu.registers.PC = returnAddr;
+                cpu.registers.FLAGS = flags;
+
+                // Réactiver interruptions
+                cpu.interruptsEnabled = true;
+                cpu.inInterruptHandler = false;
+            };
+            break;
+
         case <u8>Opcode.INT3:
             run = (cpu: Cpu) => {
                 const PcHex = toHex(cpu.registers.PC, 4);
@@ -425,12 +552,10 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 // PUSH l'adresse de retour sur la pile (16 bits)
 
                 // PUSH high byte
-                cpu.writeMemory(cpu.registers.SP, ((returnAddr >> 8) & 0xFF) as u8);
-                cpu.registers.SP--
+                cpu.pushValue(<u8>(returnAddr >> 8) & 0xFF)
 
                 // PUSH low byte
-                cpu.writeMemory(cpu.registers.SP, (returnAddr & 0xFF) as u8);
-                cpu.registers.SP--
+                cpu.pushValue(<u8>(returnAddr & 0xFF));
 
                 // Lire l'adresse de destination
                 const callAddr = cpu.readMem16(cpu.registers.PC);
@@ -443,12 +568,10 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
         case <u8>Opcode.RET:
             run = (cpu: Cpu) => {
                 // POP low byte
-                cpu.registers.SP++
-                const low = cpu.readMemory(cpu.registers.SP);
+                const low = cpu.popValue();
 
                 // POP high byte
-                cpu.registers.SP++
-                const high = cpu.readMemory(cpu.registers.SP);
+                const high = cpu.popValue();
 
                 //const retAddr = ((high << 8) | low) as u16;
                 const retAddr = ((high * 256) + low) as u16;

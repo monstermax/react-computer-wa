@@ -1,11 +1,17 @@
 
-import { MEMORY_MAP } from "./memory_map";
-import { toHex } from "./lib/lib_numbers";
+import { MEMORY_MAP } from "../memory_map";
+import { toHex } from "../utils";
 import { Computer } from "./Computer";
-import { console, jsIo } from "./external_functions";
+import { console, jsIo } from "../external_functions";
 
 
 const DEVICE_PORT_SIZE: u8 = 0x10; // 16 ports per device
+
+//const DEVICE_TYPE_SYSTEM: u8 = 0x00;
+//const DEVICE_TYPE_INPUT: u8 = 0x01;
+//const DEVICE_TYPE_OUTPUT: u8 = 0x02;
+//const DEVICE_TYPE_INPUT_OUTPUT: u8 = 0x03;
+//const DEVICE_TYPE_STORAGE: u8 = 0x03;
 
 
 export class IoManager {

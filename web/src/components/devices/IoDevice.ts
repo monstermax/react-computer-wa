@@ -4,6 +4,13 @@ import EventEmitter from "eventemitter3";
 import type { u8 } from "@/types/computer.types";
 
 
+//const DEVICE_TYPE_SYSTEM: u8 = 0x00;
+//const DEVICE_TYPE_INPUT: u8 = 0x01;
+//const DEVICE_TYPE_OUTPUT: u8 = 0x02;
+//const DEVICE_TYPE_INPUT_OUTPUT: u8 = 0x03;
+//const DEVICE_TYPE_STORAGE: u8 = 0x03;
+
+
 export type IoDeviceParams = {
     type: string;
     vendor?: string;

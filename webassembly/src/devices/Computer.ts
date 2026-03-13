@@ -1,5 +1,7 @@
 
 import { Cpu } from "./Cpu";
+import { InterruptTimerDevice } from "./interrupt_timer";
+import { InterruptManager } from "./InterruptManager";
 import { IoManager } from "./IoManager";
 import { MemoryBus, Ram, Rom } from "./Memory";
 //import { console } from "./external_functions";
@@ -20,6 +22,8 @@ export class Computer {
     public cpus: Cpu[] = [];
     public breakpoints: Map<u16, Breakpoint> = new Map;
     public pendingBreakpointType: BreakpointType = BreakpointType.NONE;
+    public interruptManager: InterruptManager | null = null;
+    public timers: InterruptTimerDevice[] = [];
 
 
     constructor() {
@@ -29,7 +33,7 @@ export class Computer {
         this.memoryBus = new MemoryBus(this);
     }
 
-    addMemoryRam(): void {
+    addRam(): void {
         this.ram = new Ram(this);
 
         //const ram = this.ram;
@@ -39,16 +43,30 @@ export class Computer {
         //}
     }
 
-    addMemoryRom(): void {
+    addRom(): void {
         this.rom = new Rom(this);
     }
 
-    addMemoryIoManager(): void {
+    addIoManager(): void {
         this.ioManager = new IoManager(this);
     }
 
-    addMemoryCpu(): void {
+    addCpu(): void {
         this.cpus.push(new Cpu(this));
+    }
+
+    addInterruptManager(): void {
+        this.interruptManager = new InterruptManager;
+    }
+
+    addTimer(): void {
+        const ioManager = this.ioManager;
+        if (!ioManager) throw new Error("Missing ioManager")
+
+        const timer = new InterruptTimerDevice(this);
+        ioManager.addDevice('timer0', 0);
+
+        this.timers.push(timer);
     }
 
     setBreakpoints(addresses: u16[], files: string[], lines: u16[]): void {

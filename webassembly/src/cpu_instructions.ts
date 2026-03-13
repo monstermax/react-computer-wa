@@ -12,12 +12,12 @@ export enum Opcode {
     DEBUG_MEM = 0x06,
 
     // INTERRUPTS
-    //INT = 0x08,     // TODO
+    INT = 0x08,       // TODO: Interrupt
     INT3 = 0x09,      // breakpoint
-    //EI = 0x0A,      // TODO   // Enable Interrupts
-    //DI = 0x0B,      // TODO   // Disable Interrupts
-    //IRET = 0x0C,    // TODO   // Return from Interrupt
-    //SYSCALL = 0x0D, // TODO
+    EI = 0x0A,        // Enable Interrupts
+    DI = 0x0B,        // Disable Interrupts
+    IRET = 0x0C,      // Return from Interrupt
+    //SYSCALL = 0x0D, // TODO ? (alias de INT 80)
 
     // JUMP
     JMP = 0x10, // Jump

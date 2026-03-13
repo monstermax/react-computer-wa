@@ -213,21 +213,21 @@ export const useEmulator = (params: useEmulatorParams) => {
                     throw new Error("Unreachable Error");
                 }
 
-                try {
-                    const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
-
-                    const timer: InterruptTimerDevice | null = (timerIdx === null)
-                        ? null
-                        : devicesManager.devicesRef.current.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
-
-                    if (timer) {
-                        timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer (à chaque tick de clock)
-                    }
-
-                } catch (err: any) {
-                    wasmError(err);
-                    throw new Error("Unreachable Error");
-                }
+//                try {
+//                    const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
+//
+//                    const timer: InterruptTimerDevice | null = (timerIdx === null)
+//                        ? null
+//                        : devicesManager.devicesRef.current.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
+//
+//                    if (timer) {
+//                        timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer (à chaque tick de clock)
+//                    }
+//
+//                } catch (err: any) {
+//                    wasmError(err);
+//                    throw new Error("Unreachable Error");
+//                }
             }
         }
 

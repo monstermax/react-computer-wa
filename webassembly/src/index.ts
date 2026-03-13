@@ -1,7 +1,7 @@
 
 // The entry file of your WebAssembly module.
 
-import { Computer } from "./Computer";
+import { Computer } from "./devices/Computer";
 import { console } from "./external_functions";
 import { MEMORY_MAP } from "./memory_map";
 
@@ -9,10 +9,12 @@ import { MEMORY_MAP } from "./memory_map";
 export function instanciateComputer(): Computer {
     const computer = new Computer;
     computer.addMemoryBus();
-    computer.addMemoryRam();
-    computer.addMemoryRom();
-    computer.addMemoryIoManager();
-    computer.addMemoryCpu();
+    computer.addRam();
+    computer.addRom();
+    computer.addIoManager();
+    computer.addCpu();
+    computer.addInterruptManager();
+    computer.addTimer();
     console.log(`Computer instanciated`)
     return computer;
 }
@@ -94,6 +96,17 @@ export function computerRunCycles(computer: Computer, cycles: u32, skipBreakpoin
                 }
             }
         }
+
+        // Run timers tick
+        const timers = computer.timers;
+        if (!timers) throw new Error(`Missing Timers`);
+
+        for (let i=0; i<timers.length; i++) {
+            const timer = timers[i];
+            if (!timer) throw new Error(`Missing Timer #${i}`);
+            timer.tick();
+        }
+
     }
 
     return canContinue;

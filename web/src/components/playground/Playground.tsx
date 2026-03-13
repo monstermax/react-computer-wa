@@ -14,8 +14,8 @@ import { useDebugger } from "@/hooks/useDebugger";
 import { useCompiler } from "@/hooks/useCompiler";
 
 import { ScreenCanvasDevice } from "../devices/screen_canvas";
-import { InterruptDevice } from "../devices/interrupt";
-import { InterruptTimerDevice } from "../devices/interrupt_timer";
+//import { InterruptDevice } from "../devices/interrupt";
+//import { InterruptTimerDevice } from "../devices/interrupt_timer";
 import { BuzzerDevice } from "../devices/buzzer";
 import { RngDevice } from "../devices/rng";
 import { RtcDevice } from "../devices/rtc";
@@ -155,8 +155,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
     const osDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
     const userDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { persistent: true });
     const dmaDeviceHook = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
-    const interruptDeviceHook = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {});
-    const timerDeviceHook = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {});
+    //const interruptDeviceHook = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {});
+    //const timerDeviceHook = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {});
     const rtcDeviceHook = useDevice<RtcDevice>(emulator.devicesManager, 'rtc', RtcDevice, {});
     const rngDeviceHook = useDevice<RngDevice>(emulator.devicesManager, 'rng', RngDevice, {});
     const buzzerDeviceHook = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {});
@@ -314,8 +314,8 @@ export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
                 osDiskDeviceHook,
                 userDiskDeviceHook,
                 dmaDeviceHook,
-                interruptDeviceHook,
-                timerDeviceHook,
+                //interruptDeviceHook,
+                //timerDeviceHook,
                 rtcDeviceHook,
                 rngDeviceHook,
                 buzzerDeviceHook,
