@@ -2,12 +2,16 @@
 import { IoDevice } from "../IoDevice";
 import { U8 } from "../../lib/lib_numbers";
 
+
+throw new Error("DEPRECATED. MOVED INTO WASM")
+
+
 //import { IRQ_MAP } from "../../../webassembly/src/memory_map";
 import { IRQ_MAP } from "../../webassembly_dependencies/memory_map";
 
 import type { u16, u8 } from "@/types";
 import type { DevicesManagerHook } from "../useDevice";
-import type { InterruptDevice } from "./interrupt";
+//import type { InterruptDevice } from "./interrupt";
 
 
 export type InterruptTimerDeviceParams = {
@@ -44,17 +48,17 @@ export class InterruptTimerDevice extends IoDevice {
             // Déclencher interruption
             //console.log('⏰ TIMER INTERRUPT! Requesting IRQ 0');
 
-            const interruptIdx = this.devicesManager.devicesMap.get('interrupt') ?? null;
-            const interrupt = (interruptIdx === null)
-                ? null
-                : this.devicesManager.devicesRef.get(interruptIdx) as InterruptDevice | undefined ?? null;
-
-            if (interrupt) {
-                interrupt.requestInterrupt(U8(IRQ_MAP.IRQ_TIMER));
-
-            } else {
-                console.warn(`Missing Interrupt for Timer`);
-            }
+//            const interruptIdx = this.devicesManager.devicesMap.get('interrupt') ?? null;
+//            const interrupt = (interruptIdx === null)
+//                ? null
+//                : this.devicesManager.devicesRef.get(interruptIdx) as InterruptDevice | undefined ?? null;
+//
+//            if (interrupt) {
+//                interrupt.requestInterrupt(U8(IRQ_MAP.IRQ_TIMER));
+//
+//            } else {
+//                console.warn(`Missing Interrupt for Timer`);
+//            }
 
             this.counter = 0 as u8
             return

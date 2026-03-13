@@ -11,8 +11,8 @@ import { CompiledProgram, CompilerError } from "../../web/src/types/compiler.typ
 
 import type { u16, u32, u8 } from './types';
 import { useDevice } from './web_dependencies/useDevice';
-import { InterruptDevice } from './web_dependencies/devices/interrupt';
-import { InterruptTimerDevice } from './web_dependencies/devices/interrupt_timer';
+//import { InterruptDevice } from './web_dependencies/devices/interrupt';
+//import { InterruptTimerDevice } from './web_dependencies/devices/interrupt_timer';
 import { DiskDevice } from './web_dependencies/devices/disk';
 import { DmaDevice } from './web_dependencies/devices/dma';
 import { RtcDevice } from './web_dependencies/devices/rtc';
@@ -193,8 +193,8 @@ async function main() {
         const osDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'os_disk', DiskDevice, { data: osDiskData });
         const userDiskDeviceHook = useDevice<DiskDevice>(emulator.devicesManager, 'user_disk', DiskDevice, { persistent: true });
         const dmaDeviceHook = useDevice<DmaDevice>(emulator.devicesManager, 'dma', DmaDevice, { devicesRef: emulator.devicesManager.devicesRef, readRam: emulator.readRam, writeRam: emulator.writeRam });
-        const interruptDeviceHook = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {});
-        const timerDeviceHook = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {});
+        //const interruptDeviceHook = useDevice<InterruptDevice>(emulator.devicesManager, 'interrupt', InterruptDevice, {});
+        //const timerDeviceHook = useDevice<InterruptTimerDevice>(emulator.devicesManager, 'timer', InterruptTimerDevice, {});
         const rtcDeviceHook = useDevice<RtcDevice>(emulator.devicesManager, 'rtc', RtcDevice, {});
         const rngDeviceHook = useDevice<RngDevice>(emulator.devicesManager, 'rng', RngDevice, {});
         //const buzzerDeviceHook = useDevice<BuzzerDevice>(emulator.devicesManager, 'buzzer', BuzzerDevice, {});
@@ -211,8 +211,8 @@ async function main() {
             osDiskDeviceHook,
             userDiskDeviceHook,
             dmaDeviceHook,
-            interruptDeviceHook,
-            timerDeviceHook,
+            //interruptDeviceHook,
+            //timerDeviceHook,
             rtcDeviceHook,
             rngDeviceHook,
             //buzzerDeviceHook,

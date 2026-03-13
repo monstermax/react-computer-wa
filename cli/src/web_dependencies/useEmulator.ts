@@ -9,7 +9,7 @@ import * as releaseModule from "../../../webassembly/build/release";
 
 import type { u32, u8, u16 } from "@/types";
 import type { IoDevice } from "./IoDevice";
-import type { InterruptTimerDevice } from "./devices/interrupt_timer";
+//import type { InterruptTimerDevice } from "./devices/interrupt_timer";
 
 import type { CompiledProgram } from "../../../web/src/types/compiler.types";
 
@@ -211,21 +211,21 @@ export const useEmulator = async (params: useEmulatorParams) => {
                 throw new Error("Unreachable Error");
             }
 
-            try {
-                const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
-
-                const timer: InterruptTimerDevice | null = (timerIdx === null)
-                    ? null
-                    : devicesManager.devicesRef.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
-
-                if (timer) {
-                    timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer
-                }
-
-            } catch (err: any) {
-                wasmError(err);
-                throw new Error("Unreachable Error");
-            }
+//            try {
+//                const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
+//
+//                const timer: InterruptTimerDevice | null = (timerIdx === null)
+//                    ? null
+//                    : devicesManager.devicesRef.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
+//
+//                if (timer) {
+//                    timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer
+//                }
+//
+//            } catch (err: any) {
+//                wasmError(err);
+//                throw new Error("Unreachable Error");
+//            }
         }
     }
 

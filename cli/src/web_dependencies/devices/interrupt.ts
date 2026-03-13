@@ -8,6 +8,9 @@ import { MEMORY_MAP } from "../../webassembly_dependencies/memory_map";
 import type { u16, u8 } from "@/types";
 
 
+throw new Error("DEPRECATED. MOVED INTO WASM")
+
+
 export type InterruptDeviceParams = {
     type: string;
     vendor?: string;

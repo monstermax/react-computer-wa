@@ -13,7 +13,7 @@ import * as releaseModule from "@/../public/webassembly_build/release";
 import type { u32, u8, u16 } from "@/types/computer.types";
 import type { CompiledProgram } from "@/types/compiler.types";
 import type { IoDevice } from "@/components/devices/IoDevice";
-import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer";
+//import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer";
 import type { RegistersDump } from "@/components/playground/Playground";
 import type { Breakpoint } from "./useDebugger";
 
