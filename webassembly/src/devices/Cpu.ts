@@ -447,37 +447,34 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
         case <u8>Opcode.INT:
             run = (cpu: Cpu) => {
                 const intCode = cpu.readMem8(cpu.registers.PC);
+                //console.log(`intCode = ${toHex(intCode)}`)
 
-                if (intCode === 0x80) {
-                    // Syscall
-                    // TODO: gérer le dispatch des Syscall vers le code assembleur
-                    // voir "SYSCALLS TABLE" dans le fichier memory_map.ts
-                    const syscallsTablePointer = MEMORY_MAP.SYSCALLS_TABLE_START;
-                    const syscallTablePointer = syscallsTablePointer + intCode * MEMORY_MAP.SYSCALLS_TABLE_ENTRY_SIZE;
-                    const handlerAddressPointerLow = cpu.readMemory(syscallTablePointer + 3)
-                    const handlerAddressPointerHigh = cpu.readMemory(syscallTablePointer + 3)
-                    const handlerAddressPointer = <u8>(handlerAddressPointerLow + 256 * handlerAddressPointerHigh);
-                    const handlerAddress = cpu.readMemory(handlerAddressPointer);
+                const interruptsTablePointer = MEMORY_MAP.INTERRUPTS_TABLE_START;
+                const interruptTablePointer = interruptsTablePointer + intCode * MEMORY_MAP.INTERRUPTS_TABLE_ENTRY_SIZE;
+                const handlerAddressLow = cpu.readMemory(interruptTablePointer + 2)
+                const handlerAddressHigh = cpu.readMemory(interruptTablePointer + 3)
+                const handlerAddress = <u16>(handlerAddressLow + 256 * handlerAddressHigh);
+                //console.log(`interruptsTablePointer = ${toHex(interruptsTablePointer, 4)}`)
+                //console.log(`interruptTablePointer = ${toHex(interruptTablePointer, 4)}`)
+                //console.log(`handlerAddressPointerLow = ${toHex(handlerAddressLow)}`)
+                //console.log(`handlerAddressPointerHigh = ${toHex(handlerAddressHigh)}`)
+                //console.log(`handlerAddress = ${toHex(handlerAddress, 4)}`)
 
-                    // Adresse de retour = PC + 2 (opcode + 1 byte)
-                    const returnAddr = cpu.registers.PC + 2;
+                // Adresse de retour = PC + 2 (opcode + 1 byte)
+                const returnAddr = cpu.registers.PC + 2;
 
-                    // PUSH l'adresse de retour sur la pile (16 bits)
+                // PUSH l'adresse de retour sur la pile (16 bits)
 
-                    // PUSH high byte
-                    cpu.pushValue(<u8>(returnAddr >> 8) & 0xFF)
+                // PUSH high byte
+                cpu.pushValue(<u8>(returnAddr >> 8) & 0xFF)
 
-                    // PUSH low byte
-                    cpu.pushValue(<u8>(returnAddr & 0xFF));
+                // PUSH low byte
+                cpu.pushValue(<u8>(returnAddr & 0xFF));
 
-                    // Sauter
-                    cpu.registers.PC = handlerAddress;
-                    return;
-                }
+                // Sauter
+                cpu.registers.PC = handlerAddress;
 
-                // TODO: gérer plusieurs code d'interruption
-
-                cpu.registers.PC += 2;
+                //cpu.registers.PC += 2;
             };
             break;
 

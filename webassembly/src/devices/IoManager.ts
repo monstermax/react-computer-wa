@@ -59,6 +59,7 @@ export class IoManager {
     public resetDevices(): void {
         for (let i=0; i<this.devices.length; i++) {
             const device = this.devices[i];
+            if (device.typeId === 0) continue; // ignore internal device => TODO
 
             if (device) {
                 jsIo.reset(i as u8);

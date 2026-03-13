@@ -229,6 +229,10 @@ run_shell:
     SKIP_HANDLE_BUTTONS:
 
 
+    mov cl, [keyboard_io_base]     ; low  byte de l'adresse de la variable keyboard_io_base
+    mov dl, [keyboard_io_base + 1] ; high byte de l'adresse de la variable keyboard_io_base
+
+
 ;    ; Calcul l'adresse pour acceder à la lecture du statut clavier
 ;    mov cl, [keyboard_io_base]     ; low  byte de l'adresse de la variable keyboard_io_base
 ;    mov dl, [keyboard_io_base + 1] ; high byte de l'adresse de la variable keyboard_io_base

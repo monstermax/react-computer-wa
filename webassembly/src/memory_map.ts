@@ -32,6 +32,22 @@ export namespace MEMORY_MAP {
         export const DEVICE_STRINGS_END: u16 = 0x05FF;
 
 
+        // INTERRUPTS TABLE
+        // Header: 1 byte (device count)
+        // Entries: N * 6 bytes each:
+        //   offset 0: syscall index (1 byte)
+        //   offset 1: type (1 byte) - currently not specified
+        //   offset 2-3: handler address (2 bytes, little-endian)
+        //   offset 4-5: pointer to name string (2 bytes, little-endian)
+        export const INTERRUPTS_TABLE_COUNT: u16 = 0x0600;
+        export const INTERRUPTS_TABLE_START: u16 = 0x0601;
+            export const INTERRUPTS_TABLE_ENTRY_SIZE: u8 = 6;
+            export const INTERRUPTS_TABLE_MAX_ENTRIES: u8 = 20;
+
+        export const INTERRUPTS_STRINGS_START: u16 = 0x0680;
+        export const INTERRUPTS_STRINGS_END: u16 = 0x06FF;
+
+
         // SYSCALLS TABLE
         // Header: 1 byte (device count)
         // Entries: N * 6 bytes each:
@@ -39,13 +55,13 @@ export namespace MEMORY_MAP {
         //   offset 1: type (1 byte) - currently not specified (syscall return type ? arguments count ? calling convention ?)
         //   offset 2-3: handler address (2 bytes, little-endian)
         //   offset 4-5: pointer to name string (2 bytes, little-endian)
-        export const SYSCALLS_TABLE_COUNT: u16 = 0x0600;
-        export const SYSCALLS_TABLE_START: u16 = 0x0601;
+        export const SYSCALLS_TABLE_COUNT: u16 = 0x0700;
+        export const SYSCALLS_TABLE_START: u16 = 0x0701;
             export const SYSCALLS_TABLE_ENTRY_SIZE: u8 = 6;
             export const SYSCALLS_TABLE_MAX_ENTRIES: u8 = 20;
 
-        export const SYSCALLS_STRINGS_START: u16 = 0x0680;
-        export const SYSCALLS_STRINGS_END: u16 = 0x06FF;
+        export const SYSCALLS_STRINGS_START: u16 = 0x0780;
+        export const SYSCALLS_STRINGS_END: u16 = 0x07FF;
 
 
         // RAM / OS (0x1000-???)

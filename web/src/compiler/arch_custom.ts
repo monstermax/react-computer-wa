@@ -23,6 +23,10 @@ const instructions: InstructionDef[] = [
     { mnemonic: 'NOP', opcode: Opcode.NOP, operands: 'NONE', size: 1 },
     { mnemonic: 'HALT', opcode: Opcode.HALT, operands: 'NONE', size: 1 },
     { mnemonic: 'HLT', opcode: Opcode.HALT, operands: 'NONE', size: 1 },
+    { mnemonic: 'INT', opcode: Opcode.INT, operands: 'IMM8', size: 2 },
+    { mnemonic: 'EI', opcode: Opcode.EI, operands: 'NONE', size: 1 },
+    { mnemonic: 'DI', opcode: Opcode.DI, operands: 'NONE', size: 1 },
+    { mnemonic: 'IRET', opcode: Opcode.IRET, operands: 'NONE', size: 1 },
     { mnemonic: 'INT3', opcode: Opcode.INT3, operands: 'NONE', size: 1 },
 
     { 

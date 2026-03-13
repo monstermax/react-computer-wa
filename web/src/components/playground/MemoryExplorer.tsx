@@ -251,7 +251,7 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                                 {/* Mobile: stacked layout */}
                                 <div className="sm:hidden space-y-1">
                                     <div className="font-mono text-[10px] text-emerald-400/70">
-                                        0x{addr.toString(16).padStart(4, '0')}
+                                        {toHex(addr, 4)}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[8px] text-zinc-600 uppercase w-6">Hex</span>
@@ -266,7 +266,7 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
                                 {/* Tablet/Desktop: grid layout */}
                                 <div className="hidden sm:grid grid-cols-[80px_1fr_auto] gap-2">
                                     <div className="font-mono text-[11px] text-emerald-400/70">
-                                        0x{addr.toString(16).padStart(4, '0')}
+                                        {toHex(addr, 4)}
                                     </div>
                                     <div>
                                         {bytesToHex(data, addr, bytesPerLine)}
@@ -288,27 +288,8 @@ export const MemoryExplorer = (props: MemoryExplorerProps) => {
 
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         <div className="space-y-1">
-                            <div className="text-[10px] text-emerald-400/60 uppercase">ROM</div>
                             <div className="flex flex-wrap gap-1">
-                                {[0x0000, 0x0200, 0x0400].map(addr => (
-                                    <button
-                                        key={addr}
-                                        onClick={() => {
-                                            goToPage(Math.floor(addr / bytesPerPage));
-                                            //setShowQuickJump(false);
-                                        }}
-                                        className="px-2 py-1 text-[10px] font-mono bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-400 hover:text-emerald-400 transition-colors"
-                                    >
-                                        {toHex(addr, 4)}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="space-y-1">
-                            <div className="text-[10px] text-emerald-400/60 uppercase">RAM</div>
-                            <div className="flex flex-wrap gap-1">
-                                {[0x0500, 0x0700, 0x1000, 0xA000, 0xC000].map(addr => (
+                                {[0x0000, 0x0500, 0x0700, 0x1000, 0xA000, 0xC000, 0xEE00].map(addr => (
                                     <button
                                         key={addr}
                                         onClick={() => {

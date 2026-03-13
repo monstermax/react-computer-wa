@@ -6,6 +6,8 @@
 .org 0x1000
 
 %include "os/v3/drivers/init_devices.asm"
+%include "os/v3/drivers/lib_interrupts.asm"
+%include "os/v3/syscalls/lib_syscalls.asm"
 %include "os/v3/shell/lib_shell.asm"
 %include "os/v3/filesystem/lib_virtual_filesystem.asm"
 
@@ -60,16 +62,6 @@ init_open_files:
 
 
 init_scheduler:
-    ; todo
-    ret
-
-
-init_interrupts:
-    ; todo
-    ret
-
-
-init_syscalls:
     ; todo
     ret
 

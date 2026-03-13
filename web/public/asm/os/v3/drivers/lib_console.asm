@@ -26,15 +26,30 @@ ret ; this is a lib. no default entrypoint defined
 
 
 init_device_console:
+    push al
+    push bl
+    push cl
+    push dl
+
+
     ; initialise le device console
     lea al, bl, [str_console]
     lea cl, dl, [console_device_idx]
     call init_device ; set and store console_device_idx value
+
+    pop dl
+    pop cl
+    pop bl
+    pop al
     ret
 
 
 
 console_clear:
+    push al
+    push el
+    push fl
+
     mov al, 0x01
     ; mov [CONSOLE_CLEAR], al
 
@@ -48,19 +63,32 @@ console_clear:
     CONSOLE_CLEAR_AFTER_CARRY:
 
     sti el, fl, al ; [e:f] = A
+
+    pop fl
+    pop el
+    pop al
     ret
 
 
 ; Register A = ASCII Char
 console_print_char:
+    push el
+    push fl
+
     mov el, [console_io_base]     ; low  byte de l'adresse de la variable console_io_base
     mov fl, [console_io_base + 1] ; high byte de l'adresse de la variable console_io_base
     sti el, fl, al ; [e:f] = A
+
+    pop fl
+    pop el
     ret
 
 
 
 console_print_string:
+    push al
+    push el
+
     CONSOLE_PRINT_STRING_LOOP:
     ; Lire caractère depuis buffer
     ldi al, cl, dl ; A = [C:D]
@@ -79,12 +107,17 @@ console_print_string:
 
     CONSOLE_PRINT_STRING_END:
 
+    pop el
+    pop al
     ret
 
 
 ; Affiche une string depuis un buffer mémoire (string max length = 256)
 ; Input: C:D = adresse du buffer, B = taille
 console_print_sized_string:
+    push al
+    push bl
+
     DEQUEUE:
     ; Lire caractère depuis buffer
     ldi al, cl, dl ; A = [C:D]
@@ -102,4 +135,6 @@ console_print_sized_string:
     jnz DEQUEUE
 
     CONSOLE_PRINT_SIZED_STRING_END:
+    pop bl
+    pop al
     ret
