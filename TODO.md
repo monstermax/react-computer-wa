@@ -14,13 +14,15 @@
 - /!\ ne pas lire le code depuis la ROM. d'abord copier la ROM dans la RAM => bootloader stage 2 qui copie le kernel en RAM ?
 
 + cpu: interrupts
+
 - io gamepad
 - io mouse
 - io 7-segments display
 - io network/socket => OK (nodejs)
 - io websocket
-- os: interrupts
-- os: syscall
+
+- os: syscall handlers
+- os: interrupts handlers
 - os: gestionnaire du root virtual system
 - os: gestionnaire de fichiers ouverts
 - os: gestionnaire de processus/threads
