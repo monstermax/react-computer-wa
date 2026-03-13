@@ -269,3 +269,35 @@ Là, on a un CPU qui calcule, mais tout seul dans son coin, il sert à rien.
 Ce qui le rend utile, c'est les périphériques : écran, clavier, réseau... Grâce à son jeu d'instructions, le CPU peut les piloter. Et c'est là que la magie opère.
 
 
+---
+
+
+idées noms chaine youtube / discord:
+- Assembly Required
+- Illegal Opcode
+- ByteForge
+- Out of Memory
+- Illegal Instruction
+- OpCode Only
+- The NOP
+- BitShift
+- 8-bit Lab
+- 8-bit Forge
+- ByteCraft
+
+- Bare Metal JS
+- Silicon in JavaScript
+- Build Your CPU
+- The Virtual Machine Lab
+- Crafting a Computer
+- From Bits to OS
+
+- 8 bits suffisent
+- Carrément 8-bit
+- Bit à Bit
+- L'Assembleur du Dimanche
+- RétroCode
+- La Guerre des Bits
+- Le Bastion 8-bit
+
+
