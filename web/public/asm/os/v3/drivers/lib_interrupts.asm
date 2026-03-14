@@ -69,6 +69,7 @@ interrupt_syscall:
     cmp al, 0x03
     jne interrupt_syscall_after_03
     call syscall_read
+    jmp interrupt_syscall_end
     interrupt_syscall_after_03:
 
 
@@ -77,10 +78,14 @@ interrupt_syscall:
     cmp al, 0x04
     jne interrupt_syscall_after_04
     call syscall_write
+    jmp interrupt_syscall_end
     interrupt_syscall_after_04:
 
 
+    ; syscall not found
+
     interrupt_syscall_end:
+
 
     ; push & restore interrupt return addr & flags
     mov el, [interrupt_handler_backup_high]  ; load high byte

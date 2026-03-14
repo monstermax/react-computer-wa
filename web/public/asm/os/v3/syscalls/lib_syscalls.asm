@@ -92,10 +92,13 @@ syscall_read:
     je syscall_read_loop
 
     call get_keyboard_char ; => OUTPUT in A (char)
-    ;cmp al, 0
-    ;je syscall_read_end
+    call set_keyboard_status ; ack
 
-    call set_keyboard_status
+    cmp al, 0
+    je syscall_read_end
+
+    cmp al, 13
+    je syscall_read_end
 
     sti cl, dl, al
 
@@ -105,6 +108,12 @@ syscall_read:
 
     syscall_read_end:
     pop el
+
+    ; push & restore syscall return addr
+    mov el, [syscall_handler_backup_high]  ; load high byte
+    push el                                ; push high byte
+    mov el, [syscall_handler_backup_low]   ; load low byte
+    push el                                ; push low byte
     ret
 
 
