@@ -449,6 +449,12 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 const intCode = cpu.readMem8(cpu.registers.PC);
                 //console.log(`intCode = ${toHex(intCode)}`)
 
+                if (intCode === 3) {
+                    cpu.registers.PC += 2;
+                    jsCpu.jsDebugger()
+                    return;
+                }
+
                 const interruptsTablePointer = MEMORY_MAP.INTERRUPTS_TABLE_START;
                 const interruptTablePointer = interruptsTablePointer + intCode * MEMORY_MAP.INTERRUPTS_TABLE_ENTRY_SIZE;
                 const handlerAddressLow = cpu.readMemory(interruptTablePointer + 2)

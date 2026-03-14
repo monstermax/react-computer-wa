@@ -27,6 +27,7 @@
  (import "env" "jsIoRead" (func $src/external_functions/jsIo.read (param i32 i32) (result i32)))
  (import "env" "jsCpuBreakpoint" (func $src/external_functions/jsCpu.breakpoint))
  (import "env" "jsCpuHalted" (func $src/external_functions/jsCpu.halted))
+ (import "env" "jsCpuDebugger" (func $src/external_functions/jsCpu.jsDebugger))
  (import "env" "console.warn" (func $~lib/bindings/dom/console.warn (param i32)))
  (import "env" "jsIoReset" (func $src/external_functions/jsIo.reset (param i32)))
  (import "env" "console.log" (func $~lib/bindings/dom/console.log (param i32)))
@@ -13410,6 +13411,45 @@
   call $src/devices/Cpu/CpuRegisters#get:PC
   call $src/devices/Cpu/Cpu#readMem8
   local.set $intCode
+  local.get $intCode
+  i32.const 3
+  i32.eq
+  if
+   local.get $cpu
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store offset=4
+   local.get $7
+   call $src/devices/Cpu/Cpu#get:registers
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store
+   local.get $7
+   local.get $cpu
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store offset=8
+   local.get $7
+   call $src/devices/Cpu/Cpu#get:registers
+   local.set $7
+   global.get $~lib/memory/__stack_pointer
+   local.get $7
+   i32.store offset=4
+   local.get $7
+   call $src/devices/Cpu/CpuRegisters#get:PC
+   i32.const 2
+   i32.add
+   call $src/devices/Cpu/CpuRegisters#set:PC
+   call $src/external_functions/jsCpu.jsDebugger
+   global.get $~lib/memory/__stack_pointer
+   i32.const 12
+   i32.add
+   global.set $~lib/memory/__stack_pointer
+   return
+  end
   i32.const 1537
   local.get $intCode
   global.get $src/memory_map/MEMORY_MAP.INTERRUPTS_TABLE_ENTRY_SIZE

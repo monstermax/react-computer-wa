@@ -98,6 +98,7 @@ export const useEmulator = (params: useEmulatorParams) => {
                     jsIoReset,
                     jsCpuHalted,
                     jsCpuBreakpoint,
+                    jsCpuDebugger,
                     //console.log is mapped on window.wasmConsoleLog
                     //console.warn is mapped on window.wasmConsoleWarn
                 },
@@ -172,6 +173,13 @@ export const useEmulator = (params: useEmulatorParams) => {
         cyclesPerSecondRef.current = 0
         addLog('CPU Breakpoint');
     };
+
+
+    const jsCpuDebugger = (): void => {
+        addLog('CPU Debugger');
+        debugger
+    };
+
 
 
     //  Init clock & tick handler

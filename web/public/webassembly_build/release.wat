@@ -18,6 +18,7 @@
  (import "env" "jsIoRead" (func $src/external_functions/jsIo.read (param i32 i32) (result i32)))
  (import "env" "jsCpuBreakpoint" (func $src/external_functions/jsCpu.breakpoint))
  (import "env" "jsCpuHalted" (func $src/external_functions/jsCpu.halted))
+ (import "env" "jsCpuDebugger" (func $src/external_functions/jsCpu.jsDebugger))
  (import "env" "console.warn" (func $~lib/bindings/dom/console.warn (param i32)))
  (import "env" "jsIoReset" (func $src/external_functions/jsIo.reset (param i32)))
  (import "env" "console.log" (func $~lib/bindings/dom/console.log (param i32)))
@@ -3415,7 +3416,7 @@
     global.get $~lib/memory/__stack_pointer
     local.get $0
     i32.store
-    block $__inlined_func$~lib/rt/itcms/__renew$1928
+    block $__inlined_func$~lib/rt/itcms/__renew$1932
      i32.const 1073741820
      local.get $3
      i32.const 1
@@ -3458,7 +3459,7 @@
       i32.store offset=16
       local.get $3
       local.set $2
-      br $__inlined_func$~lib/rt/itcms/__renew$1928
+      br $__inlined_func$~lib/rt/itcms/__renew$1932
      end
      local.get $4
      local.get $7
@@ -4207,7 +4208,7 @@
      global.get $~lib/memory/__stack_pointer
      local.get $1
      i32.store
-     block $__inlined_func$~lib/string/String#charCodeAt$1992
+     block $__inlined_func$~lib/string/String#charCodeAt$1996
       local.get $3
       local.get $1
       i32.const 20
@@ -4223,7 +4224,7 @@
        global.set $~lib/memory/__stack_pointer
        i32.const -1
        local.set $2
-       br $__inlined_func$~lib/string/String#charCodeAt$1992
+       br $__inlined_func$~lib/string/String#charCodeAt$1996
       end
       local.get $1
       local.get $3
@@ -4381,7 +4382,7 @@
       global.get $~lib/memory/__stack_pointer
       i32.const 4752
       i32.store
-      block $__inlined_func$~lib/string/String#charAt$1993
+      block $__inlined_func$~lib/string/String#charAt$1997
        local.get $2
        i32.const 16
        i32.rem_s
@@ -4398,7 +4399,7 @@
         global.set $~lib/memory/__stack_pointer
         i32.const 3776
         local.set $0
-        br $__inlined_func$~lib/string/String#charAt$1993
+        br $__inlined_func$~lib/string/String#charAt$1997
        end
        global.get $~lib/memory/__stack_pointer
        i32.const 2
@@ -9469,18 +9470,51 @@
   local.get $1
   i32.load16_u offset=6
   call $src/devices/Cpu/Cpu#readMem8
+  local.tee $1
+  i32.const 3
+  i32.eq
+  if
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.store offset=4
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=4
+   local.tee $1
+   i32.store
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.store offset=8
+   global.get $~lib/memory/__stack_pointer
+   local.get $0
+   i32.load offset=4
+   local.tee $0
+   i32.store offset=4
+   local.get $1
+   local.get $0
+   i32.load16_u offset=6
+   i32.const 2
+   i32.add
+   i32.store16 offset=6
+   call $src/external_functions/jsCpu.jsDebugger
+   global.get $~lib/memory/__stack_pointer
+   i32.const 12
+   i32.add
+   global.set $~lib/memory/__stack_pointer
+   return
+  end
+  global.get $~lib/memory/__stack_pointer
+  local.get $0
+  i32.store
+  local.get $0
+  local.get $1
   i32.const 6
   i32.mul
   i32.const 255
   i32.and
   i32.const 1537
   i32.add
-  local.set $1
-  global.get $~lib/memory/__stack_pointer
-  local.get $0
-  i32.store
-  local.get $0
-  local.get $1
+  local.tee $1
   i32.const 2
   i32.add
   call $src/devices/Cpu/Cpu#readMemory
@@ -25158,7 +25192,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterPC$1971
+   block $__inlined_func$src/index/computerGetRegisterPC$1975
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25193,7 +25227,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterPC$1971
+     br $__inlined_func$src/index/computerGetRegisterPC$1975
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25252,7 +25286,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterSP$1972
+   block $__inlined_func$src/index/computerGetRegisterSP$1976
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25287,7 +25321,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterSP$1972
+     br $__inlined_func$src/index/computerGetRegisterSP$1976
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25346,7 +25380,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterIR$1973
+   block $__inlined_func$src/index/computerGetRegisterIR$1977
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25381,7 +25415,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterIR$1973
+     br $__inlined_func$src/index/computerGetRegisterIR$1977
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25440,7 +25474,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterA$1974
+   block $__inlined_func$src/index/computerGetRegisterA$1978
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25475,7 +25509,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterA$1974
+     br $__inlined_func$src/index/computerGetRegisterA$1978
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25534,7 +25568,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterB$1975
+   block $__inlined_func$src/index/computerGetRegisterB$1979
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25569,7 +25603,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterB$1975
+     br $__inlined_func$src/index/computerGetRegisterB$1979
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25628,7 +25662,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterC$1976
+   block $__inlined_func$src/index/computerGetRegisterC$1980
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25663,7 +25697,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterC$1976
+     br $__inlined_func$src/index/computerGetRegisterC$1980
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25722,7 +25756,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterD$1977
+   block $__inlined_func$src/index/computerGetRegisterD$1981
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25757,7 +25791,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterD$1977
+     br $__inlined_func$src/index/computerGetRegisterD$1981
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25816,7 +25850,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterE$1978
+   block $__inlined_func$src/index/computerGetRegisterE$1982
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25851,7 +25885,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterE$1978
+     br $__inlined_func$src/index/computerGetRegisterE$1982
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -25910,7 +25944,7 @@
    i32.load offset=16
    local.tee $1
    i32.store
-   block $__inlined_func$src/index/computerGetRegisterF$1979
+   block $__inlined_func$src/index/computerGetRegisterF$1983
     local.get $1
     call $~lib/array/Array<src/devices/IoManager/IoDevice>#get:length
     i32.const 0
@@ -25945,7 +25979,7 @@
      i32.const 12
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetRegisterF$1979
+     br $__inlined_func$src/index/computerGetRegisterF$1983
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 12
@@ -26000,7 +26034,7 @@
    i32.load
    local.tee $0
    i32.store offset=4
-   block $__inlined_func$src/index/computerGetMemory$1980
+   block $__inlined_func$src/index/computerGetMemory$1984
     i32.const 12480
     i32.const 0
     local.get $0
@@ -26017,7 +26051,7 @@
      i32.const 8
      i32.add
      global.set $~lib/memory/__stack_pointer
-     br $__inlined_func$src/index/computerGetMemory$1980
+     br $__inlined_func$src/index/computerGetMemory$1984
     end
     global.get $~lib/memory/__stack_pointer
     i32.const 8

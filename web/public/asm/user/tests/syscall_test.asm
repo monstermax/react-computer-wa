@@ -47,7 +47,6 @@ test_read:
 
 
 test_write:
-
     ; prepare sys_write params for str_text_1
 
     lea cl, dl, [str_text_1] ; load string pointer
@@ -67,6 +66,27 @@ test_write:
 
 
     call test_read
+
+
+
+    ; prepare sys_write params for NEW_LINE
+
+    lea cl, dl, [NEW_LINE] ; load string pointer
+
+    ;call strlen ; => calculate string size => A = strlen([C:D])
+    mov al, 1
+
+    push al ; 4th param : str length
+    push dl ; 3st param : pointer to the buffer (low byte)
+    push cl ; 2nd param : pointer to the buffer (high byte)
+
+    mov al, 1 ; stdout
+    push al ; 1st param : file descriptor. not yet supported. push anything
+
+    ; sys_write call
+    mov al, sys_write
+    int 0x08
+
 
 
     ; prepare sys_write params for str_text_2

@@ -19,6 +19,10 @@ export namespace jsCpu {
     @external("env", "jsCpuBreakpoint")
     export declare function breakpoint(): void;
 
+    // @ts-ignore
+    @external("env", "jsCpuDebugger")
+    export declare function jsDebugger(): void;
+
 }
 
 export namespace jsIo {

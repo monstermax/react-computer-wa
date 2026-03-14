@@ -103,7 +103,7 @@ syscall_read:
     sti cl, dl, al
 
     inc el
-    call dec_cd
+    call inc_cd
     jmp syscall_read_loop
 
     syscall_read_end:
