@@ -21,8 +21,9 @@
 - io network/socket => OK (nodejs)
 - io websocket
 
-- os: syscall handlers
-- os: interrupts handlers
++ os: interrupts handlers
++ os: syscall handlers
+- os: gestionnaire de devices
 - os: gestionnaire du root virtual system
 - os: gestionnaire de fichiers ouverts
 - os: gestionnaire de processus/threads
