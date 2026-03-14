@@ -8,6 +8,7 @@ section .data
 
     interrupt_handler_backup_low   db 0
     interrupt_handler_backup_high  db 0
+    interrupt_handler_backup_flags db 0
 
     int_syscall     equ 8
 
@@ -36,9 +37,6 @@ init_interrupts:
     call inc_cd
     call inc_cd
 
-    debug 3, cl
-    debug 3, dl
-
     sti cl, dl, el
     call inc_cd
     sti cl, dl, fl
@@ -54,10 +52,14 @@ init_interrupts:
 
 ; code appelé par l'instruction INT du CPU. A contient l'id de syscall a appeler
 interrupt_syscall:
-    pop el
-    pop fl
-    mov [interrupt_handler_backup_low], el
-    mov [interrupt_handler_backup_high], fl
+
+    ; pop & save interrupt return addr & flags
+    pop el                                   ; pop flags
+    mov [interrupt_handler_backup_flags], el ; save flags
+    pop el                                   ; pop low byte
+    mov [interrupt_handler_backup_low], el   ; save low byte
+    pop el                                   ; pop high byte
+    mov [interrupt_handler_backup_high], el  ; save high byte
 
     ; TODO : rechercher dans la table SYSCALLS_TABLE au lieu de lister chaque syscall
 
@@ -78,10 +80,14 @@ interrupt_syscall:
     interrupt_syscall_after_04:
 
 
-
     interrupt_syscall_end:
-    mov el, [interrupt_handler_backup_low]
-    mov fl, [interrupt_handler_backup_high]
-    push fl
-    push el
+
+    ; push & restore interrupt return addr & flags
+    mov el, [interrupt_handler_backup_high]  ; load high byte
+    push el                                  ; push high byte
+    mov el, [interrupt_handler_backup_low]   ; load low byte
+    push el                                  ; push low byte
+    mov el, [interrupt_handler_backup_flags] ; load flags
+    push el                                  ; push flags
+
     iret

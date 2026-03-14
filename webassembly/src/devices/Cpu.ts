@@ -187,7 +187,7 @@ export class Cpu {
         // little endian
         const low = this.readMemory((pc + 1) as u16);
         const high = this.readMemory((pc + 2) as u16);
-        //const value = ((high << 8) | low) as u16;
+        //const value = ((high << 8) | low) as u16; // BUG
         const value = ((high * 256) + low) as u16;
         return value;
     }
@@ -460,6 +460,11 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 //console.log(`handlerAddressPointerHigh = ${toHex(handlerAddressHigh)}`)
                 //console.log(`handlerAddress = ${toHex(handlerAddress, 4)}`)
 
+                // similaire à handleInterrupt
+
+                // push flags
+                cpu.pushValue(cpu.registers.FLAGS);
+
                 // Adresse de retour = PC + 2 (opcode + 1 byte)
                 const returnAddr = cpu.registers.PC + 2;
 
@@ -483,7 +488,11 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 // POP return address
                 const pcLow = cpu.popValue();
                 const pcHigh = cpu.popValue();
-                const returnAddr = ((pcHigh << 8) | pcLow) as u16;
+                //const returnAddr = ((pcHigh << 8) | pcLow) as u16; // BUG
+                const returnAddr = ((pcHigh * 256) + pcLow) as u16;
+                //console.log(`IRET pcLow = ${toHex(pcLow, 2)}`)
+                //console.log(`IRET pcHigh = ${toHex(pcHigh, 2)}`)
+                //console.log(`IRET returnAddr = ${toHex(returnAddr, 4)}`)
 
                 // POP Flags
                 const flags = cpu.popValue();
@@ -570,7 +579,7 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 // POP high byte
                 const high = cpu.popValue();
 
-                //const retAddr = ((high << 8) | low) as u16;
+                //const retAddr = ((high << 8) | low) as u16; // BUG
                 const retAddr = ((high * 256) + low) as u16;
 
                 // Sauter à l'adresse retour

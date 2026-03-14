@@ -65,6 +65,14 @@ init_syscalls:
 
 
 syscall_read:
+
+    ; pop & save syscall return addr
+    pop el
+    mov [syscall_handler_backup_low], el
+    pop el
+    mov [syscall_handler_backup_high], el
+
+    ; read syscall_read params
     pop al ; 1st arg = file descriptor (not yet supported. read from keyboard)
     pop cl ; 2nd arg = pointer to the buffer (low byte)
     pop dl ; 2nd arg = pointer to the buffer (high byte)
@@ -101,21 +109,25 @@ syscall_read:
 
 
 syscall_write:
-    pop el
-    pop fl
-    mov [syscall_handler_backup_low], el
-    mov [syscall_handler_backup_high], fl
 
+    ; pop & save syscall return addr
+    pop el                                ; pop low byte
+    mov [syscall_handler_backup_low], el  ; save low byte
+    pop el                                ; pop high byte
+    mov [syscall_handler_backup_high], el ; save high byte
+
+    ; read syscall_write params
     pop al ; 1st arg = file descriptor (not yet supported. print to console)
     pop cl ; 2nd arg = pointer to the buffer (low byte)
     pop dl ; 2nd arg = pointer to the buffer (high byte)
     pop bl ; 3st arg = buffer length
     call console_print_sized_string
 
-    mov el, [syscall_handler_backup_low]
-    mov fl, [syscall_handler_backup_high]
-    push fl
-    push el
+    ; push & restore syscall return addr
+    mov el, [syscall_handler_backup_high]  ; load high byte
+    push el                                ; push high byte
+    mov el, [syscall_handler_backup_low]   ; load low byte
+    push el                                ; push low byte
     ret
 
 
