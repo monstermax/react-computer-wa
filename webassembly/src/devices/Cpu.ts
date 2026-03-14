@@ -460,13 +460,8 @@ function fetchInstructionActions(opcode: u8): InstructionActions {
                 const handlerAddressLow = cpu.readMemory(interruptTablePointer + 2)
                 const handlerAddressHigh = cpu.readMemory(interruptTablePointer + 3)
                 const handlerAddress = <u16>(handlerAddressLow + 256 * handlerAddressHigh);
-                //console.log(`interruptsTablePointer = ${toHex(interruptsTablePointer, 4)}`)
-                //console.log(`interruptTablePointer = ${toHex(interruptTablePointer, 4)}`)
-                //console.log(`handlerAddressPointerLow = ${toHex(handlerAddressLow)}`)
-                //console.log(`handlerAddressPointerHigh = ${toHex(handlerAddressHigh)}`)
-                //console.log(`handlerAddress = ${toHex(handlerAddress, 4)}`)
 
-                // similaire à handleInterrupt
+                // note: similaire à handleInterrupt
 
                 // push flags
                 cpu.pushValue(cpu.registers.FLAGS);
