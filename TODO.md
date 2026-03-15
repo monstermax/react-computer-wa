@@ -15,6 +15,8 @@
 
 + cpu: interrupts
 
+- prevoir un interpreteur assembleur (en plus du compilateur) ?
+
 - io gamepad
 - io mouse
 - io 7-segments display
