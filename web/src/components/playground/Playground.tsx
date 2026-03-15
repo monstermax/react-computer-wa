@@ -20,7 +20,8 @@ import { BuzzerDevice } from "../devices/buzzer";
 import { RngDevice } from "../devices/rng";
 import { RtcDevice } from "../devices/rtc";
 import { SwitchsDevice } from "../devices/switchs";
-import { SpeakerDevice } from "../devices/speaker";
+//import { SpeakerDevice } from "../devices/speaker";
+import { SpeakerDevice } from "../devices/speaker2";
 import { LcdDevice } from "../devices/lcd";
 
 import { Navbar } from "./Navbar";
@@ -60,7 +61,8 @@ const bootloaderCodeFilepath = "bootloader/bootloader_v3.asm";
 
 const osCodeFilepath = "os/os_v3.asm";
 
-const defaultCodeFilepath = "user/examples/sokoban_game.asm";
+//const defaultCodeFilepath = "user/examples/sokoban_game.asm";
+const defaultCodeFilepath = "user/tests/audio_test_monkey2.asm";
 
 
 const asmPrefixUrl = "";
@@ -70,7 +72,7 @@ const asmPrefixUrl = "";
 //  Playground Component
 // ─────────────────────────────────────────────
 export const Playground: React.FC<{ autoStart?: boolean }> = (props) => {
-    const { autoStart = false } = props;
+    const { autoStart = true } = props;
 
     // ── Clock ──
     const [clockFrequency, setClockFrequency] = useState(10 as u32);       // nb tick per second

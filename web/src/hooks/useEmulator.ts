@@ -16,6 +16,7 @@ import type { IoDevice } from "@/components/devices/IoDevice";
 //import type { InterruptTimerDevice } from "@/components/devices/interrupt_timer";
 import type { RegistersDump } from "@/components/playground/Playground";
 import type { Breakpoint } from "./useDebugger";
+import type { SpeakerDevice } from "@/components/devices/speaker2";
 
 
 declare global {
@@ -27,6 +28,8 @@ declare global {
 
 
 export type WasmExports = typeof releaseModule.__AdaptedExports;
+
+export type ComputerPointer = releaseModule.__Internref4;
 
 
 export type useEmulatorParams = {
@@ -44,7 +47,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     const [wasmExports, setWasmExports] = useState<WasmExports | null>(null);
 
     // Computer
-    const [computerPointer, setComputerPointer] = useState<releaseModule.__Internref4 | null>(null);
+    const [computerPointer, setComputerPointer] = useState<ComputerPointer | null>(null);
 
     // Clock
     const [clock] = useState(() => new Clock(clockFrequency));
@@ -162,6 +165,10 @@ export const useEmulator = (params: useEmulatorParams) => {
         setClockStatus(false)
         cyclesPerSecondRef.current = 0
         setCpuHalted(true)
+
+        const speaker = devicesManager.getDeviceByName<SpeakerDevice>('speaker');
+        if (speaker) speaker.reset();
+
         addLog('CPU halted');
     };
 
@@ -171,6 +178,10 @@ export const useEmulator = (params: useEmulatorParams) => {
         clock.stop();
         setClockStatus(false)
         cyclesPerSecondRef.current = 0
+
+        const speaker = devicesManager.getDeviceByName<SpeakerDevice>('speaker');
+        if (speaker) speaker.reset();
+
         addLog('CPU Breakpoint');
     };
 
@@ -192,12 +203,14 @@ export const useEmulator = (params: useEmulatorParams) => {
         const _handleClockTick = () => {
             if (wasmExports && computerPointer) {
                 try {
-                    // Run cycles
                     const canContinue = wasmExports.computerRunCycles(computerPointer, speedMultiplier, false);
+                    if (!canContinue) {
+                        clock.stop();
 
-                    if (!canContinue) clock.stop();
+                        const speaker = devicesManager.getDeviceByName<SpeakerDevice>('speaker');
+                        if (speaker) speaker.reset();
+                    }
 
-                    // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
                     delayer('dump-registers', dumpRegisters, 100, 200, []);
 
                 } catch (err: any) {
@@ -221,21 +234,21 @@ export const useEmulator = (params: useEmulatorParams) => {
                     throw new Error("Unreachable Error");
                 }
 
-//                try {
-//                    const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
-//
-//                    const timer: InterruptTimerDevice | null = (timerIdx === null)
-//                        ? null
-//                        : devicesManager.devicesRef.current.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
-//
-//                    if (timer) {
-//                        timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer (à chaque tick de clock)
-//                    }
-//
-//                } catch (err: any) {
-//                    wasmError(err);
-//                    throw new Error("Unreachable Error");
-//                }
+                //                try {
+                //                    const timerIdx = devicesManager.devicesMap.get('timer') ?? null;
+                //
+                //                    const timer: InterruptTimerDevice | null = (timerIdx === null)
+                //                        ? null
+                //                        : devicesManager.devicesRef.current.get(timerIdx) as InterruptTimerDevice | undefined ?? null;
+                //
+                //                    if (timer) {
+                //                        timer.write(0x03 as u8, 0 as u8) // declenche le tick du timer (à chaque tick de clock)
+                //                    }
+                //
+                //                } catch (err: any) {
+                //                    wasmError(err);
+                //                    throw new Error("Unreachable Error");
+                //                }
             }
         }
 
@@ -266,12 +279,16 @@ export const useEmulator = (params: useEmulatorParams) => {
         clock.stop();
         setClockStatus(false)
         cyclesPerSecondRef.current = 0
+
+        const speaker = devicesManager.getDeviceByName<SpeakerDevice>('speaker');
+        if (speaker) speaker.reset();
+
         addLog('Clock stopped')
     }
 
 
     // Execute N cycles
-    const runCycles = (cyclesCount=1): boolean => {
+    const runCycles = (cyclesCount = 1): boolean => {
         if (!wasmExports || computerPointer === null) return false;
 
         try {
@@ -322,7 +339,7 @@ export const useEmulator = (params: useEmulatorParams) => {
     // ═══════════════════════════════════════════
 
     //cyclesCount
-    const getCyclesCount = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4): bigint => {
+    const getCyclesCount = (wasmExports: WasmExports, computerPtr: ComputerPointer): bigint => {
         try {
             return wasmExports.computerGetCycles(computerPtr)
 
@@ -334,7 +351,7 @@ export const useEmulator = (params: useEmulatorParams) => {
 
 
     // Read all CPU Control Registers
-    const readControlRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
+    const readControlRegisters = (wasmExports: WasmExports, computerPtr: ComputerPointer) => {
         try {
             return {
                 PC: wasmExports.computerGetRegisterPC(computerPtr) as u16,
@@ -350,7 +367,7 @@ export const useEmulator = (params: useEmulatorParams) => {
 
 
     // Read all CPU Data Registers
-    const readDataRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
+    const readDataRegisters = (wasmExports: WasmExports, computerPtr: ComputerPointer) => {
         try {
             return {
                 A: wasmExports.computerGetRegisterA(computerPtr) as u8,
@@ -401,6 +418,9 @@ export const useEmulator = (params: useEmulatorParams) => {
         clock.stop();
         setClockStatus(false)
         cyclesPerSecondRef.current = 0
+
+        const speaker = devicesManager.getDeviceByName<SpeakerDevice>('speaker');
+        if (speaker) speaker.reset();
 
         // dump les registres CPU (max freq = 10x/sec. | min freq = 5x/sec)
         dumpRegisters(true)
@@ -463,7 +483,7 @@ export const useEmulator = (params: useEmulatorParams) => {
 
 export type EmulatorHook = {
     wasmExports: WasmExports | null;
-    computerPointer: releaseModule.__Internref4 | null;
+    computerPointer: ComputerPointer | null;
     clock: Clock;
     cyclesPerSecondRef: React.RefObject<number>;
     clockStatus: boolean;
@@ -475,9 +495,9 @@ export type EmulatorHook = {
     setClockStatus: (value: React.SetStateAction<boolean>) => void;
     startClock: () => void;
     stopClock: () => void;
-    getCyclesCount: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => bigint;
-    readControlRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { PC: u16, SP: u16, IR: u8 };
-    readDataRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { A: u8, B: u8, C: u8, D: u8, E: u8, F: u8 };
+    getCyclesCount: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: ComputerPointer) => bigint;
+    readControlRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: ComputerPointer) => { PC: u16, SP: u16, IR: u8 };
+    readDataRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: ComputerPointer) => { A: u8, B: u8, C: u8, D: u8, E: u8, F: u8 };
     readRam: (address: u16) => u8;
     writeRam: (address: u16, value: u8) => void;
     resetComputer: () => void;
@@ -487,7 +507,7 @@ export type EmulatorHook = {
 }
 
 
-async function loadWasmExports(imports: { env: unknown }, debug=true) {
+async function loadWasmExports(imports: { env: unknown }, debug = true) {
     const wasmFileUrl = debug
         ? "/webassembly_build/debug.wasm"
         : "/webassembly_build/release.wasm"

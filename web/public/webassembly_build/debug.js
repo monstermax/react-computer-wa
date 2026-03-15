@@ -17,20 +17,20 @@ export async function instantiate(module, imports = {}) {
         s = __liftString(s >>> 0);
         wasmConsoleLog(s);
       },
-      wasmConsoleWarn(s) {
-        // src/external_functions/console.warn(~lib/string/String) => void
-        s = __liftString(s >>> 0);
-        wasmConsoleWarn(s);
+      "console.log"(text) {
+        // ~lib/bindings/dom/console.log(~lib/string/String) => void
+        text = __liftString(text >>> 0);
+        console.log(text);
       },
       "console.warn"(text) {
         // ~lib/bindings/dom/console.warn(~lib/string/String) => void
         text = __liftString(text >>> 0);
         console.warn(text);
       },
-      "console.log"(text) {
-        // ~lib/bindings/dom/console.log(~lib/string/String) => void
-        text = __liftString(text >>> 0);
-        console.log(text);
+      wasmConsoleWarn(s) {
+        // src/external_functions/console.warn(~lib/string/String) => void
+        s = __liftString(s >>> 0);
+        wasmConsoleWarn(s);
       },
     }, Object.assign(Object.create(globalThis), imports.env || {})),
   };
@@ -38,7 +38,7 @@ export async function instantiate(module, imports = {}) {
   const memory = exports.memory || imports.env.memory;
   const adaptedExports = Object.setPrototypeOf({
     instanciateComputer() {
-      // src/index/instanciateComputer() => src/devices/Computer/Computer
+      // src/index/instanciateComputer() => src/core/Computer/Computer
       return __liftInternref(exports.instanciateComputer() >>> 0);
     },
     allocate(size) {
@@ -46,94 +46,94 @@ export async function instantiate(module, imports = {}) {
       return exports.allocate(size) >>> 0;
     },
     computerloadCodeInROM(computer, valPtr, dataLen) {
-      // src/index/computerloadCodeInROM(src/devices/Computer/Computer, usize, i32) => void
+      // src/index/computerloadCodeInROM(src/core/Computer/Computer, usize, i32) => void
       computer = __lowerInternref(computer) || __notnull();
       exports.computerloadCodeInROM(computer, valPtr, dataLen);
     },
     computerloadCodeInRAM(computer, valPtr, dataLen) {
-      // src/index/computerloadCodeInRAM(src/devices/Computer/Computer, usize, i32) => void
+      // src/index/computerloadCodeInRAM(src/core/Computer/Computer, usize, i32) => void
       computer = __lowerInternref(computer) || __notnull();
       exports.computerloadCodeInRAM(computer, valPtr, dataLen);
     },
     computerRunCycles(computer, cycles, skipBreakpoints) {
-      // src/index/computerRunCycles(src/devices/Computer/Computer, u32, bool?) => bool
+      // src/index/computerRunCycles(src/core/Computer/Computer, u32, bool?) => bool
       computer = __lowerInternref(computer) || __notnull();
       skipBreakpoints = skipBreakpoints ? 1 : 0;
       exports.__setArgumentsLength(arguments.length);
       return exports.computerRunCycles(computer, cycles, skipBreakpoints) != 0;
     },
     computerGetCycles(computer) {
-      // src/index/computerGetCycles(src/devices/Computer/Computer) => u64
+      // src/index/computerGetCycles(src/core/Computer/Computer) => u64
       computer = __lowerInternref(computer) || __notnull();
       return BigInt.asUintN(64, exports.computerGetCycles(computer));
     },
     computerGetRegisterPC(computer) {
-      // src/index/computerGetRegisterPC(src/devices/Computer/Computer) => u16
+      // src/index/computerGetRegisterPC(src/core/Computer/Computer) => u16
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterPC(computer);
     },
     computerGetRegisterSP(computer) {
-      // src/index/computerGetRegisterSP(src/devices/Computer/Computer) => u16
+      // src/index/computerGetRegisterSP(src/core/Computer/Computer) => u16
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterSP(computer);
     },
     computerGetRegisterIR(computer) {
-      // src/index/computerGetRegisterIR(src/devices/Computer/Computer) => u8
+      // src/index/computerGetRegisterIR(src/core/Computer/Computer) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterIR(computer);
     },
     computerGetRegisterA(computer) {
-      // src/index/computerGetRegisterA(src/devices/Computer/Computer) => u8
+      // src/index/computerGetRegisterA(src/core/Computer/Computer) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterA(computer);
     },
     computerGetRegisterB(computer) {
-      // src/index/computerGetRegisterB(src/devices/Computer/Computer) => u8
+      // src/index/computerGetRegisterB(src/core/Computer/Computer) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterB(computer);
     },
     computerGetRegisterC(computer) {
-      // src/index/computerGetRegisterC(src/devices/Computer/Computer) => u8
+      // src/index/computerGetRegisterC(src/core/Computer/Computer) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterC(computer);
     },
     computerGetRegisterD(computer) {
-      // src/index/computerGetRegisterD(src/devices/Computer/Computer) => u8
+      // src/index/computerGetRegisterD(src/core/Computer/Computer) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterD(computer);
     },
     computerGetRegisterE(computer) {
-      // src/index/computerGetRegisterE(src/devices/Computer/Computer) => u8
+      // src/index/computerGetRegisterE(src/core/Computer/Computer) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterE(computer);
     },
     computerGetRegisterF(computer) {
-      // src/index/computerGetRegisterF(src/devices/Computer/Computer) => u8
+      // src/index/computerGetRegisterF(src/core/Computer/Computer) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetRegisterF(computer);
     },
     computerGetMemory(computer, address) {
-      // src/index/computerGetMemory(src/devices/Computer/Computer, u16) => u8
+      // src/index/computerGetMemory(src/core/Computer/Computer, u16) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerGetMemory(computer, address);
     },
     computerSetMemory(computer, address, value) {
-      // src/index/computerSetMemory(src/devices/Computer/Computer, u16, u8) => void
+      // src/index/computerSetMemory(src/core/Computer/Computer, u16, u8) => void
       computer = __lowerInternref(computer) || __notnull();
       exports.computerSetMemory(computer, address, value);
     },
     computerAddDevice(computer, namePtr, nameLen, typeId) {
-      // src/index/computerAddDevice(src/devices/Computer/Computer, usize, i32, u8) => u8
+      // src/index/computerAddDevice(src/core/Computer/Computer, usize, i32, u8) => u8
       computer = __lowerInternref(computer) || __notnull();
       return exports.computerAddDevice(computer, namePtr, nameLen, typeId);
     },
     computerResetComputer(computer) {
-      // src/index/computerResetComputer(src/devices/Computer/Computer) => void
+      // src/index/computerResetComputer(src/core/Computer/Computer) => void
       computer = __lowerInternref(computer) || __notnull();
       exports.computerResetComputer(computer);
     },
     computerSetBreakpoints(computer, addresses, files, lines) {
-      // src/index/computerSetBreakpoints(src/devices/Computer/Computer, ~lib/array/Array<u16>, ~lib/array/Array<~lib/string/String>, ~lib/array/Array<u16>) => void
+      // src/index/computerSetBreakpoints(src/core/Computer/Computer, ~lib/array/Array<u16>, ~lib/array/Array<~lib/string/String>, ~lib/array/Array<u16>) => void
       computer = __retain(__lowerInternref(computer) || __notnull());
       addresses = __retain(__lowerArray(__setU16, 35, 1, addresses) || __notnull());
       files = __retain(__lowerArray((pointer, value) => { __setU32(pointer, __lowerString(value) || __notnull()); }, 36, 2, files) || __notnull());
@@ -145,6 +145,16 @@ export async function instantiate(module, imports = {}) {
         __release(addresses);
         __release(files);
       }
+    },
+    computerSetIrqHandler(computer, lo, hi) {
+      // src/index/computerSetIrqHandler(src/core/Computer/Computer, u8, u8) => void
+      computer = __lowerInternref(computer) || __notnull();
+      exports.computerSetIrqHandler(computer, lo, hi);
+    },
+    computerEnableIrq(computer, mask) {
+      // src/index/computerEnableIrq(src/core/Computer/Computer, u8) => void
+      computer = __lowerInternref(computer) || __notnull();
+      exports.computerEnableIrq(computer, mask);
     },
   }, exports);
   function __liftString(pointer) {

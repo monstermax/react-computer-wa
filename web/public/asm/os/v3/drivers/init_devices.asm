@@ -11,6 +11,8 @@
 %include "os/v3/drivers/lib_screen.asm"
 %include "os/v3/drivers/lib_screen_hd.asm"
 %include "os/v3/drivers/lib_switchs.asm"
+%include "os/v3/drivers/lib_rtc.asm"
+%include "os/v3/drivers/lib_speaker.asm"
 
 
 section .data
@@ -43,6 +45,8 @@ init_devices:
     call init_device_screenhd ; screenhd
     call init_device_leds ; leds
     call init_device_lcd ; lcd
+    call init_device_rtc ; rtc
+    call init_device_speaker ; speaker
 
     ; inputs
     call init_device_keyboard ; keyboard

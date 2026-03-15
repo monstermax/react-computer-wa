@@ -40,6 +40,8 @@ export type RegistersDump = {
 
 export type WasmExports = typeof releaseModule.__AdaptedExports;
 
+export type ComputerPointer = releaseModule.__Internref4;
+
 
 export type useEmulatorParams = {
     clockFrequency: u32;
@@ -56,7 +58,7 @@ export const useEmulator = async (params: useEmulatorParams) => {
     let wasmExports = null as WasmExports | null;
 
     // Computer
-    let computerPointer = null as releaseModule.__Internref4 | null;
+    let computerPointer = null as ComputerPointer | null;
 
     // Clock
     const clock = new Clock(clockFrequency);
@@ -293,7 +295,7 @@ export const useEmulator = async (params: useEmulatorParams) => {
     // ═══════════════════════════════════════════
 
     //cyclesCount
-    const getCyclesCount = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4): bigint => {
+    const getCyclesCount = (wasmExports: WasmExports, computerPtr: ComputerPointer): bigint => {
         try {
             return wasmExports.computerGetCycles(computerPtr)
 
@@ -304,7 +306,7 @@ export const useEmulator = async (params: useEmulatorParams) => {
     }
 
 
-    const readControlRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
+    const readControlRegisters = (wasmExports: WasmExports, computerPtr: ComputerPointer) => {
         try {
             return {
                 PC: wasmExports.computerGetRegisterPC(computerPtr) as u16,
@@ -319,7 +321,7 @@ export const useEmulator = async (params: useEmulatorParams) => {
     };
 
 
-    const readDataRegisters = (wasmExports: WasmExports, computerPtr: releaseModule.__Internref4) => {
+    const readDataRegisters = (wasmExports: WasmExports, computerPtr: ComputerPointer) => {
         try {
             return {
                 A: wasmExports.computerGetRegisterA(computerPtr) as u8,
@@ -431,7 +433,7 @@ export const useEmulator = async (params: useEmulatorParams) => {
 
 export type EmulatorHook = {
     wasmExports: WasmExports | null;
-    computerPointer: releaseModule.__Internref4 | null;
+    computerPointer: ComputerPointer | null;
     clock: Clock;
     cyclesPerSecondRef: number;
     clockStatus: boolean;
@@ -441,9 +443,9 @@ export type EmulatorHook = {
     runCycles: (cyclesCount?: number) => boolean;
     startClock: () => void;
     stopClock: () => void;
-    getCyclesCount: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => bigint;
-    readControlRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { PC: u16, SP: u16, IR: u8 };
-    readDataRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: releaseModule.__Internref4) => { A: u8, B: u8, C: u8, D: u8, E: u8, F: u8 };
+    getCyclesCount: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: ComputerPointer) => bigint;
+    readControlRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: ComputerPointer) => { PC: u16, SP: u16, IR: u8 };
+    readDataRegisters: (wasmExports: typeof releaseModule.__AdaptedExports, computerPtr: ComputerPointer) => { A: u8, B: u8, C: u8, D: u8, E: u8, F: u8 };
     readRam: (address: u16) => u8;
     writeRam: (address: u16, value: u8) => void;
     resetComputer: () => void;

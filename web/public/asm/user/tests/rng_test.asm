@@ -9,7 +9,7 @@
 
 
 section .data
-    rng_io_base  dw 0xF0A0
+    rng_io_base  dw 0xF0A0 ; /!\ NE PAS HARDCODER
 
 section .bss
     string_buffer resb 4

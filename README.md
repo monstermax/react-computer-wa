@@ -13,9 +13,8 @@ The CPU is an 8-bit processor with a 16-bit address bus (64KB addressable memory
 
 | Range | Usage |
 |---|---|
-| `0x0000-0x04FF` | ROM (Bootloader) |
-| `0x0500-0xEFFF` | RAM |
-| `0x0500+` | RAM — OS |
+| `0x0000-0x04FF` | RAM - Bootloader |
+| `0x1000+` | RAM — OS |
 | `0xA000+` | RAM — User programs |
 | `0xEFFF` | RAM — Stack top (grows downward) |
 | `0xF000+` | I/O device ports |

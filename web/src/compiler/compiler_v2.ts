@@ -826,7 +826,7 @@ export class CompilerV2 {
                 offset++;
 
             } else {
-                throw new Error("edit me: calculateDataSize");
+                throw new Error(`edit me: calculateDataSize (token type ${token.type} / ${token.value})`);
                 break;
             }
         }
@@ -1304,7 +1304,7 @@ export class CompilerV2 {
                     : this.parseNumber(op.value);
 
                 if (value === null) {
-                    throw new Error(`Unknown operand "${op.value}"`);
+                    throw new Error(`Unknown operand "${op.value}" in emitOperands`);
                 }
 
                 this.emitByte(value & 0xFF, op.value, refInstrToken, false);

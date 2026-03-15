@@ -144,12 +144,17 @@ export class InterruptManager {
                 break;
 
             case 0x04: // INTERRUPT_HANDLER_LOW
-                this.handlerAddr = ((this.handlerAddr & 0xFF00) | (value & 0xFF)) as u16;
+                console.log(`InterruptManager: set handler LO = ${value} (0x${value.toString(16)})`);
+                //this.handlerAddr = ((this.handlerAddr & 0xFF00) | (value & 0xFF)) as u16; // BUG
+                this.handlerAddr = ((this.handlerAddr & 0xFF00) + (value as u16)) as u16;
                 //this.emit('state', { handlerAddr: this.handlerAddr })
                 break;
 
             case 0x05: // INTERRUPT_HANDLER_HIGH
-                this.handlerAddr = ((this.handlerAddr & 0x00FF) | ((value & 0xFF) << 8)) as u16;
+                console.log(`InterruptManager: set handler HI = ${value} (0x${value.toString(16)})`);
+                //this.handlerAddr = ((this.handlerAddr & 0x00FF) | ((value & 0xFF) << 8)) as u16; // BUG
+                this.handlerAddr = ((this.handlerAddr & 0x00FF) + ((value as u16) * 256)) as u16;
+
                 //this.emit('state', { handlerAddr: this.handlerAddr })
                 break;
 

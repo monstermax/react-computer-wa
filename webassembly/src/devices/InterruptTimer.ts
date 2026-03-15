@@ -1,6 +1,6 @@
 
 import { IRQ_MAP } from "../memory_map";
-import { Computer } from "./Computer";
+import { Computer } from "../core/Computer";
 
 
 export class InterruptTimerDevice {

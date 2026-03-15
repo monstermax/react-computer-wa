@@ -29,16 +29,7 @@ init_device_lcd:
     lea al, bl, [str_lcd]
     lea cl, dl, [lcd_device_idx]
 
-    debug 1, al
-    debug 1, bl
-    debug 1, cl
-    debug 1, dl
-
     call init_device ; set and store lcd_device_idx value followed by lcd_io_base value
-
-    debug 2, [lcd_device_idx]
-    debug 2, [lcd_io_base]
-    debug 2, [lcd_io_base + 1]
 
     ret
 

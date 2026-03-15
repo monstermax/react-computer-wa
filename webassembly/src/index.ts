@@ -1,7 +1,7 @@
 
 // The entry file of your WebAssembly module.
 
-import { Computer } from "./devices/Computer";
+import { Computer } from "./core/Computer";
 import { console } from "./external_functions";
 import { MEMORY_MAP } from "./memory_map";
 
@@ -73,42 +73,32 @@ export function computerloadCodeInRAM(computer: Computer, valPtr: usize, dataLen
 export function computerRunCycles(computer: Computer, cycles: u32, skipBreakpoints: boolean=false): boolean {
     let canContinue = true;
 
-    if (computer.cpus.length > 0) {
+    for (let i = 0; i < computer.cpus.length; i++) {
+        computer.cpus[i].isOnBreakpoint = false;
+    }
+ 
+    for (let i: u32 = 0; i < cycles; i++) {
+        for (let j = 0; j < computer.cpus.length; j++) {
+            const cpu = computer.cpus[j];
+            if (!cpu) throw new Error(`Missing CPU #${j}`);
+ 
+            if (cpu.isOnBreakpoint || cpu.halted) {
+                canContinue = false;
 
-        // remove breakpoints bypass
-        for (let i = 0; i < computer.cpus.length; i++) {
-            const cpu = computer.cpus[i];
-            cpu.isOnBreakpoint = false;
-        }
-
-        // run cycles
-        for (let i: u32 = 0; i < cycles; i++) {
-            for (let i = 0; i < computer.cpus.length; i++) {
-                const cpu = computer.cpus[i];
-
-                if (!cpu) throw new Error(`Missing CPU #${i}`);
-
-                if (cpu.isOnBreakpoint || cpu.halted) {
-                    canContinue = false;
-
-                } else {
-                    cpu.runCpuCycle(skipBreakpoints);
-                }
+            } else {
+                cpu.runCpuCycle(skipBreakpoints);
             }
         }
-
-        // Run timers tick
-        const timers = computer.timers;
-        if (!timers) throw new Error(`Missing Timers`);
-
-        for (let i=0; i<timers.length; i++) {
-            const timer = timers[i];
-            if (!timer) throw new Error(`Missing Timer #${i}`);
-            timer.tick();
-        }
-
     }
-
+ 
+    const timers = computer.timers;
+    if (!timers) throw new Error(`Missing Timers`);
+    for (let i = 0; i < timers.length; i++) {
+        const timer = timers[i];
+        if (!timer) throw new Error(`Missing Timer #${i}`);
+        timer.tick();
+    }
+ 
     return canContinue;
 }
 
@@ -280,4 +270,21 @@ export function computerResetComputer(computer: Computer): void {
 
 export function computerSetBreakpoints(computer: Computer, addresses: u16[], files: string[], lines: u16[]): void {
     computer.setBreakpoints(addresses, files, lines);
+}
+
+
+
+
+// InterruptManager
+
+export function computerSetIrqHandler(computer: Computer, lo: u8, hi: u8): void {
+    const im = computer.interruptManager;
+    if (!im) return;
+    im.handlerAddr = ((hi << 8) | lo) as u16;
+}
+
+export function computerEnableIrq(computer: Computer, mask: u8): void {
+    const im = computer.interruptManager;
+    if (!im) return;
+    im.enabled = mask;
 }

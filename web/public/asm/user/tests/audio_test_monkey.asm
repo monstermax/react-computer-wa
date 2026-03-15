@@ -2,10 +2,15 @@
 ; Monkey Island Theme - Opening melody
 ; Tempo ~160 BPM, noire = 375ms
 
+
+; ne fonctionne pas correctement
+; code obsolete (ne pas hardcoder les adresses de devices. ne pas utiliser buzzer mais speaker, ...)
+
+
 %include "os/v3/arithmetic/lib_math.asm"
 
 section .data
-    buzzer_io_base  dw 0xF0B0
+    buzzer_io_base  dw 0xF0B0 ; /!\ NE PAS HARDCODER
 
     ; Note table: freq byte values (100 + val * 7.45 = Hz)
     ; G4=392Hz  → (392-100)/7.45 ≈ 39

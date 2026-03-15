@@ -7,7 +7,7 @@
 %include "os/v3/arithmetic/lib_math.asm"
 
 section .data
-    speaker_io_base  dw 0xF0E0
+    speaker_io_base  dw 0xF0E0 ; /!\ NE PAS HARDCODER
 
     ; MIDI: C4=60, D4=62, E4=64
     melody db 60, 30      ; do

@@ -7,6 +7,11 @@ import { high16, low16, toHex, U16, U8 } from "@/lib/lib_numbers";
 import type { u16, u8 } from "@/types/computer.types";
 
 
+// TODO: composant à migrer coté WASM ??
+// - oui car fait des accès à la RAM
+// - non car fait des accès au disk (external io device)
+
+
 export type DmaDeviceParams = {
     type: string;
     vendor?: string;

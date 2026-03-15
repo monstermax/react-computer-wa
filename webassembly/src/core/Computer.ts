@@ -1,9 +1,10 @@
 
 import { Cpu } from "./Cpu";
-import { InterruptTimerDevice } from "./interrupt_timer";
 import { InterruptManager } from "./InterruptManager";
 import { IoManager } from "./IoManager";
 import { MemoryBus, Ram, Rom } from "./Memory";
+import { InterruptTimerDevice } from "../devices/InterruptTimer";
+import { DEVICE_TYPE_SYSTEM } from "../memory_map";
 //import { console } from "./external_functions";
 
 
@@ -56,7 +57,12 @@ export class Computer {
     }
 
     addInterruptManager(): void {
+        const ioManager = this.ioManager;
+        if (!ioManager) throw new Error("Missing ioManager")
+
         this.interruptManager = new InterruptManager;
+
+        ioManager.addDevice('interrupt', DEVICE_TYPE_SYSTEM);
     }
 
     addTimer(): void {
@@ -64,7 +70,7 @@ export class Computer {
         if (!ioManager) throw new Error("Missing ioManager")
 
         const timer = new InterruptTimerDevice(this);
-        ioManager.addDevice('timer0', 0);
+        ioManager.addDevice('timer0', DEVICE_TYPE_SYSTEM);
 
         this.timers.push(timer);
     }

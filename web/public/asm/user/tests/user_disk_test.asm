@@ -5,7 +5,7 @@
 
 
 section .data
-    user_disk_io_base  dw 0xF050  ; TODO: reproduire/copier/importer le code du bootloader pour initialiser les devices
+    user_disk_io_base  dw 0xF050 ; /!\ NE PAS HARDCODER
 
 
 section .text

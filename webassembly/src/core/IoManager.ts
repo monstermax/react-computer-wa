@@ -57,7 +57,7 @@ export class IoManager {
 
     // Reset devices states
     public resetDevices(): void {
-        for (let i=0; i<this.devices.length; i++) {
+        for (let i = 0; i < this.devices.length; i++) {
             const device = this.devices[i];
             if (device.typeId === 0) continue; // ignore internal device => TODO
 
@@ -73,7 +73,7 @@ export class IoManager {
 
         this.stringCursor = MEMORY_MAP.DEVICE_STRINGS_START;
 
-        for (let i=0; i<this.devices.length; i++) {
+        for (let i = 0; i < this.devices.length; i++) {
             const device = this.devices[i];
 
             if (device) {
@@ -156,14 +156,39 @@ export class IoManager {
 
         const device = this.devices[ioDevice];
 
+        // ── Devices système : router vers WASM directement ──
+        if (device && device.typeId === 0) {
+            const internalDeviceValue: i16 =  this.readSystemDevice(device.name, ioPort);
+            if (internalDeviceValue !== -1) return <u8>internalDeviceValue;
+        }
 
         if (device) {
             return jsIo.read(ioDevice, ioPort)
         }
 
         console.warn(`No IO Device found. Cannot read device #${ioDevice} on port ${ioPort}`);
-
         return 0
+    }
+
+
+    private readSystemDevice(name: string, port: u8): i16 {
+        if (name === 'interrupt') {
+            const im = this.computer.interruptManager;
+            if (im) {
+                return im.read(port);
+            }
+        }
+
+        if (name === 'timer0') {
+            const timer = this.computer.timers[0];
+            if (timer) {
+                return timer.read(port);
+            }
+        }
+
+        //console.warn(`No System Device found. Cannot read device "${name}" on port ${port}`);
+        //return 0;
+        return -1
     }
 
 
@@ -177,15 +202,43 @@ export class IoManager {
 
         const device = this.devices[ioDevice];
 
+        // Devices système : router vers WASM directement (pas de jsIo)
+        if (device && device.typeId === 0) {
+            const isInternalDeviceOk = this.writeSystemDevice(device.name, ioPort, value);
+            if (isInternalDeviceOk) return;
+        }
+
         if (device) {
             jsIo.write(ioDevice, ioPort, value)
-            return
+            return;
         }
 
         console.warn(`No IO Device found. Cannot write device #${ioDevice} on port ${ioPort}`);
-
-        return
+        return;
     }
+
+
+    private writeSystemDevice(name: string, port: u8, value: u8): boolean {
+        if (name === 'interrupt') {
+            const im = this.computer.interruptManager;
+            if (im) {
+                im.write(port, value);
+                return true;
+            }
+        }
+
+        if (name === 'timer0') {
+            const timers = this.computer.timers;
+            if (timers.length > 0) {
+                timers[0].write(port, value);
+                return true;
+            }
+        }
+
+        //console.warn(`No System Device found. Cannot write device "${name}" on port ${port}`);
+        return false;
+    }
+
 }
 
 

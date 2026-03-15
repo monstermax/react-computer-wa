@@ -7,7 +7,7 @@
 
 
 section .data
-    buzzer_io_base  dw 0xF0B0
+    buzzer_io_base  dw 0xF0B0 ; /!\ NE PAS HARDCODER
 
 
 section .text

@@ -54,7 +54,7 @@ export class Cpu {
 
         // Handle Interrupts - Vérifier les interruptions AVANT de fetch
         if (interrupt && this.interruptsEnabled && !this.inInterruptHandler && interrupt.hasPendingInterrupt()) {
-            this.handleInterrupt();
+            this.handleIoInterrupt();
             //return; // On saute l'exécution normale ce cycle
         }
 
@@ -236,7 +236,7 @@ export class Cpu {
     }
 
 
-    handleInterrupt(): void {
+    handleIoInterrupt(): void {
         const interrupt = this.computer.interruptManager;
         if (!interrupt) throw new Error("Missing interrupt")
 
@@ -276,7 +276,7 @@ export class Cpu {
 
         this.registers.PC = handlerAddress;
 
-        console.log(`🔄 Interruption IRQ${irq} -> Handler ${toHex(handlerAddress)}`);
+        //console.log(`🔄 Interruption IRQ${irq} -> Handler ${toHex(handlerAddress, 4)}`);
     }
 
 
