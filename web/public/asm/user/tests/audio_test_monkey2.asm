@@ -92,6 +92,10 @@ _start:
     call init_device_speaker
     call init_device_keyboard
 
+    mov al, 100 ; delay millisecond = 1 / clockFreq => 100 pour clock à 10 ticks/sec.
+    mov bl, 0
+    call music_set_tick_ms
+
     mov al, 0
     call speaker_set_wave
     mov al, 180

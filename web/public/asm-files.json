@@ -1,6 +1,6 @@
 {
-  "generated": "2026-03-14T23:07:19.342Z",
-  "count": 50,
+  "generated": "2026-03-15T17:53:29.763Z",
+  "count": 56,
   "files": [
     "bootloader/bootloader_v2.asm",
     "bootloader/bootloader_v3.asm",
@@ -13,15 +13,19 @@
     "os/os_v3.asm",
     "os/v3/arithmetic/lib_math.asm",
     "os/v3/arithmetic/russian_multiply.asm",
+    "os/v3/audio/lib_music.asm",
     "os/v3/drivers/init_devices.asm",
     "os/v3/drivers/lib_console.asm",
     "os/v3/drivers/lib_devices.asm",
+    "os/v3/drivers/lib_interrupt.asm",
     "os/v3/drivers/lib_interrupts.asm",
     "os/v3/drivers/lib_keyboard.asm",
     "os/v3/drivers/lib_lcd.asm",
     "os/v3/drivers/lib_leds.asm",
+    "os/v3/drivers/lib_rtc.asm",
     "os/v3/drivers/lib_screen.asm",
     "os/v3/drivers/lib_screen_hd.asm",
+    "os/v3/drivers/lib_speaker.asm",
     "os/v3/drivers/lib_switchs.asm",
     "os/v3/filesystem/lib_virtual_filesystem.asm",
     "os/v3/graphics/demo_screen.asm",
@@ -46,11 +50,13 @@
     "user/examples/trex_game.asm",
     "user/tests/audio_test_lune.asm",
     "user/tests/audio_test_monkey.asm",
+    "user/tests/audio_test_monkey2.asm",
     "user/tests/buzzer_test.asm",
     "user/tests/lcd_test.asm",
     "user/tests/rng_test.asm",
     "user/tests/switchs_test.asm",
     "user/tests/syscall_test.asm",
+    "user/tests/timer_irq_test.asm",
     "user/tests/user_disk_test.asm"
   ]
 }

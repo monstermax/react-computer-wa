@@ -2,7 +2,8 @@
 ; Séquenceur musical basé sur timer IRQ
 ;
 ; API publique :
-;   play_melody   : lance la mélodie (C:D = adresse de la table)
+;   play_melody      : lance la mélodie (C:D = adresse de la table)
+;   music_set_tick_ms: A = durée en ms d'un tick (défaut 100)
 ;   stop_melody   : arrête la mélodie et coupe le son
 ;
 ; Format de la table melody :
@@ -18,6 +19,7 @@
 %include "os/v3/drivers/lib_speaker.asm"
 
 section .data
+    _tick_ms       dw 100       ; durée d'un tick en ms (à ajuster selon la clock)
     _mel_start_lo  db 0x00   ; adresse de début de la table (pour boucle)
     _mel_start_hi  db 0x00
     _mel_ptr_lo    db 0x00   ; pointeur courant
@@ -34,11 +36,26 @@ section .data
 
 section .text
     global play_melody
+    global music_set_tick_ms
     global stop_melody
     global _music_play_current_note
     global _music_timer_handler
 
 ret
+
+
+; ─────────────────────────────────────────────────
+; music_set_tick_ms
+; INPUT: A = tick ms low byte, B = tick ms high byte
+; Exemple : clock 10Hz → 100ms → mov al, 100 / mov bl, 0
+;           clock 50Hz → 20ms  → mov al, 20  / mov bl, 0
+; ─────────────────────────────────────────────────
+music_set_tick_ms:
+    lea cl, dl, [_tick_ms]
+    sti cl, dl, al
+    call inc_cd
+    sti cl, dl, bl
+    ret
 
 
 ; ─────────────────────────────────────────────────
@@ -163,7 +180,9 @@ _music_timer_handler:
 
     mov al, [_elapsed_lo]
     mov bl, [_elapsed_hi]
-    add al, 100
+    lea cl, dl, [_tick_ms]
+    ldi cl, cl, dl
+    add al, cl
     jnc _mth_nc1
     inc bl
     _mth_nc1:
