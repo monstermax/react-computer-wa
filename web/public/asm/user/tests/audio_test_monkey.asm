@@ -1,105 +1,78 @@
-; Author: claude
-; Monkey Island Theme - Opening melody
-; Tempo ~160 BPM, noire = 375ms
+; Monkey Island Theme
 
+%include "os/v3/audio/lib_music.asm"
+%include "os/v3/drivers/lib_keyboard.asm"
 
-; ne fonctionne pas correctement
-; code obsolete (ne pas hardcoder les adresses de devices. ne pas utiliser buzzer mais speaker, ...)
-
-
-%include "os/v3/arithmetic/lib_math.asm"
+KEY_ESC equ 0x1B
 
 section .data
-    buzzer_io_base  dw 0xF0B0 ; /!\ NE PAS HARDCODER
-
-    ; Note table: freq byte values (100 + val * 7.45 = Hz)
-    ; G4=392Hz  → (392-100)/7.45 ≈ 39
-    ; A4=440Hz  → (440-100)/7.45 ≈ 46
-    ; B4=494Hz  → (494-100)/7.45 ≈ 53
-    ; C5=523Hz  → (523-100)/7.45 ≈ 57
-    ; D5=587Hz  → (587-100)/7.45 ≈ 65
-    ; E5=659Hz  → (659-100)/7.45 ≈ 75
-    ; F5=698Hz  → (698-100)/7.45 ≈ 80
-    ; G5=784Hz  → (784-100)/7.45 ≈ 92
-    ; D4=294Hz  → (294-100)/7.45 ≈ 26
-    ; E4=330Hz  → (330-100)/7.45 ≈ 31
-    ; F4=349Hz  → (349-100)/7.45 ≈ 33
-    ; REST=0Hz  →  0 duration
-
-    ; melody: pairs of (freq_byte, duration_byte)
-    ; duration: value * 10ms. 19=190ms (croche), 37=370ms (noire), 56=560ms (noire pointée)
-    melody db 39, 19      ; G4 croche
-           db 57, 19      ; C5 croche
-           db 65, 37      ; D5 noire
-           db 65, 19      ; D5 croche
-           db 57, 19      ; C5 croche
-           db 65, 19      ; D5 croche
-           db 75, 19      ; E5 croche
-           db 65, 37      ; D5 noire
-           db 57, 19      ; C5 croche
-           db 65, 19      ; D5 croche
-           db 57, 37      ; C5 noire
-           db 46, 19      ; A4 croche
-           db 39, 37      ; G4 noire
-           db 0, 0        ; END marker
+    melody:
+        db 76, 200, 0   ; E5
+        db 0,  100, 0   ; REST
+        db 76, 200, 0   ; E5
+        db 79, 200, 0   ; G5
+        db 78, 200, 0   ; F#5
+        db 76, 200, 0   ; E5
+        db 74, 200, 0   ; D5
+        db 0,  100, 0   ; REST
+        db 76,  88, 2   ; E5 600ms
+        db 0,  144, 1   ; REST 400ms
+        db 74, 200, 0   ; D5
+        db 0,  200, 0   ; REST
+        db 74, 200, 0   ; D5
+        db 72, 200, 0   ; C5
+        db 71, 200, 0   ; B4
+        db 74, 200, 0   ; D5
+        db 72, 200, 0   ; C5
+        db 0,  100, 0   ; REST
+        db 72, 200, 0   ; C5
+        db 0,  100, 0   ; REST
+        db 71,  88, 2   ; B4 600ms
+        db 0,  144, 1   ; REST 400ms
+        db 76, 200, 0   ; E5
+        db 0,  200, 0   ; REST
+        db 76, 144, 1   ; E5 400ms
+        db 79, 200, 0   ; G5
+        db 78, 200, 0   ; F#5
+        db 76, 200, 0   ; E5
+        db 74, 200, 0   ; D5
+        db 0,  200, 0   ; REST
+        db 76, 232, 3   ; E5 1000ms
+        db 0,  200, 0   ; REST
+        db 78, 200, 0   ; F#5
+        db 79, 100, 0   ; G5
+        db 0,  200, 0   ; REST
+        db 79, 200, 0   ; G5
+        db 0, 0, 0
 
 
 section .text
     global _start
 
 _start:
-    mov cl, [buzzer_io_base]
-    mov dl, [buzzer_io_base + 1]
+    call init_device_interrupt
+    call init_device_timer0
+    call init_device_speaker
+    call init_device_keyboard
 
-    mov el, [melody]
-    mov fl, [melody + 1]
+    mov al, 0
+    call speaker_set_wave
+    mov al, 180
+    call speaker_set_volume
 
-play_loop:
-    ; Read freq byte
-    ldi al, el, fl
-    cmp al, 0
-    je .done
+    lea cl, dl, [melody]
+    call play_melody
 
-    ; Write freq to buzzer port 0
-    sti cl, dl, al
+    main_loop:
+        call get_keyboard_status
+        and al, 0x01
+        jz main_loop
+        call get_keyboard_char
+        cmp al, KEY_ESC
+        jz _quit
+        call set_keyboard_status
+        jmp main_loop
 
-    ; Advance to duration byte
-    call inc_ef
-
-    ; Read duration byte
-    ldi al, el, fl
-    
-    ; Advance to next note
-    call inc_ef
-
-    ; Write duration to buzzer port 1 (triggers playback)
-    push cl
-    push dl
-    call inc_cd
-    sti cl, dl, al
-    pop dl
-    pop cl
-
-    ; Wait for note to finish
-.wait:
-    push cl
-    push dl
-    call inc_cd
-    ldi al, cl, dl
-    pop dl
-    pop cl
-    cmp al, 1
-    je .wait
-
-    jmp play_loop
-
-.done:
-    ret
-
-
-inc_ef:
-    inc el
-    jnc .no_carry
-    inc fl
-    .no_carry:
+    _quit:
+    call stop_melody
     ret

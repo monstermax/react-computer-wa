@@ -1,139 +1,199 @@
 ; lib_music.asm
-; Séquenceur musical — timing basé sur RTC millis (temps réel JS)
-; Indépendant de la clock CPU.
+; Séquenceur musical basé sur timer IRQ
 ;
 ; API publique :
-;   music_sleep_ms  : C:D = durée ms → busy-wait RTC
-;   music_play_note : A = note MIDI (0=silence), C:D = durée ms
-;   music_play_rest : C:D = durée ms → silence
+;   play_melody   : lance la mélodie (C:D = adresse de la table)
+;   stop_melody   : arrête la mélodie et coupe le son
+;
+; Format de la table melody :
+;   triplets (note_midi, dur_lo, dur_hi)
+;   note=0, dur>0  → silence
+;   note=0, dur=0  → fin → boucle depuis le début
+;
+; Dépendances :
+;   lib_interrupt.asm
+;   lib_speaker.asm
 
+%include "os/v3/drivers/lib_interrupt.asm"
 %include "os/v3/drivers/lib_speaker.asm"
-%include "os/v3/drivers/lib_rtc.asm"
 
 section .data
-    _ms_start_lo  db 0x00
-    _ms_start_hi  db 0x00
-    _ms_dur_lo    db 0x00
-    _ms_dur_hi    db 0x00
+    _mel_start_lo  db 0x00   ; adresse de début de la table (pour boucle)
+    _mel_start_hi  db 0x00
+    _mel_ptr_lo    db 0x00   ; pointeur courant
+    _mel_ptr_hi    db 0x00
+    _cur_dur_lo    db 0x00
+    _cur_dur_hi    db 0x00
+    _elapsed_lo    db 0x00
+    _elapsed_hi    db 0x00
+    _bk_a          db 0x00
+    _bk_b          db 0x00
+    _bk_c          db 0x00
+    _bk_d          db 0x00
+
 
 section .text
-    global music_sleep_ms
-    global music_play_note
-    global music_play_rest
+    global play_melody
+    global stop_melody
+    global _music_play_current_note
+    global _music_timer_handler
 
 ret
 
 
-; ─────────────────────────────────────────────────────
-; music_sleep_ms
-; INPUT: C:D = durée en ms (uint16)
-; Clobbers: A, B, E, F
-; C:D restaurés en sortie
-; ─────────────────────────────────────────────────────
-music_sleep_ms:
-    mov [_ms_dur_lo], cl
-    mov [_ms_dur_hi], dl
+; ─────────────────────────────────────────────────
+; play_melody
+; INPUT: C:D = adresse de la table melody
+; Lance le séquenceur timer IRQ
+; ─────────────────────────────────────────────────
+play_melody:
+    ; Sauvegarder adresse de début (pour boucle)
+    mov [_mel_start_lo], cl
+    mov [_mel_start_hi], dl
+    mov [_mel_ptr_lo],   cl
+    mov [_mel_ptr_hi],   dl
 
-    ; Snapshot de départ
-    call _rtc_millis_16
-    mov [_ms_start_lo], al
-    mov [_ms_start_hi], bl
+    ; Réinitialiser elapsed
+    mov al, 0
+    mov [_elapsed_lo], al
+    mov [_elapsed_hi], al
 
-    music_sleep_loop:
-        call _rtc_millis_16   ; A=lo, B=hi
+    ; Configurer handler IRQ timer
+    lea cl, dl, [_music_timer_handler]
+    call interrupt_set_handler
 
-        ; elapsed = now - start (16-bit)
-        sub al, [_ms_start_lo]
-        jnc _no_borrow
-        dec bl
-        _no_borrow:
-        sub bl, [_ms_start_hi]
+    ; Activer IRQ timer
+    mov al, IRQ_TIMER
+    call interrupt_enable_irq
 
-        ; elapsed (B:A) >= durée ?
-        cmp bl, [_ms_dur_hi]
-        jg  music_sleep_done
-        jl  music_sleep_loop
-        cmp al, [_ms_dur_lo]
-        jl  music_sleep_loop
+    ; Timer period = 1 tick = 100ms
+    mov al, 1
+    call timer0_set_period
+    call timer0_enable
 
-    music_sleep_done:
-    mov cl, [_ms_dur_lo]
-    mov dl, [_ms_dur_hi]
+    ; Jouer la première note immédiatement
+    call _music_play_current_note
+
+    ei
     ret
 
 
-; ─────────────────────────────────────────────────────
-; _rtc_millis_16
-; OUTPUT: A = RTC_MILLIS_0 (lo), B = RTC_MILLIS_1 (hi)
-; Clobbers: C, D, E
-; ─────────────────────────────────────────────────────
-_rtc_millis_16:
-    mov el, 0x0F        ; RTC_MILLIS_REL_LO
-    call _rtc_port
-    ldi al, cl, dl
-
-    mov el, 0x10        ; RTC_MILLIS_REL_HI
-    call _rtc_port
-    ldi bl, cl, dl
+; ─────────────────────────────────────────────────
+; stop_melody
+; Arrête le timer et coupe le son
+; ─────────────────────────────────────────────────
+stop_melody:
+    call timer0_disable
+    mov al, 0
+    mov el, SPEAKER_PORT_GATE
+    call _speaker_port
+    sti cl, dl, al
     ret
 
 
-; ─────────────────────────────────────────────────────
-; music_play_note
-; INPUT: A = note MIDI (0=silence), C:D = durée ms
-; ─────────────────────────────────────────────────────
-music_play_note:
+; ─────────────────────────────────────────────────
+; _music_play_current_note
+; ─────────────────────────────────────────────────
+_music_play_current_note:
+    mov cl, [_mel_ptr_lo]
+    mov dl, [_mel_ptr_hi]
+
+    ldi al, cl, dl      ; note
+    call inc_cd
+    ldi bl, cl, dl      ; dur_lo
+    call inc_cd
+    ldi el, cl, dl      ; dur_hi
+    call inc_cd
+
+    ; Sauvegarder nouveau pointeur
+    mov [_mel_ptr_lo], cl
+    mov [_mel_ptr_hi], dl
+
+    ; Fin → boucler
     cmp al, 0
-    jz music_play_rest
+    jnz _mpcn_save
+    cmp bl, 0
+    jnz _mpcn_save
+    cmp el, 0
+    jnz _mpcn_save
+    mov cl, [_mel_start_lo]
+    mov dl, [_mel_start_hi]
+    mov [_mel_ptr_lo], cl
+    mov [_mel_ptr_hi], dl
+    call _music_play_current_note
+    ret
 
-    ; Écrire LENGTH_LO/HI avant le GATE
-    push al
-    push cl
-    push dl
+    _mpcn_save:
+    mov [_cur_dur_lo], bl
+    mov [_cur_dur_hi], el
+    mov bl, 0
+    mov [_elapsed_lo], bl
+    mov [_elapsed_hi], bl
 
-    mov al, cl
-    mov el, SPEAKER_PORT_LENGTH_LO
-    call _speaker_port
-    sti cl, dl, al
+    cmp al, 0
+    jz _mpcn_rest
 
-    pop al
-    push al
-    mov el, SPEAKER_PORT_LENGTH_HI
-    call _speaker_port
-    sti cl, dl, al
-
-    pop dl
-    pop cl
-    pop al
-
-    ; Écrire la note
-    push cl
-    push dl
+    ; NOTE + GATE ON
     mov el, SPEAKER_PORT_NOTE
     call _speaker_port
     sti cl, dl, al
-    pop dl
-    pop cl
-
-    ; GATE ON
-    push cl
-    push dl
     mov al, 1
     mov el, SPEAKER_PORT_GATE
     call _speaker_port
     sti cl, dl, al
-    pop dl
-    pop cl
+    ret
 
-    ; Attendre via RTC
-    call music_sleep_ms
+    _mpcn_rest:
+    ; GATE OFF
+    mov al, 0
+    mov el, SPEAKER_PORT_GATE
+    call _speaker_port
+    sti cl, dl, al
     ret
 
 
-; ─────────────────────────────────────────────────────
-; music_play_rest
-; INPUT: C:D = durée ms
-; ─────────────────────────────────────────────────────
-music_play_rest:
-    call music_sleep_ms
-    ret
+; ─────────────────────────────────────────────────
+; _music_timer_handler — IRQ toutes les 100ms
+; ─────────────────────────────────────────────────
+_music_timer_handler:
+    mov [_bk_a], al
+    mov [_bk_b], bl
+    mov [_bk_c], cl
+    mov [_bk_d], dl
+
+    mov al, [_elapsed_lo]
+    mov bl, [_elapsed_hi]
+    add al, 100
+    jnc _mth_nc1
+    inc bl
+    _mth_nc1:
+    mov [_elapsed_lo], al
+    mov [_elapsed_hi], bl
+
+    mov cl, [_cur_dur_hi]
+    cmp bl, cl
+    jg  _mth_next
+    jl  _mth_ack
+    mov cl, [_cur_dur_lo]
+    cmp al, cl
+    jl  _mth_ack
+
+    _mth_next:
+    call _music_play_current_note
+
+    _mth_ack:
+    mov cl, [interrupt_io_base]
+    mov dl, [interrupt_io_base + 1]
+    mov al, 0x02
+    add cl, al
+    jnc _mth_nc2
+    inc dl
+    _mth_nc2:
+    mov al, IRQ_TIMER
+    sti cl, dl, al
+
+    mov al, [_bk_a]
+    mov bl, [_bk_b]
+    mov cl, [_bk_c]
+    mov dl, [_bk_d]
+    iret
