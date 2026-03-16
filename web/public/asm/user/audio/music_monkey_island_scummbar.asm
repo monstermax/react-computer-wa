@@ -3,10 +3,13 @@
 
 %include "os/v3/audio/lib_music.asm"
 %include "os/v3/drivers/lib_keyboard.asm"
+%include "os/v3/drivers/lib_console.asm"
 
 KEY_ESC equ 0x1B
 
 section .data
+    STR_PRESS_ESCAPE db "Press ESCAPE to stop", 13, 0
+
     melody:
         db 67, 100, 0   ; G4
         db 0,  200, 0   ; REST
@@ -92,6 +95,7 @@ _start:
     call init_device_timer0
     call init_device_speaker
     call init_device_keyboard
+    call init_device_console
 
     mov al, 100 ; delay millisecond = 1 / clockFreq => 100 pour clock à 10 ticks/sec.
     mov bl, 0
@@ -104,6 +108,9 @@ _start:
 
     lea cl, dl, [melody]
     call play_melody
+
+    lea cl, dl, [STR_PRESS_ESCAPE]
+    call console_print_string
 
     main_loop:
         call get_keyboard_status
