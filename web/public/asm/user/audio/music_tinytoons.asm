@@ -1,6 +1,6 @@
 ; Tiny Toon Adventures Theme — thème complet
 
-%include "os/v3/drivers/lib_music.asm"
+%include "os/v3/audio/lib_music.asm"
 %include "os/v3/drivers/lib_keyboard.asm"
 
 KEY_ESC equ 0x1B
