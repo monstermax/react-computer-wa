@@ -62,7 +62,7 @@ const bootloaderCodeFilepath = "bootloader/bootloader_v3.asm";
 const osCodeFilepath = "os/os_v3.asm";
 
 //const defaultCodeFilepath = "user/examples/sokoban_game.asm";
-const defaultCodeFilepath = "user/tests/audio_test_monkey2.asm";
+const defaultCodeFilepath = "user/audio/music_monkey_island_scummbar.asm";
 
 
 const asmPrefixUrl = "";

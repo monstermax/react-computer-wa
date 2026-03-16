@@ -1,4 +1,5 @@
-; Monkey Island Theme — thème complet (88 notes)
+; Author: claude + yomax
+; Name: Monkey Island Theme — thème complet (88 notes)
 
 %include "os/v3/audio/lib_music.asm"
 %include "os/v3/drivers/lib_keyboard.asm"

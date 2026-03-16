@@ -1,4 +1,4 @@
-; Author: Bob + yomax
+; Author: openclaw + yomax
 ; Name: sokoban_game
 ; Description: Sokoban (8x8 grid, rendered on 32x32 screen)
 ; Visual scale: tiles are 3x3, walls are drawn with 2px thickness

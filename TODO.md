@@ -1,6 +1,7 @@
 
 - os: partitions / secteur d'amorcage
 - os: filesystem (mkfs) => voir https://github.com/ReturnInfinity/BareMetal-OS-legacy/blob/master/os/drivers/filesystems/bmfs.asm
+- os: filesystem (montage dossier "asm")
 - os: parser les arguments de la commande shell
 - os: separer dans 2 dossiers le code "kernel" et le code "user/userland"
 - gestion des fleches clavier (pour créer jeu dans screen ou pour créer menu menuconfig)

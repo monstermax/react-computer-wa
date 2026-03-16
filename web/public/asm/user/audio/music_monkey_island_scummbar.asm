@@ -1,4 +1,5 @@
-; Scumm Bar Theme — Monkey Island
+; Author: claude + yomax
+; Name: Scumm Bar Theme — Monkey Island
 
 %include "os/v3/audio/lib_music.asm"
 %include "os/v3/drivers/lib_keyboard.asm"
